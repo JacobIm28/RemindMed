@@ -9,7 +9,9 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.compose.setContent
 import com.example.remindmed.databinding.ActivityMainBinding
+import com.gradle.views.MedicationEntryScreen
 
 class MainActivity : AppCompatActivity() {
 
@@ -31,6 +33,9 @@ class MainActivity : AppCompatActivity() {
         binding.fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show()
+        }
+        setContent {
+            MedicationEntryScreen()
         }
     }
 
