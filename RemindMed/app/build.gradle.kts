@@ -46,4 +46,16 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+
+    // for calling REST APIs with Ktor
+    implementation("io.ktor:ktor-client-core:2.3.8")
+    implementation("io.ktor:ktor-client-android:2.3.8")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
+
+    // for deserializing strings to objects
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2")
+
+    // for parsing JSON
+    implementation("com.google.code.gson:gson:2.8.9")
 }

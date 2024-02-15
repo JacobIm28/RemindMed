@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.example.remindmed.databinding.FragmentFirstBinding
+import com.gradle.apiCalls.callListOfMedication
+import com.gradle.apiCalls.callOpenFdaSingleDrug
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
