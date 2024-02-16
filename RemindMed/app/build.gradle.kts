@@ -30,12 +30,8 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.9" // Use the version compatible with your Compose version
-    }
     buildFeatures {
         viewBinding = true
-        compose = true
     }
 }
 
@@ -62,15 +58,4 @@ dependencies {
 
     // for parsing JSON
     implementation("com.google.code.gson:gson:2.8.9")
-
-    // Jetpack Compose
-    implementation("androidx.compose.ui:ui:1.2.1") // Update to the latest Compose version
-    implementation("androidx.compose.material:material:1.2.1")
-    implementation("androidx.compose.ui:ui-tooling-preview:1.2.1")
-    debugImplementation("androidx.compose.ui:ui-tooling:1.2.1")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.2.1")
-
-    // Kotlin compiler extension for Compose
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.4.1")
-    implementation("androidx.activity:activity-compose:1.4.0")
 }
