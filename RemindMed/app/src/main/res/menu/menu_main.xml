@@ -1,7 +1,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+<<<<<<< HEAD
     tools:context="com.example.remindmed.remindmed.MainActivity">
+=======
+    tools:context="com.example.remindmed.MainActivity">
+>>>>>>> ce6a51f96359c36cfb4ebd09fd9f7ed043642665
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
