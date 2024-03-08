@@ -88,7 +88,8 @@ fun RemindMedApp() {
                 NavHost(navController, startDestination = "home") {
                     composable(Routes.HOME) { HomeScreen(navController) }
                     composable(Routes.MEDICATION_LIST) { MedicationListScreen(navController) }
-                    composable(Routes.PROFILE) { ProfileScreen(navController) }
+                    // composable(Routes.PROFILE) { ProfileScreen(navController) }
+                    composable(Routes.PROFILE) { DoctorPatientListScreen(navController) }
                     composable(Routes.USER_MEDICATION_ENTRY) { UserMedicationEntryScreen(navController) }
                 }
             }
