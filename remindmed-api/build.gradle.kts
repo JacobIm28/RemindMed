@@ -25,6 +25,18 @@ dependencies {
 	// Used to connect to our database
 	implementation("org.postgresql:postgresql:42.3.1")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+	// for calling REST APIs with Ktor
+	implementation("io.ktor:ktor-client-core:2.3.8")
+	implementation("io.ktor:ktor-client-android:2.3.8")
+
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
+
+	// for deserializing strings to objects
+	implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2")
+
+	// for parsing JSON
+	implementation("com.google.code.gson:gson:2.8.9")
 }
 
 tasks.withType<KotlinCompile> {

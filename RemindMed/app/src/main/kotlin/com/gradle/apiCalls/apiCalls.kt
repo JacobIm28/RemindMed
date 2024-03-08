@@ -34,7 +34,7 @@ fun callListOfMedication(strSoFar: String) {
     try {
         runBlocking{
             launch{
-                val response: String = client.get("https://rxnav.nlm.nih.gov/REST/approximateTerm.json?term=$strSoFar%2010%20mg&maxEntries=100").bodyAsText()
+                val response: String = client.get("https://rxnav.nlm.nih.gov/REST/approximateTerm.json?term=$strSoFar&maxEntries=100").bodyAsText()
                 val data: rxNormData= Gson().fromJson(response, rxNormData::class.java)
 
                 // will now begin looping through the candidates field and adding valid elements to our return array

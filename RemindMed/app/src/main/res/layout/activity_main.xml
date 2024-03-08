@@ -5,11 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-<<<<<<< HEAD
     tools:context="remindmed.MainActivity">
-=======
-    tools:context=".MainActivity">
->>>>>>> ce6a51f96359c36cfb4ebd09fd9f7ed043642665
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"

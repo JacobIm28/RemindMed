@@ -26,7 +26,7 @@ fun MedicationEntryScreen() {
             topBar = {
                 TopAppBar(
                     // integrate with user name later
-                    title = { Text("Enter Medication: James Gray") }
+                    title = { Text("Enter Medication: ") }
                 )
             }
         ) {

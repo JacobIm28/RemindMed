@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.remindmed"
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
@@ -13,11 +14,7 @@
         android:theme="@style/Theme.RemindMed"
         tools:targetApi="31">
         <activity
-<<<<<<< HEAD
             android:name="remindmed.MainActivity"
-=======
-            android:name=".MainActivity"
->>>>>>> ce6a51f96359c36cfb4ebd09fd9f7ed043642665
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.RemindMed">

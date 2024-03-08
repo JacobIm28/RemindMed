@@ -1,10 +1,20 @@
 package com.gradle.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+
+private val MainColors = lightColorScheme(
+    primary = text_colour,
+    secondary = button_colour,
+    tertiary = container_colour,
+)
 
 private val LightColors = lightColorScheme(
     primary = md_theme_light_primary,
@@ -70,7 +80,6 @@ private val DarkColors = darkColorScheme(
     outlineVariant = md_theme_dark_outlineVariant,
     scrim = md_theme_dark_scrim,
 )
-
 @Composable
 fun AppTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
@@ -81,7 +90,7 @@ fun AppTheme(
 //    } else {
 //        DarkColors
 //    }
-    val colors = LightColors
+    val colors = MainColors
 
     MaterialTheme(
         colorScheme = colors,
