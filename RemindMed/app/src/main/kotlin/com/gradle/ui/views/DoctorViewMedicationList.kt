@@ -38,8 +38,7 @@ fun DoctorViewMedicationListScreen(navController: NavController) {
         Scaffold(
             floatingActionButton = {
                 FloatingActionButton(
-                    // onClick = { navController.navigate(Routes.USER_MEDICATION_ENTRY)},
-                    onClick = { navController.navigate(Routes.PROFILE)},
+                    onClick = { navController.navigate(Routes.LIST)},
                     containerColor = MaterialTheme.colorScheme.primary
                 ) {
                     Icon(Icons.Default.ArrowBack, contentDescription = "Add Medication")
@@ -55,7 +54,7 @@ fun DoctorViewMedicationListScreen(navController: NavController) {
                 HeadlineLarge("Doctor Assigned")
                 LazyColumn {
                     items(doctorAssignedMedications) { medication ->
-                        MedicationItem(medication)
+                        MedicationItem(medication, navController)
                     }
                 }
                 Row (modifier = Modifier.align(Alignment.CenterHorizontally)) {
@@ -65,7 +64,7 @@ fun DoctorViewMedicationListScreen(navController: NavController) {
                 HeadlineLarge("Self Assigned")
                 LazyColumn {
                     items(selfAssignedMedications) { medication ->
-                        MedicationItem(medication)
+                        MedicationItem(medication, navController)
                     }
                 }
                 Row (modifier = Modifier.align(Alignment.CenterHorizontally)) {
