@@ -37,8 +37,6 @@ fun DoctorPatientListScreen(navController: NavController) {
         Scaffold(
             floatingActionButton = {
                 FloatingActionButton(
-                    // needs to route to the page for doctors to add patients later
-                    // onClick = { navController.navigate(Routes.USER_MEDICATION_ENTRY)},
                     onClick = {},
                     containerColor = MaterialTheme.colorScheme.primary
                 ) {
@@ -54,7 +52,7 @@ fun DoctorPatientListScreen(navController: NavController) {
 
                 LazyColumn {
                     items(patients) { patient ->
-                        PatientItem(patient)
+                        PatientItem(patient, navController)
                     }
                 }
             }
@@ -63,7 +61,7 @@ fun DoctorPatientListScreen(navController: NavController) {
 }
 
 @Composable
-fun PatientItem(patient: Patient) {
+fun PatientItem(patient: Patient, navController: NavController) {
     Card(
         modifier = Modifier.padding(6.dp),
         elevation = CardDefaults.cardElevation(
@@ -91,7 +89,8 @@ fun PatientItem(patient: Patient) {
                 Text("Gender: ${patient.age}")
             }
             Spacer(modifier = Modifier.weight(1f))
-            IconButton(onClick = { /* TODO: Handle navigate to patient details */ }) {
+            IconButton(onClick = { currName = patient.name
+                                    navController.navigate(Routes.DOCTOR_VIEW_MEDICATION_LIST)}) {
                 Icon(Icons.Default.ArrowForward, contentDescription = "Go to details")
             }
         }

@@ -91,6 +91,7 @@ fun RemindMedApp() {
                     // composable(Routes.PROFILE) { ProfileScreen(navController) }
                     composable(Routes.PROFILE) { DoctorPatientListScreen(navController) }
                     composable(Routes.USER_MEDICATION_ENTRY) { UserMedicationEntryScreen(navController) }
+                    composable(Routes.DOCTOR_VIEW_MEDICATION_LIST) {DoctorViewMedicationListScreen(navController)}
                 }
             }
         }
