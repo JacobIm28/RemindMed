@@ -58,9 +58,18 @@ fun MedicationListScreen(navController: NavController) {
                         MedicationItem(medication)
                     }
                 }
+                Spacer(modifier = (Modifier.height(16.dp)))
+
                 Row (modifier = Modifier.align(Alignment.CenterHorizontally)) {
                     ButtonSecondary(text = "See more", onClick = {}, enabled = true)
                 }
+                Spacer(modifier = (Modifier.height(16.dp)))
+
+                HorizontalDivider(
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
+                    thickness = 2.dp,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
 
                 HeadlineLarge("Self Assigned")
                 LazyColumn {
@@ -68,13 +77,16 @@ fun MedicationListScreen(navController: NavController) {
                         MedicationItem(medication)
                     }
                 }
+                Spacer(modifier = (Modifier.height(16.dp)))
                 Row (modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                    ButtonSecondary(text = "See more", onClick = {}, enabled = true)
+                    ButtonSecondary(text = "See More", onClick = {}, enabled = true)
                 }
             }
         }
     }
 }
+
+
 
 @Composable
 fun MedicationItem(medication: Medication) {
@@ -85,8 +97,8 @@ fun MedicationItem(medication: Medication) {
         ),
 
         colors = CardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+            containerColor = MaterialTheme.colorScheme.tertiary,
+            contentColor = MaterialTheme.colorScheme.primary,
             disabledContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
             disabledContentColor = MaterialTheme.colorScheme.onTertiaryContainer
         )
@@ -107,17 +119,19 @@ fun MedicationItem(medication: Medication) {
             Spacer(modifier = Modifier.width(8.dp))
             Column {
                 Text(medication.name, fontWeight = FontWeight.Bold)
-                Text("Dosage: ${medication.dosage}")
-                Text(medication.time)
-                Text(medication.instructions)
+                Text("Dosage: ${medication.dosage}", style = MaterialTheme.typography.bodyMedium)
+                Text(medication.time, style = MaterialTheme.typography.bodyMedium)
+                Text(medication.instructions, style = MaterialTheme.typography.bodyMedium)
             }
             Spacer(modifier = Modifier.weight(1f))
             IconButton(onClick = { /* TODO: Handle navigate to medication details */ }) {
-                Icon(Icons.Default.ArrowForward, contentDescription = "Go to details")
+                Icon(Icons.Default.ArrowForward, contentDescription = "Go to Details")
             }
         }
     }
 }
+
+
 
 //@Preview(showBackground = true)
 //@Composable

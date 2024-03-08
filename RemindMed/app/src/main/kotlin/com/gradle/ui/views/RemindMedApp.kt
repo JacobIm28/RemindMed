@@ -31,15 +31,15 @@ fun RemindMedApp() {
         Scaffold (
             bottomBar = {
                 BottomNavigation (
-                    backgroundColor = MaterialTheme.colorScheme.primaryContainer
+                    backgroundColor = MaterialTheme.colorScheme.tertiary
                 ) {
 
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
                     val currentDestination = navBackStackEntry?.destination
 
                     BottomNavigationItem(
-                        icon = { Icon(Icons.Rounded.Home, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer) },
-//                        label = { Text(stringResource(screen.resourceId)) },
+                        icon = { Icon(Icons.Rounded.Home, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+                        label = { Text("Home", style = MaterialTheme.typography.bodySmall) },
                         selected = currentDestination?.hierarchy?.any { it.route == Routes.HOME } == true,
                         onClick = {
                             navController.navigate(Routes.HOME) {
@@ -52,8 +52,8 @@ fun RemindMedApp() {
                         }
                     )
                     BottomNavigationItem(
-                        icon = { Icon(Icons.AutoMirrored.Rounded.List, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer) },
-//                        label = { Text(stringResource(screen.resourceId)) },
+                        icon = { Icon(Icons.AutoMirrored.Rounded.List, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+                        label = { Text("List", style = MaterialTheme.typography.bodySmall) },
                         selected = currentDestination?.hierarchy?.any { it.route == Routes.MEDICATION_LIST } == true,
                         onClick = {
                             navController.navigate(Routes.MEDICATION_LIST) {
@@ -66,8 +66,8 @@ fun RemindMedApp() {
                         }
                     )
                     BottomNavigationItem(
-                        icon = { Icon(Icons.Rounded.Person, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer) },
-//                        label = { Text(stringResource(screen.resourceId)) },
+                        icon = { Icon(Icons.Rounded.Person, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+                        label = { Text("Profile", style = MaterialTheme.typography.bodySmall) },
                         selected = currentDestination?.hierarchy?.any { it.route == Routes.PROFILE } == true,
                         onClick = {
                             navController.navigate(Routes.PROFILE) {

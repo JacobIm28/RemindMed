@@ -2,10 +2,13 @@ package com.gradle.ui.theme
 
 import android.service.autofill.OnClickAction
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Colors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.*
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 
 @Composable
 fun TitleLarge(text: String) {
@@ -13,7 +16,10 @@ fun TitleLarge(text: String) {
         Text(
             text,
             modifier = Modifier.padding(top = 13.dp, bottom = 5.dp),
-            style = MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.titleLarge.copy(
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold
+            )
         )
     }
 }
@@ -24,7 +30,10 @@ fun HeadlineLarge(text: String) {
         Text(
             text,
             modifier = Modifier.padding(top = 13.dp, bottom = 5.dp),
-            style = MaterialTheme.typography.headlineLarge
+            style = MaterialTheme.typography.headlineLarge.copy(
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold
+            )
         )
     }
 }
@@ -35,8 +44,11 @@ fun ButtonPrimary(text: String, onClick: () -> Unit, enabled: Boolean) {
         Button(
             onClick,
             colors = ButtonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
+                // primary: text
+                // secondary: button
+                // container: medication cards
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = Color.White,
                 disabledContainerColor = MaterialTheme.colorScheme.tertiary,
                 disabledContentColor = MaterialTheme.colorScheme.onTertiary
             ),
@@ -52,9 +64,10 @@ fun ButtonSecondary(text: String, onClick: () -> Unit, enabled: Boolean) {
     AppTheme {
         FilledTonalButton(
             onClick,
+            shape = MaterialTheme.shapes.medium,
             colors = ButtonColors(
                 containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                contentColor = Color.White,
                 disabledContainerColor = MaterialTheme.colorScheme.tertiary,
                 disabledContentColor = MaterialTheme.colorScheme.onTertiary
             ),
