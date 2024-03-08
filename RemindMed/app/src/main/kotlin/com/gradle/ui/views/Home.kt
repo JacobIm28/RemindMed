@@ -49,6 +49,8 @@ import com.gradle.utilities.toFormattedDateShortString
 import com.gradle.utilities.toFormattedDateString
 import com.gradle.utilities.toFormattedMonthDateString
 import com.example.remindmed.R
+import com.gradle.constants.Routes
+import com.gradle.constants.doctorView
 import com.gradle.ui.theme.AppTheme
 //import com.google.accompanist.permissions.ExperimentalPermissionsApi
 //import com.google.accompanist.permissions.isGranted
@@ -138,6 +140,10 @@ fun MedicationListHomeScreen(
 fun HomeScreen(
     navController: NavController
 ) {
+    if (doctorView) {
+        navController.navigate(Routes.LIST)
+    }
+
     var takenMedications by remember { mutableStateOf(listOf<Prescription>()) }
     var notTakenMedications by remember { mutableStateOf(listOf<Prescription>()) }
 

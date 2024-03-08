@@ -6,5 +6,8 @@ object Routes {
     val PROFILE = "profile"
     val USER_MEDICATION_ENTRY = "user-medication-entry"
     val DOCTOR_VIEW_MEDICATION_LIST = "doctor-view-medication"
+    val LIST = "list"
+    val MEDICATION_INFO = "medication-info"
+    val ADD_PATIENT = "add-patient"
 }
 

@@ -55,7 +55,7 @@ fun MedicationListScreen(navController: NavController) {
                 HeadlineLarge("Doctor Assigned")
                 LazyColumn {
                     items(doctorAssignedMedications) { medication ->
-                        MedicationItem(medication)
+                        MedicationItem(medication, navController);
                     }
                 }
                 Spacer(modifier = (Modifier.height(16.dp)))
@@ -74,7 +74,7 @@ fun MedicationListScreen(navController: NavController) {
                 HeadlineLarge("Self Assigned")
                 LazyColumn {
                     items(selfAssignedMedications) { medication ->
-                        MedicationItem(medication)
+                        MedicationItem(medication, navController)
                     }
                 }
                 Spacer(modifier = (Modifier.height(16.dp)))
@@ -87,9 +87,9 @@ fun MedicationListScreen(navController: NavController) {
 }
 
 
-
+// TODO: Move into a components folder
 @Composable
-fun MedicationItem(medication: Medication) {
+fun MedicationItem(medication: Medication, navController: NavController) {
     Card(
         modifier = Modifier.padding(6.dp),
         elevation = CardDefaults.cardElevation(
@@ -124,7 +124,7 @@ fun MedicationItem(medication: Medication) {
                 Text(medication.instructions, style = MaterialTheme.typography.bodyMedium)
             }
             Spacer(modifier = Modifier.weight(1f))
-            IconButton(onClick = { /* TODO: Handle navigate to medication details */ }) {
+            IconButton(onClick = { navController.navigate(Routes.MEDICATION_INFO)}) {
                 Icon(Icons.Default.ArrowForward, contentDescription = "Go to Details")
             }
         }
