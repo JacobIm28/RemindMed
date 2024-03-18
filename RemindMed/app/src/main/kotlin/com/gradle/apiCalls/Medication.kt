@@ -18,7 +18,7 @@ import java.sql.Time
 @OptIn(DelicateCoroutinesApi::class)
 class Medication {
     //TODO: Change host to server's address once API deployed to some server
-    private val host: String = "http://10.19.2.96:8080"
+    private val host: String = ""
     private val nullMedication = Medication(0, "", "", Date(0), Date(0), "", "", mutableListOf<Time>())
     private val client = HttpClient(Android) {
         install(ContentNegotiation) {
