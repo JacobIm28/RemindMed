@@ -14,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import com.gradle.constants.Routes
 import com.gradle.ui.theme.AppTheme
-import com.gradle.ui.theme.ButtonPrimary
 import com.gradle.ui.theme.container_colour
 import com.gradle.apiCalls.Patient as PatientApi
 

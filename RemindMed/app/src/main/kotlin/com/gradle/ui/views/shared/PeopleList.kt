@@ -21,6 +21,7 @@ import com.gradle.constants.doctorView
 import com.gradle.ui.theme.*
 import com.gradle.models.Doctor
 import com.gradle.models.Patient
+import com.gradle.ui.components.TitleLarge
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
