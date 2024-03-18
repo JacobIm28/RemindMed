@@ -1,4 +1,4 @@
-package com.gradle.ui.views
+package com.gradle.ui.views.shared
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
@@ -27,7 +27,7 @@ data class Doctor(val name: String, val practice: String)
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun ListScreen(navController: NavController) {
+fun PeopleListScreen(navController: NavController) {
     val patients = listOf(
         Patient("Gen", 20, "Male"),
         Patient("Jacob", 20, "Male"),
@@ -143,8 +143,8 @@ fun PatientItem(patient: Patient, navController: NavController) {
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(onClick = {
-                    currName = patient.name
-                    navController.navigate(Routes.DOCTOR_VIEW_MEDICATION_LIST)
+//                    currName = patient.name
+                    navController.navigate(Routes.MEDICATION_LIST)
                 }) {
                     Icon(Icons.Default.ArrowForward, contentDescription = "Go to details")
                 }

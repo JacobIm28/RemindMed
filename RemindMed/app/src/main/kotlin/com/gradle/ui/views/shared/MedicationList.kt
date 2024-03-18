@@ -1,4 +1,4 @@
-package com.gradle.ui.views
+package com.gradle.ui.views.shared
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
@@ -16,30 +16,30 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.gradle.constants.Routes
+import com.gradle.models.Medication
 import com.gradle.ui.theme.*
 
-data class Medication(val name: String, val dosage: String, val time: String, val instructions: String)
-// have to integrate with the medication model
-
-@OptIn(ExperimentalMaterial3Api::class)
+//@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun MedicationListScreen(navController: NavController) {
     // Just some starter medications here for now as a view example
     // --> to do: need to integrate the logic and pull from database
-    val doctorAssignedMedications = listOf(
-        Medication("Reserphine", "3 ml per usage", "9:00 AM", "After Breakfast"),
-    )
+//    val doctorAssignedMedications = listOf(
+//        Medication("Reserphine", "3 ml per usage", "9:00 AM", "After Breakfast"),
+//    )
+    val doctorAssignedMedications = listOf<Medication>()
 
-    val selfAssignedMedications = listOf(
-        Medication("Vitamin D", "4g twice per day", "9:00 AM + 12:00 AM", "After Breakfast + Lunch"),
-    )
+//    val selfAssignedMedications = listOf(
+//        Medication("Vitamin D", "4g twice per day", "9:00 AM + 12:00 AM", "After Breakfast + Lunch"),
+//    )
+    val selfAssignedMedications = listOf<Medication>()
 
     AppTheme {
         Scaffold(
             floatingActionButton = {
                 FloatingActionButton(
-                    onClick = { navController.navigate(Routes.USER_MEDICATION_ENTRY)},
+                    onClick = { navController.navigate(Routes.MEDICATION_ENTRY)},
                     containerColor = MaterialTheme.colorScheme.primary
                 ) {
                     Icon(Icons.Default.Add, contentDescription = "Add Medication")
@@ -118,10 +118,10 @@ fun MedicationItem(medication: Medication, navController: NavController) {
             Icon(Icons.Outlined.Info, contentDescription = null, Modifier.size(50.dp))
             Spacer(modifier = Modifier.width(8.dp))
             Column {
-                Text(medication.name, fontWeight = FontWeight.Bold)
-                Text("Dosage: ${medication.dosage}", style = MaterialTheme.typography.bodyMedium)
-                Text(medication.time, style = MaterialTheme.typography.bodyMedium)
-                Text(medication.instructions, style = MaterialTheme.typography.bodyMedium)
+                Text("test", fontWeight = FontWeight.Bold)
+                Text("Dosage: asdasd", style = MaterialTheme.typography.bodyMedium)
+                Text("test", style = MaterialTheme.typography.bodyMedium)
+                Text("asdassdds", style = MaterialTheme.typography.bodyMedium)
             }
             Spacer(modifier = Modifier.weight(1f))
             IconButton(onClick = { navController.navigate(Routes.MEDICATION_INFO)}) {

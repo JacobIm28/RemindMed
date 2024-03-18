@@ -1,20 +1,18 @@
-package com.gradle.ui.views
+package com.gradle.ui.views.shared
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.gradle.constants.Routes
+import com.gradle.ui.components.MedicationSummaryCard
 import com.gradle.ui.theme.AppTheme
 import com.gradle.ui.theme.ButtonSecondary
 import com.gradle.ui.theme.TitleLarge

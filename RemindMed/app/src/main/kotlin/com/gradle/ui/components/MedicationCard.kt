@@ -1,4 +1,4 @@
-package com.gradle.ui.views
+package com.gradle.ui.components
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column

@@ -1,6 +1,5 @@
-package com.gradle.ui.views
+package com.gradle.ui.views.doctor
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,14 +20,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.Role.Companion.DropdownList
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.gradle.constants.Routes
 import com.gradle.ui.theme.AppTheme
 import com.gradle.ui.theme.HeadlineLarge
 import com.gradle.ui.theme.TitleLarge
+import com.gradle.ui.views.shared.Patient
+import com.gradle.ui.views.shared.PatientItem
 
 //@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,7 +55,7 @@ fun AddPatientScreen(navController: NavController) {
         Scaffold (
             floatingActionButton = {
                 FloatingActionButton(
-                    onClick = { navController.navigate(Routes.LIST) },
+                    onClick = { navController.navigate(Routes.PEOPLE_LIST) },
                     containerColor = MaterialTheme.colorScheme.primary
                 ) {
                     Icon(Icons.Default.ArrowBack, contentDescription = "Back")
