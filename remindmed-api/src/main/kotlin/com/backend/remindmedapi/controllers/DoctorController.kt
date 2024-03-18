@@ -3,16 +3,9 @@ package com.backend.remindmedapi.controllers
 import com.backend.remindmedapi.services.DatabaseService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.ComponentScan
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.ResponseBody
-import org.springframework.web.bind.annotation.RestController
 import com.backend.remindmedapi.models.Doctor
 import com.backend.remindmedapi.models.Patient
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @ComponentScan("com.backend.remindmedapi.services")
@@ -24,11 +17,14 @@ class DoctorController {
     @GetMapping("")
     @ResponseBody
     fun getDoctor(@RequestParam("id") id: Int): Doctor {
-        val result: ArrayList<ArrayList<String>>? = databaseService.query("SELECT * FROM Doctors d where d.did = $id;")
+        val result: ArrayList<ArrayList<Any>>? = databaseService.query("SELECT * FROM Doctors d where d.did = $id;")
         if (result.isNullOrEmpty()) {
             return Doctor(-1, "No doctor found", "No doctor found")
+        } else if (result[0][0] is Int && result[0][1] is String && result[0][2] is String) {
+            return Doctor(result[0][0] as Int, result[0][1] as String, result[0][2] as String)
+        } else {
+            return Doctor(-1, "No doctor found", "No doctor found")
         }
-        return Doctor(result[0][0].toInt(), result[0][1], result[0][2])
     }
 
     @GetMapping("/all")
@@ -37,19 +33,21 @@ class DoctorController {
         val result = databaseService.query("SELECT * FROM Doctors;")
         val response = ArrayList<Doctor>()
         for (doctor in result!!) {
-            response.add(Doctor(doctor[0].toInt(), doctor[1], doctor[2]))
+            if(doctor[0] is Int && doctor[1] is String && doctor[2] is String) {
+                response.add(Doctor(doctor[0] as Int, doctor[1] as String, doctor[2] as String))
+            }
         }
         return response
     }
 
-    @PostMapping("/add")
+    @PostMapping("")
     @ResponseBody
     fun addDoctor(@RequestBody doctor: Doctor): String {
         val result = databaseService.query("INSERT INTO Doctors (name, email) VALUES ('${doctor.name}', '${doctor.email}') RETURNING did;")
         return "Inserted Doctor with name: ${doctor.name} and email: ${doctor.email} with new id: ${result!![0][0]}"
     }
 
-    @PostMapping("/delete")
+    @DeleteMapping("")
     @ResponseBody
     //Option to delete is currently restricted to id, in case of dupe emails/names
     fun deleteDoctor(@RequestParam("id") id: Int): String {
@@ -57,7 +55,7 @@ class DoctorController {
         return "Deleted Doctor with id: $id"
     }
 
-    @PutMapping("/update")
+    @PutMapping("")
     @ResponseBody
     fun updateDoctor(@RequestParam("id") id: Int, @RequestParam("name", required = false, defaultValue = "") name: String,
                      @RequestParam("email", required = false, defaultValue = "") email: String): String {
@@ -83,7 +81,7 @@ class DoctorController {
         return "Inserted Patient with id: $pid to Doctor with id: $did"
     }
 
-    @PostMapping("/removePatient")
+    @DeleteMapping("/patient")
     @ResponseBody
     fun removePatient(@RequestParam("did") did: Int, @RequestParam("pid") pid: Int): String {
         val result = databaseService.query("DELETE FROM Treatment WHERE did = $did AND pid = $pid RETURNING did;")
@@ -96,7 +94,9 @@ class DoctorController {
         val result = databaseService.query("SELECT * FROM Patients p WHERE p.pid IN (SELECT t.pid FROM Treatment t WHERE t.did = $did);")
         val response = ArrayList<ArrayList<Patient>>()
         for (patient in result!!) {
-            response.add(arrayListOf(Patient(patient[0].toInt(), patient[1], patient[2])))
+          if(patient[0] is Int && patient[1] is String && patient[2] is String) {
+              response.add(arrayListOf(Patient(patient[0] as Int, patient[1] as String, patient[2] as String)))
+          }
         }
 
         return response

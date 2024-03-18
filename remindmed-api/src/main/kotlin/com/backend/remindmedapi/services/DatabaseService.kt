@@ -7,10 +7,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Import
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
-import java.sql.DriverManager
-import java.sql.Connection
-import java.sql.ResultSet
-import java.sql.ResultSetMetaData
+import org.postgresql.util.PGobject
+import java.sql.*
 
 @Service
 
@@ -31,21 +29,35 @@ class DatabaseService {
     }
   }
   //create function to take query result and prepare data in an array where each array is a row of the result.
-  fun prepareData(data: ResultSet): ArrayList<ArrayList<String>> {
-    val result = ArrayList<ArrayList<String>>()
+  fun prepareData(data: ResultSet): ArrayList<ArrayList<Any>> {
+    val result = ArrayList<ArrayList<Any>>()
     val rsmd:ResultSetMetaData = data.metaData
 
     while (data.next()) {
-      val row = ArrayList<String>()
+      val row = ArrayList<Any>()
       for (i in 1..rsmd.columnCount) {
-        row.add(data.getString(i))
+        // get type of column i
+        // if type is date, convert to date
+        // if type is time, convert to time
+        println(rsmd.getColumnTypeName(i))
+        if (rsmd.getColumnTypeName(i) == "date") {
+            row.add(data.getDate(i))
+        } else if (rsmd.getColumnTypeName(i) == "jsonb") {
+            row.add(data.getObject(i) as PGobject)
+        } else if (rsmd.getColumnTypeName(i) == "serial" || rsmd.getColumnTypeName(i) == "int4") {
+            row.add(data.getInt(i))
+        } else if (rsmd.getColumnTypeName(i) == "_time") {
+            row.add(data.getArray(i).array as Array<Time>)
+        } else {
+            row.add(data.getString(i))
+        }
       }
       result.add(row)
     }
     return result
   }
 
-  fun query(queryString: String): ArrayList<ArrayList<String>>? {
+  fun query(queryString: String): ArrayList<ArrayList<Any>>? {
     try {
       if (db == null) {
         throw Error("Database connection is null")
