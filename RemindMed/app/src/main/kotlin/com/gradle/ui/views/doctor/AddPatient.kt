@@ -23,10 +23,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.gradle.constants.Routes
+import com.gradle.models.Patient
 import com.gradle.ui.theme.AppTheme
 import com.gradle.ui.theme.HeadlineLarge
 import com.gradle.ui.theme.TitleLarge
-import com.gradle.ui.views.shared.Patient
+import com.gradle.apiCalls.Patient as PatientApi
 import com.gradle.ui.views.shared.PatientItem
 
 //@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -47,7 +48,8 @@ fun AddPatientScreen(navController: NavController) {
     var expanded by remember { mutableStateOf(false) }
 
     var email by remember{mutableStateOf("")}
-    val proxyPatient = Patient("Ben Smith", 32, "Male")
+    val proxyPatient = Patient(-1, "", "")
+    var currPatient by remember{mutableStateOf(proxyPatient)}
     var showPatient by remember{mutableStateOf(false)}
     var patientExists by remember{mutableStateOf(false)}
 
@@ -71,57 +73,18 @@ fun AddPatientScreen(navController: NavController) {
                     HeadlineLarge("Email")
                     Spacer(modifier = Modifier.height(8.dp))
                     TextField(label = {Text("Email")}, value = email, onValueChange = {email = it}, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(8.dp), singleLine = true)
-                    /*
-                    HeadlineLarge("Patient Name")
-                    Spacer(modifier = Modifier.height(8.dp))
-                    TextField(value = patientName, onValueChange = {patientName = it}, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(8.dp), singleLine = true)
-
-                    Spacer(modifier = Modifier.height(12.dp))
-                    HeadlineLarge("Birthday")
-                    Spacer(modifier = Modifier.height(8.dp))
-                    DatePicker(state = birthday)
-
-                    Spacer(modifier = Modifier.height(12.dp))
-                    HeadlineLarge("Height")
-                    Spacer(modifier = Modifier.height(8.dp))
-                    TextField(label = {Text("cm")}, value = height, onValueChange = {height = it}, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(8.dp), singleLine = true)
-
-                    Spacer(modifier = Modifier.height(12.dp))
-                    HeadlineLarge("Weight")
-                    Spacer(modifier = Modifier.height(8.dp))
-                    TextField(label = {Text("kg")}, value = weight, onValueChange = {weight = it}, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(8.dp), singleLine = true)
-
-                    Spacer(modifier = Modifier.height(12.dp))
-                    HeadlineLarge("Blood Type")
-                    Spacer(modifier = Modifier.height(8.dp))
-                    ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = {expanded = it}) {
-                        TextField(
-                            value = bloodType,
-                            onValueChange = {},
-                            readOnly = true,
-                            trailingIcon = {
-                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                            },
-                            colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                            modifier = Modifier.menuAnchor()
-                        )
-
-                        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                            possibleBloodTypes.forEach{pbt ->
-                                DropdownMenuItem(text = {Text(text = pbt)}, onClick = {
-                                    bloodType = pbt
-                                    expanded = false
-                                })
-                            }
-                        }
-                    }
-                    */
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Row (modifier = Modifier.align(Alignment.CenterHorizontally)) {
                         Button(onClick = {
-                            // Where Samir will have to connect FE to BE
                             showPatient = true
+                            currPatient = PatientApi().getPatientbyEmail(email)
+                            if(currPatient.pid != -1) {
+                                patientExists = true
+                            } else {
+                                patientExists = false
+                                showPatient = false
+                            }
                         }) {
                             Text("Search for Patient")
                         }
@@ -130,8 +93,8 @@ fun AddPatientScreen(navController: NavController) {
                     Spacer(modifier = Modifier.height(16.dp))
 
                     if (showPatient && patientExists) {
-                        PatientItem(patient = proxyPatient, navController = navController)
-                    } else if (showPatient && !patientExists) {
+                        PatientItem(patient = currPatient, navController = navController)
+                    } else if (!showPatient && !patientExists) {
                         HeadlineLarge("Unfortunately this patient does not exist")
                     }
 

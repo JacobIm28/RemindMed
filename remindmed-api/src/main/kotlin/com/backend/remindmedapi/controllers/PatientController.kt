@@ -1,17 +1,17 @@
 package com.backend.remindmedapi.controllers
 
+import com.backend.remindmedapi.models.Doctor
+import com.backend.remindmedapi.models.Medication
 import com.backend.remindmedapi.services.DatabaseService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.ComponentScan
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.ResponseBody
-import org.springframework.web.bind.annotation.RestController
 import com.backend.remindmedapi.models.Patient
-import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.PutMapping
+import kotlinx.serialization.json.JsonObject
+import org.postgresql.util.PGobject
+import org.springframework.web.bind.annotation.*
+import java.sql.Date
+import java.sql.Time
+import kotlin.reflect.jvm.internal.impl.load.kotlin.JvmType
 
 @RestController
 @ComponentScan("com.backend.remindmedapi.services")
@@ -22,39 +22,57 @@ class PatientController {
     lateinit var databaseService: DatabaseService
     @GetMapping("")
     @ResponseBody
-    fun getPatient(@RequestParam("id") id: Int): Patient {
-        val result: ArrayList<ArrayList<String>>? = databaseService.query("SELECT * FROM Patients p where p.pid = $id;")
+    fun getPatientById(@RequestParam("id") id: Int): Patient {
+        val result: List<List<Any>>? = databaseService.query("SELECT * FROM Patients p where p.pid = $id;")
         if(result.isNullOrEmpty()) {
             return Patient(-1, "No patient found", "No patient found")
+        } else if(result[0][0] is Int && result[0][1] is String && result[0][2] is String) {
+            return Patient(result[0][0] as Int, result[0][1] as String, result[0][2] as String)
+        } else {
+            return Patient(-1, "No patient found", "No patient found")
         }
-        return Patient(result[0][0].toInt(), result[0][1], result[0][2])
+    }
+
+    @GetMapping("/email")
+    @ResponseBody
+    fun getPatientByEmail(@RequestParam("email") email: String): Patient {
+        val result: List<List<Any>>? = databaseService.query("SELECT * FROM Patients p where p.email = '$email';")
+        if(result.isNullOrEmpty()) {
+            return Patient(-1, "No patient found", "No patient found")
+        } else if(result[0][0] is Int && result[0][1] is String && result[0][2] is String) {
+            return Patient(result[0][0] as Int, result[0][1] as String, result[0][2] as String)
+        } else {
+            return Patient(-1, "No patient found", "No patient found")
+        }
     }
 
     @GetMapping("/all")
     @ResponseBody
     //WARNING: This is a very dangerous method, as it returns all patients in the database
     //TODO: Remove this method once we have a proper authentication system in place
-    fun getAllPatients(): ArrayList<Patient> {
+    fun getAllPatients(): MutableList<Patient> {
         val result = databaseService.query("SELECT * FROM Patients;")
-        val response = ArrayList<Patient>()
+        val response = mutableListOf<Patient>()
         for (patient in result!!) {
-            response.add(Patient(patient[0].toInt(), patient[1], patient[2]))
+            if(patient[0] is Int && patient[1] is String && patient[2] is String) {
+                response.add(Patient(patient[0] as Int, patient[1] as String, patient[2] as String))
+            }
         }
         return response
     }
 
     @PostMapping("/add")
     @ResponseBody
-    fun addPatient(@RequestParam("name") name: String, @RequestParam("email") email: String): String {
-        val result = databaseService.query("INSERT INTO Patients (name, email) VALUES ('$name', '$email') RETURNING pid;")
-        return "Inserted Patient with name: $name and email: $email with new id: ${result!![0][0]}"
+    fun addPatient(@RequestBody patient: Patient): String {
+       val result = databaseService.query("INSERT INTO Patients (name, email) VALUES ('${patient.name}', '${patient.email}') RETURNING pid;")
+        return "Inserted Patient with name: ${patient.name} and email: ${patient.email} with new id: ${result!![0][0]}"
     }
 
-    @PostMapping("/delete")
+    @DeleteMapping("/delete")
     @ResponseBody
     //Option to delete is currently restricted to id, in case of dupe emails/names
     fun deletePatient(@RequestParam("id") id: Int): String {
-        val result = databaseService.query("DELETE FROM Patients WHERE pid = $id RETURNING pid;")
+        databaseService.query("DELETE FROM Patients WHERE pid = $id RETURNING pid;")
         return "Deleted Patient with id: $id"
     }
 
@@ -73,31 +91,34 @@ class PatientController {
             queryStr += "email = '$email'"
         }
         queryStr += " WHERE pid = $id RETURNING pid;"
-        val result = databaseService.query(queryStr)
+        databaseService.query(queryStr)
         return "Updated Patient with id: $id"
     }
 
     @PostMapping("/medicine")
     @ResponseBody
-    fun addMedicine(@RequestParam("pid") pid: Int, @RequestParam("mid") mid: Int, @RequestParam("amount") amount: String): String {
-        val result = databaseService.query("INSERT INTO Medication (pid, mid, amount) VALUES ($pid, $mid, $amount) RETURNING pid;")
-        return "Inserted Medicine with id: $mid to Patient with id: $pid"
+    fun addMedicine(@RequestBody medication: Medication): String {
+        databaseService.query("INSERT INTO Medication (pid, medication_id, amount, start_date, end_date, name, notes, times) VALUES (${medication.pid}, ${medication.medicationId}, ${medication.amount}, " +
+                "${medication.startDate}, ${medication.endDate}, ${medication.name}, ${medication.notes}, ARRAY ${medication.times}) RETURNING pid;")
+        return "Inserted Medicine with id: ${medication.medicationId} Patient with id: ${medication.pid}"
     }
 
     @DeleteMapping("/medicine")
     @ResponseBody
     fun removeMedicine(@RequestParam("pid") pid: Int, @RequestParam("mid") mid: Int): String {
-        val result = databaseService.query("DELETE FROM Medication WHERE pid = $pid AND mid = $mid RETURNING pid;")
+        databaseService.query("DELETE FROM Medication WHERE pid = $pid AND mid = $mid RETURNING pid;")
         return "Removed Medicine with id: $mid from Patient with id: $pid"
     }
 
     @GetMapping("/medicines")
     @ResponseBody
-    fun getMedicines(@RequestParam("pid") pid: Int): ArrayList<ArrayList<Int>>? {
-        val result = databaseService.query("SELECT m.mid FROM Medication m WHERE pm.pid = $pid;")
-        val response = ArrayList<ArrayList<Int>>()
+    fun getMedicines(@RequestParam("pid") pid: Int): MutableList<Medication>? {
+        val result = databaseService.query("SELECT m.* FROM Medication m WHERE m.pid = $pid;")
+        val response = mutableListOf<Medication>()
         for (medicine in result!!) {
-            response.add(arrayListOf(medicine[0].toInt()))
+            if(medicine[0] is Int && medicine[1] is String && medicine[2] is String && medicine[3] is Date && medicine[4] is Date && medicine[5] is String && medicine[6] is String && medicine[7] is Array<*> && (medicine[7] as Array<*>).isArrayOf<Time>()) {
+                response.add((Medication(medicine[0] as Int, medicine[1] as String, medicine[2] as String, medicine[3] as Date, medicine[4] as Date, medicine[5] as String, medicine[6] as String, medicine[7] as Array<Time>)))
+            }
         }
         return response
     }

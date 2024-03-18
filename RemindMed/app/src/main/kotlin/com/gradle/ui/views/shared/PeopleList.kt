@@ -19,24 +19,21 @@ import androidx.navigation.NavController
 import com.gradle.constants.Routes
 import com.gradle.constants.doctorView
 import com.gradle.ui.theme.*
-
-// Patient object that I will have for now that will later be pulled from DB
-data class Patient(val name: String, val age: Int, val Gender: String)
-
-data class Doctor(val name: String, val practice: String)
+import com.gradle.models.Doctor
+import com.gradle.models.Patient
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun PeopleListScreen(navController: NavController) {
-    val patients = listOf(
-        Patient("Gen", 20, "Male"),
-        Patient("Jacob", 20, "Male"),
-        Patient("Samir", 20, "Male"),
-        Patient("Jason", 21, "Male"),
+    val testpatients = listOf(
+        Patient(2, "Gen", "Gen.nishiwaki"),
     )
+    println(testpatients)
+    // Temporary to test endpoint
+    val patients = testpatients
 
     val doctors = listOf(
-        Doctor("Dough Kavanagh", "Family doctor")
+        Doctor(0, "Dough Kavanagh", "dougkavanah@gmail.com")
     )
 
     AppTheme {
@@ -138,8 +135,6 @@ fun PatientItem(patient: Patient, navController: NavController) {
                 Spacer(modifier = Modifier.width(8.dp))
                 Column {
                     Text(patient.name, fontWeight = FontWeight.Bold)
-                    Text("Age: ${patient.age}")
-                    Text("Gender: ${patient.age}")
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(onClick = {
