@@ -4,9 +4,8 @@ object Routes {
     val HOME = "home"
     val MEDICATION_LIST = "medication-list"
     val PROFILE = "profile"
-    val USER_MEDICATION_ENTRY = "user-medication-entry"
-    val DOCTOR_VIEW_MEDICATION_LIST = "doctor-view-medication"
-    val LIST = "list"
+    val MEDICATION_ENTRY = "medication-entry"
+    val PEOPLE_LIST = "people-list"
     val MEDICATION_INFO = "medication-info"
     val ADD_PATIENT = "add-patient"
 }

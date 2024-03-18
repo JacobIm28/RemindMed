@@ -1,3 +1,3 @@
 package com.gradle.constants
 
-val doctorView = true
+val doctorView = false

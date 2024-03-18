@@ -1,4 +1,4 @@
-package com.gradle.ui.views
+package com.gradle.ui.views.patient
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.ui.graphics.Color
@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -51,6 +50,7 @@ import com.gradle.utilities.toFormattedMonthDateString
 import com.example.remindmed.R
 import com.gradle.constants.Routes
 import com.gradle.constants.doctorView
+import com.gradle.models.Medication
 import com.gradle.ui.theme.AppTheme
 //import com.google.accompanist.permissions.ExperimentalPermissionsApi
 //import com.google.accompanist.permissions.isGranted
@@ -141,7 +141,7 @@ fun HomeScreen(
     navController: NavController
 ) {
     if (doctorView) {
-        navController.navigate(Routes.LIST)
+        navController.navigate(Routes.PEOPLE_LIST)
     }
 
     var takenMedications by remember { mutableStateOf(listOf<Prescription>()) }

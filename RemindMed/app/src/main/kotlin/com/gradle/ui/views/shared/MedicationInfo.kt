@@ -1,4 +1,4 @@
-package com.gradle.ui.views
+package com.gradle.ui.views.shared
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column

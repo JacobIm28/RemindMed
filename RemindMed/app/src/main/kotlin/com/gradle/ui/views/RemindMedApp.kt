@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.List
 import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.List
@@ -19,11 +18,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.*
 import com.gradle.constants.Routes
 import com.gradle.ui.theme.AppTheme
 import com.gradle.constants.*
+import com.gradle.ui.views.doctor.AddPatientScreen
+import com.gradle.ui.views.patient.HomeScreen
+import com.gradle.ui.views.shared.MedicationInfoScreen
+import com.gradle.ui.views.shared.MedicationListScreen
+import com.gradle.ui.views.shared.PeopleListScreen
+import com.gradle.ui.views.shared.ProfileScreen
+import com.gradle.ui.views.shared.UserMedicationEntryScreen
 
 data class NavigationItem(
     val icon: ImageVector,
@@ -50,7 +55,7 @@ fun RemindMedApp() {
         NavigationItem(
             icon = Icons.Rounded.Person,
             label = "Doctors",
-            route = Routes.LIST
+            route = Routes.PEOPLE_LIST
         ),
         NavigationItem(
             icon = Icons.Rounded.AccountCircle,
@@ -63,7 +68,7 @@ fun RemindMedApp() {
         NavigationItem(
             icon = Icons.Rounded.Person,
             label = "Patients",
-            route = Routes.LIST,
+            route = Routes.PEOPLE_LIST,
         ),
         NavigationItem(
             icon = Icons.Rounded.AccountCircle,
@@ -111,25 +116,21 @@ fun RemindMedApp() {
             ) {
                 // TODO: Remove unused routes from the navhosts
                 if (doctorView) {
-                    NavHost(navController, startDestination = "home") {
-                        composable(Routes.LIST) { ListScreen(navController) }
-                        composable(Routes.HOME) { HomeScreen(navController) }
+                    NavHost(navController, startDestination = Routes.PEOPLE_LIST) {
+                        composable(Routes.PEOPLE_LIST) { PeopleListScreen(navController) }
                         composable(Routes.MEDICATION_LIST) { MedicationListScreen(navController) }
                         composable(Routes.PROFILE) { ProfileScreen(navController) }
-                        composable(Routes.USER_MEDICATION_ENTRY) { UserMedicationEntryScreen(navController) }
-                        composable(Routes.DOCTOR_VIEW_MEDICATION_LIST) {DoctorViewMedicationListScreen(navController)}
+                        composable(Routes.MEDICATION_ENTRY) { UserMedicationEntryScreen(navController) }
                         composable(Routes.MEDICATION_INFO) { MedicationInfoScreen(navController) }
-                        composable(Routes.ADD_PATIENT) { AddPatientScreen(navController)}
+                        composable(Routes.ADD_PATIENT) { AddPatientScreen(navController) }
                     }
                 } else {
-                    NavHost(navController, startDestination = "home") {
-                        composable(Routes.LIST) { ListScreen(navController) }
+                    NavHost(navController, startDestination = Routes.HOME) {
+                        composable(Routes.PEOPLE_LIST) { PeopleListScreen(navController) }
                         composable(Routes.HOME) { HomeScreen(navController) }
                         composable(Routes.MEDICATION_LIST) { MedicationListScreen(navController) }
                         composable(Routes.PROFILE) { ProfileScreen(navController) }
-//                      composable(Routes.PROFILE) { DoctorPatientListScreen(navController) }
-                        composable(Routes.USER_MEDICATION_ENTRY) { UserMedicationEntryScreen(navController) }
-                        composable(Routes.DOCTOR_VIEW_MEDICATION_LIST) {DoctorViewMedicationListScreen(navController)}
+                        composable(Routes.MEDICATION_ENTRY) { UserMedicationEntryScreen(navController) }
                         composable(Routes.MEDICATION_INFO) { MedicationInfoScreen(navController) }
                     }
                 }
