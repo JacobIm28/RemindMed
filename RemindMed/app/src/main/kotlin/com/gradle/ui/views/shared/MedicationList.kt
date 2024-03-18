@@ -17,6 +17,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.gradle.constants.Routes
 import com.gradle.models.Medication
+import com.gradle.ui.components.ButtonSecondary
+import com.gradle.ui.components.HeadlineLarge
+import com.gradle.ui.components.TitleLarge
 import com.gradle.ui.theme.*
 
 //@OptIn(ExperimentalMaterial3Api::class)
