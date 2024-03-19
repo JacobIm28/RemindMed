@@ -24,10 +24,12 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.gradle.constants.Routes
 import com.gradle.models.Patient
+import com.gradle.ui.components.ButtonPrimary
 import com.gradle.ui.components.HeadlineLarge
 import com.gradle.ui.components.TitleLarge
 import com.gradle.ui.theme.AppTheme
 import com.gradle.apiCalls.Patient as PatientApi
+import com.gradle.apiCalls.Doctor
 import com.gradle.ui.views.shared.PatientItem
 
 //@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -52,6 +54,10 @@ fun AddPatientScreen(navController: NavController) {
     var currPatient by remember{mutableStateOf(proxyPatient)}
     var showPatient by remember{mutableStateOf(false)}
     var patientExists by remember{mutableStateOf(false)}
+    var successfullyAdded by remember{ mutableStateOf(false) }
+    var addPatientRequested by remember{ mutableStateOf(false) }
+    // fake doctor for now as we don't have much in our db atm
+    val proxyDoctor = Doctor().getDoctor(8)
 
     AppTheme {
         Scaffold (
@@ -94,7 +100,23 @@ fun AddPatientScreen(navController: NavController) {
 
                     if (showPatient && patientExists) {
                         PatientItem(patient = currPatient, navController = navController)
-                    } else if (!showPatient && !patientExists) {
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        Row (modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                            ButtonPrimary("Add Patient", {
+                                // need to use the doctor add patient here
+                                successfullyAdded = Doctor().addPatient(proxyDoctor.did, currPatient.pid)
+                                addPatientRequested = true
+                            }, true)
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+                        if (successfullyAdded && addPatientRequested) {
+                            Text("Success!")
+                        } else if (addPatientRequested) {
+                            Text("Unfortunately could not add patient")
+                        }
+                    } else if (showPatient) {
                         HeadlineLarge("Unfortunately this patient does not exist")
                     }
 
