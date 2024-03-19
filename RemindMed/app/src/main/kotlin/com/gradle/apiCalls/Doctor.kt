@@ -20,7 +20,7 @@ import kotlinx.serialization.json.Json
 @OptIn(DelicateCoroutinesApi::class)
 class Doctor {
     //TODO: Change host to server's address once API deployed to some server
-    private val host: String = "http://10.19.2.96:8080"
+    private val host: String = "http://10.0.2.2:8080"
     private val nullDoctor = Doctor(0, "", "")
     private val client = HttpClient(Android) {
         install(ContentNegotiation) {

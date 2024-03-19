@@ -1,6 +1,8 @@
 package com.gradle.ui.views.shared
 
 import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -15,14 +17,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.NavDeepLinkBuilder
+import com.gradle.apiCalls.Patient as PatientApi
+import com.gradle.constants.NavArguments
 import com.gradle.constants.Routes
 import com.gradle.models.Medication
 import com.gradle.ui.components.ButtonSecondary
 import com.gradle.ui.components.HeadlineLarge
 import com.gradle.ui.components.TitleLarge
 import com.gradle.ui.theme.*
+import com.gradle.utilities.toFormattedDateString
+import java.sql.Date
+import java.sql.Time
 
 //@OptIn(ExperimentalMaterial3Api::class)
+@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun MedicationListScreen(navController: NavController) {
@@ -31,12 +40,13 @@ fun MedicationListScreen(navController: NavController) {
 //    val doctorAssignedMedications = listOf(
 //        Medication("Reserphine", "3 ml per usage", "9:00 AM", "After Breakfast"),
 //    )
-    val doctorAssignedMedications = listOf<Medication>()
+    val doctorAssignedMedications = PatientApi().getMedicines(1)
 
 //    val selfAssignedMedications = listOf(
 //        Medication("Vitamin D", "4g twice per day", "9:00 AM + 12:00 AM", "After Breakfast + Lunch"),
 //    )
-    val selfAssignedMedications = listOf<Medication>()
+    val selfAssignedMedications = PatientApi().getMedicines(1)
+    println(selfAssignedMedications)
 
     AppTheme {
         Scaffold(
@@ -121,13 +131,18 @@ fun MedicationItem(medication: Medication, navController: NavController) {
             Icon(Icons.Outlined.Info, contentDescription = null, Modifier.size(50.dp))
             Spacer(modifier = Modifier.width(8.dp))
             Column {
-                Text("test", fontWeight = FontWeight.Bold)
-                Text("Dosage: asdasd", style = MaterialTheme.typography.bodyMedium)
-                Text("test", style = MaterialTheme.typography.bodyMedium)
-                Text("asdassdds", style = MaterialTheme.typography.bodyMedium)
+                Text(medication.name, fontWeight = FontWeight.Bold)
+                Text(medication.amount, style = MaterialTheme.typography.bodyMedium)
+                Text("${medication.startDate.toFormattedDateString()} - ${medication.endDate.toFormattedDateString()}", style = MaterialTheme.typography.bodyMedium)
+                Text("${medication.times}", style = MaterialTheme.typography.bodyMedium)
             }
             Spacer(modifier = Modifier.weight(1f))
-            IconButton(onClick = { navController.navigate(Routes.MEDICATION_INFO)}) {
+            IconButton(onClick = { navController.navigate(
+                Routes.MEDICATION_INFO + "?${NavArguments.MEDICATION_INFO.MEDICATION_NAME}=${medication.name}&" +
+                        "${NavArguments.MEDICATION_INFO.START_DATE}=${medication.startDate}&" +
+                        "${NavArguments.MEDICATION_INFO.END_DATE}=${medication.endDate}&" +
+                        "${NavArguments.MEDICATION_INFO.DOSAGE}=${medication.amount}"
+            )}) {
                 Icon(Icons.Default.ArrowForward, contentDescription = "Go to Details")
             }
         }

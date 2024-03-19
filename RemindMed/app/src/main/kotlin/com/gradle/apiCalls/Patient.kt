@@ -28,7 +28,7 @@ import java.util.Locale
 @OptIn(DelicateCoroutinesApi::class)
 class Patient {
     //TODO: Change host to server's address once API deployed to some server
-    private val host: String = "http://192.168.50.41:8080"
+    private val host: String = "http://10.0.2.2:8080"
     private val nullPatient = Patient(0, "", "")
     private val client = HttpClient(Android) {
         install(ContentNegotiation) {
@@ -217,7 +217,7 @@ class Patient {
             if (medicines?.isEmpty() == false) {
                 medicines!!
             } else {
-                 mutableListOf<Medication>()
+                mutableListOf<Medication>()
             }
         } catch (e: Exception) {
             throw e
