@@ -36,3 +36,30 @@ fun HeadlineLarge(text: String) {
         )
     }
 }
+
+@Composable
+fun HeadLineMedium(text: String) {
+    AppTheme {
+        Text(
+            text,
+            modifier = Modifier.padding(top = 13.dp, bottom = 15.dp),
+            style = MaterialTheme.typography.headlineMedium.copy(
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold
+            )
+        )
+    }
+}
+
+@Composable
+fun BoldText(text: String) {
+    AppTheme {
+        Text(
+            text,
+            style = MaterialTheme.typography.bodyLarge.copy(
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold
+            )
+        )
+    }
+}
