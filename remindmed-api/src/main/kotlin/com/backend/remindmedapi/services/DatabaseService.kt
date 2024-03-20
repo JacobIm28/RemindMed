@@ -36,10 +36,6 @@ class DatabaseService {
     while (data.next()) {
       val row = ArrayList<Any>()
       for (i in 1..rsmd.columnCount) {
-        // get type of column i
-        // if type is date, convert to date
-        // if type is time, convert to time
-        println(rsmd.getColumnTypeName(i))
         if (rsmd.getColumnTypeName(i) == "date") {
             row.add(data.getDate(i))
         } else if (rsmd.getColumnTypeName(i) == "jsonb") {

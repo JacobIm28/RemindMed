@@ -24,12 +24,13 @@ import java.sql.Time
 import java.text.SimpleDateFormat
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import com.gradle.models.Doctor
 
 @OptIn(DelicateCoroutinesApi::class)
 class Patient {
     //TODO: Change host to server's address once API deployed to some server
     private val host: String = "http://10.0.2.2:8080"
-    private val nullPatient = Patient(0, "", "")
+    private val nullPatient = Patient("-1", "", "")
     private val client = HttpClient(Android) {
         install(ContentNegotiation) {
             json(Json {
@@ -40,7 +41,7 @@ class Patient {
             ContentType.Application.Json
         }
     }
-    fun getPatientbyId(id: Int): Patient {
+    fun getPatientbyId(id: String): Patient {
         return try {
             var patient: Patient? = null
             runBlocking {
@@ -72,6 +73,29 @@ class Patient {
                 patient as Patient
             } else {
                 nullPatient
+            }
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
+    fun getDoctors(pid: String): MutableList<Doctor> {
+        return try {
+            var doctors: MutableList<Doctor>? = null
+            runBlocking {
+                launch {
+                    println("Getting all doctors")
+                    val res = client.get("$host/patient/doctors?pid=$pid").bodyAsText()
+                    doctors = JsonParser.parseString(res).asJsonArray.map {
+                        val doc = it.asJsonObject
+                        Doctor(doc["did"].asString, doc["name"].asString, doc["email"].asString)
+                    }.toMutableList()
+                }
+            }
+            if (doctors?.isEmpty() == false) {
+                doctors as MutableList<Doctor>
+            } else {
+                mutableListOf<Doctor>()
             }
         } catch (e: Exception) {
             throw e
@@ -118,7 +142,7 @@ class Patient {
         }
     }
 
-    fun deletePatient(id: Int): Boolean {
+    fun deletePatient(id: String): Boolean {
         return try {
             var success = false
             runBlocking {
@@ -150,7 +174,7 @@ class Patient {
         }
     }
 
-    fun addMedication(pid: Int, mid: Int, amount: String): Boolean {
+    fun addMedication(pid: String, mid: String, amount: String): Boolean {
         return try {
             var success = false
             runBlocking {
@@ -165,7 +189,7 @@ class Patient {
         }
     }
 
-    fun removeMedication(pid: Int, mid: Int): Boolean {
+    fun removeMedication(pid: String, mid: String): Boolean {
         return try {
             var success = false
             runBlocking {
@@ -182,7 +206,7 @@ class Patient {
 
     @SuppressLint("SimpleDateFormat")
     @RequiresApi(Build.VERSION_CODES.O)
-    fun getMedicines(pid: Int): MutableList<Medication> {
+    fun getMedicines(pid: String): MutableList<Medication> {
         return try {
             var medicines: MutableList<Medication>? = null
             runBlocking {
@@ -202,7 +226,7 @@ class Patient {
                             times.add(time)
                         }
                         medicines?.add(Medication(
-                            med["pid"].asInt,
+                            med["pid"].asString,
                             med["medicationId"].asString,
                             med["amount"].asString,
                             startDate,

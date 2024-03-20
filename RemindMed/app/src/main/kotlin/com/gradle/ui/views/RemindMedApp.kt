@@ -82,7 +82,7 @@ fun RemindMedApp() {
         )
     )
 
-    val navBarItems = if (doctorView) doctorNavBarItems else patientNavBarItems
+    val navBarItems = if (GlobalObjects.type == "doctor") doctorNavBarItems else patientNavBarItems
 
     fun onNavigateToMedicationInfo(medicationId: String) {
         navController.navigate(Routes.MEDICATION_INFO)
@@ -123,7 +123,7 @@ fun RemindMedApp() {
                     .padding(innerPadding)
                     .padding(25.dp)
             ) {
-                if (doctorView) {
+                if (GlobalObjects.type == "doctor") {
                     NavHost(navController, startDestination = Routes.PEOPLE_LIST) {
                         composable(Routes.PEOPLE_LIST) { PeopleListScreen(navController) }
                         composable(

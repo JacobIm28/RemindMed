@@ -1,7 +1,7 @@
 package com.backend.remindmedapi.models
 
 data class Doctor(
-    val did: Int,
+    val did: String,
     val name: String,
     val email: String
 ) {

@@ -50,14 +50,14 @@ fun AddPatientScreen(navController: NavController) {
     var expanded by remember { mutableStateOf(false) }
 
     var email by remember{mutableStateOf("")}
-    val proxyPatient = Patient(-1, "", "")
+    val proxyPatient = Patient("-1", "", "")
     var currPatient by remember{mutableStateOf(proxyPatient)}
     var showPatient by remember{mutableStateOf(false)}
     var patientExists by remember{mutableStateOf(false)}
     var successfullyAdded by remember{ mutableStateOf(false) }
     var addPatientRequested by remember{ mutableStateOf(false) }
     // fake doctor for now as we don't have much in our db atm
-    val proxyDoctor = Doctor().getDoctor(8)
+    val proxyDoctor = Doctor().getDoctor("8")
 
     AppTheme {
         Scaffold (
@@ -85,7 +85,7 @@ fun AddPatientScreen(navController: NavController) {
                         Button(onClick = {
                             showPatient = true
                             currPatient = PatientApi().getPatientbyEmail(email)
-                            if(currPatient.pid != -1) {
+                            if(currPatient.pid != "-1") {
                                 patientExists = true
                             } else {
                                 patientExists = false
