@@ -49,8 +49,8 @@ import com.gradle.utilities.toFormattedDateShortString
 import com.gradle.utilities.toFormattedDateString
 import com.gradle.utilities.toFormattedMonthDateString
 import com.example.remindmed.R
+import com.gradle.constants.GlobalObjects
 import com.gradle.constants.Routes
-import com.gradle.constants.doctorView
 import com.gradle.models.Medication
 import com.gradle.ui.theme.AppTheme
 //import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -141,7 +141,7 @@ fun MedicationListHomeScreen(
 fun HomeScreen(
     navController: NavController
 ) {
-    if (doctorView) {
+    if (GlobalObjects.type == "doctor") {
         navController.navigate(Routes.PEOPLE_LIST)
     }
 

@@ -21,7 +21,7 @@ import kotlinx.serialization.json.Json
 class Doctor {
     //TODO: Change host to server's address once API deployed to some server
     private val host: String = "http://10.0.2.2:8080"
-    private val nullDoctor = Doctor(0, "", "")
+    private val nullDoctor = Doctor("-1", "", "")
     private val client = HttpClient(Android) {
         install(ContentNegotiation) {
             json(Json {
@@ -32,13 +32,32 @@ class Doctor {
         }
     }
 
-    fun getDoctor(id: Int): Doctor {
+    fun getDoctor(id: String): Doctor {
         return try {
             var doctor: Doctor? = null
             runBlocking {
                 launch {
                     println("Getting doctor with id: $id")
                     doctor = client.get("$host/doctor?id=$id").body()
+                }
+            }
+            if (doctor != null) {
+                doctor as Doctor
+            } else {
+                nullDoctor
+            }
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
+    fun getDoctorbyEmail(email: String): Doctor {
+        return try {
+            var doctor: Doctor? = null
+            runBlocking {
+                launch {
+                    println("Getting doctor with email: $email")
+                    doctor = client.get("$host/doctor/email?email=$email").body()
                 }
             }
             if (doctor != null) {
@@ -89,7 +108,7 @@ class Doctor {
         }
     }
 
-    fun deleteDoctor(id: Int): Boolean {
+    fun deleteDoctor(id: String): Boolean {
         return try {
             var success = false
             runBlocking {
@@ -119,7 +138,7 @@ class Doctor {
         }
     }
 
-    fun addPatient(did: Int, pid: Int): Boolean {
+    fun addPatient(did: String, pid: String): Boolean {
         return try {
             var success = false
             runBlocking {
@@ -134,7 +153,7 @@ class Doctor {
         }
     }
 
-    fun removePatient(did: Int, pid: Int): Boolean {
+    fun removePatient(did: String, pid: String): Boolean {
         return try {
             var success = false
             runBlocking {
@@ -149,7 +168,7 @@ class Doctor {
         }
     }
 
-    fun getPatients(did: Int): ArrayList<ArrayList<Patient>> {
+    fun getPatients(did: String): ArrayList<ArrayList<Patient>> {
         return try {
             var patients: ArrayList<ArrayList<Patient>>? = null
             runBlocking {

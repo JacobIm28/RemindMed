@@ -33,13 +33,16 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.remindmed.R
 import com.google.gson.JsonObject
+import com.gradle.constants.GlobalObjects
 import com.gradle.constants.Routes
+import com.gradle.models.Medication
 import com.gradle.ui.components.BoldText
 import com.gradle.ui.components.HeadLineMedium
 import com.gradle.ui.components.TitleLarge
 import com.gradle.ui.theme.AppTheme
 import com.gradle.ui.theme.container_colour
 import org.json.JSONObject
+import java.sql.Date
 import com.gradle.apiCalls.Patient as PatientApi
 import com.gradle.apiCalls.Medication as MedicationApi
 
@@ -47,7 +50,6 @@ import com.gradle.apiCalls.Medication as MedicationApi
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun MedicationInfoScreen(navController: NavController, medicationName: String, startDate: String, endDate: String, dosage: String) {
-//    val medication = PatientApi().getMedicines(1)[0]
     // TODO: Get medication as a prop passed in from medication card
     var medicationInfo: JsonObject = JsonObject()
 

@@ -18,9 +18,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavDeepLinkBuilder
+import com.gradle.constants.GlobalObjects
 import com.gradle.apiCalls.Patient as PatientApi
 import com.gradle.constants.NavArguments
 import com.gradle.constants.Routes
+import com.gradle.models.LoginModel
 import com.gradle.models.Medication
 import com.gradle.ui.components.ButtonSecondary
 import com.gradle.ui.components.HeadlineLarge
@@ -35,18 +37,13 @@ import java.sql.Time
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun MedicationListScreen(navController: NavController) {
-    // Just some starter medications here for now as a view example
-    // --> to do: need to integrate the logic and pull from database
-//    val doctorAssignedMedications = listOf(
-//        Medication("Reserphine", "3 ml per usage", "9:00 AM", "After Breakfast"),
-//    )
-    val doctorAssignedMedications = PatientApi().getMedicines(1)
-
-//    val selfAssignedMedications = listOf(
-//        Medication("Vitamin D", "4g twice per day", "9:00 AM + 12:00 AM", "After Breakfast + Lunch"),
-//    )
-    val selfAssignedMedications = PatientApi().getMedicines(1)
-    println(selfAssignedMedications)
+    var medications: List<Medication> = List(0) { Medication("-1", "", "", Date(0), Date(0), "", "", mutableListOf()) }
+    if(GlobalObjects.type == "patient") {
+        medications = PatientApi().getMedicines(GlobalObjects.patient.pid)
+    } else {
+        //selected patient??
+    }
+    println(GlobalObjects.patient)
 
     AppTheme {
         Scaffold(
@@ -65,9 +62,9 @@ fun MedicationListScreen(navController: NavController) {
             ) {
                 TitleLarge("Medication")
 
-                HeadlineLarge("Doctor Assigned")
+                HeadlineLarge("Medications")
                 LazyColumn {
-                    items(doctorAssignedMedications) { medication ->
+                    items(medications) { medication ->
                         MedicationItem(medication, navController);
                     }
                 }
@@ -86,7 +83,7 @@ fun MedicationListScreen(navController: NavController) {
 
                 HeadlineLarge("Self Assigned")
                 LazyColumn {
-                    items(selfAssignedMedications) { medication ->
+                    items(medications) { medication ->
                         MedicationItem(medication, navController)
                     }
                 }

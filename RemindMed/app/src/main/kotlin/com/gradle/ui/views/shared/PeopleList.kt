@@ -16,26 +16,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.gradle.constants.GlobalObjects
 import com.gradle.constants.Routes
-import com.gradle.constants.doctorView
 import com.gradle.ui.theme.*
 import com.gradle.models.Doctor
 import com.gradle.models.Patient
 import com.gradle.ui.components.TitleLarge
+import com.gradle.apiCalls.Patient as PatientApi
+import com.gradle.apiCalls.Doctor as DoctorApi
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun PeopleListScreen(navController: NavController) {
-    val testpatients = listOf(
-        Patient(2, "Gen", "Gen.nishiwaki"),
-    )
-    println(testpatients)
-    // Temporary to test endpoint
-    val patients = testpatients
-
-    val doctors = listOf(
-        Doctor(0, "Dough Kavanagh", "dougkavanah@gmail.com")
-    )
+    var peopleList = if(GlobalObjects.type == "patient") {
+        PatientApi().getDoctors(GlobalObjects.patient.pid)
+    } else {
+        DoctorApi().getPatients(GlobalObjects.doctor.did)
+    }
+    val doctorView = if(GlobalObjects.type == "patient") {
+        false
+    } else {
+        true
+    }
 
     AppTheme {
         Scaffold(
@@ -62,14 +64,14 @@ fun PeopleListScreen(navController: NavController) {
 
                 if (doctorView) {
                     LazyColumn {
-                        items(patients) { patient ->
-                            PatientItem(patient, navController)
+                        items(peopleList) { patient ->
+                            PatientItem(patient as Patient, navController)
                         }
                     }
                 } else {
                     LazyColumn {
-                        items(doctors) { doctor ->
-                            DoctorItem(doctor)
+                        items(peopleList) { doctor ->
+                            DoctorItem(doctor as Doctor)
                         }
                     }
                 }

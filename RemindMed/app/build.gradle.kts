@@ -14,6 +14,9 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+        manifestPlaceholders.clear()
+        manifestPlaceholders["auth0Domain"] = "@string/com_auth0_domain"
+        manifestPlaceholders["auth0Scheme"] = "@string/com_auth0_scheme"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -78,4 +81,9 @@ dependencies {
     // Kotlin compiler extension for Compose
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.4.1")
     implementation("androidx.activity:activity-compose:1.4.0")
+
+    // Auth0
+    implementation("io.coil-kt:coil-compose:+")
+    implementation("com.auth0.android:auth0:+")
+    implementation("com.auth0.android:jwtdecode:+")
 }

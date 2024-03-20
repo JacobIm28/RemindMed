@@ -6,7 +6,7 @@ import java.sql.Time
 import java.sql.Date
 
 data class Medication (
-        val pid: Int,
+        val pid: String,
         val medicationId: String,
         val amount: String,
         val startDate: Date,
@@ -36,7 +36,7 @@ data class Medication (
     }
 
     override fun hashCode(): Int {
-        var result = pid
+        var result = pid.hashCode()
         result = 31 * result + medicationId.hashCode()
         result = 31 * result + amount.hashCode()
         result = 31 * result + startDate.hashCode()

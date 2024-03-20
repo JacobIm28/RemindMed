@@ -44,7 +44,7 @@ object TimeSerializer : KSerializer<Time> {
     }
 }
 data class Medication(
-    @SerialName("pid") val pid: Int,
+    @SerialName("pid") val pid: String,
     @SerialName("medicationId") val medicationId: String,
     @SerialName("amount") val amount: String,
     @SerialName("startDate")  val startDate: Date,
@@ -74,7 +74,7 @@ data class Medication(
     }
 
     override fun hashCode(): Int {
-        var result = pid
+        var result = pid.hashCode()
         result = 31 * result + medicationId.hashCode()
         result = 31 * result + amount.hashCode()
         result = 31 * result + startDate.hashCode()

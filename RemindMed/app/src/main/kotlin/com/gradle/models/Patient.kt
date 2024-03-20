@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 //TODO: Change once actual schema received from Jacob
 @Serializable
 data class Patient (
-    val pid: Int,
+    val pid: String,
     val name: String,
     val email: String
 ) {

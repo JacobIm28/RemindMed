@@ -43,4 +43,31 @@
         libero vel nunc consequat, quis tincidunt nisl eleifend. Cras bibendum enim a justo luctus
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
+
+    <!--
+    Auth0 identifiers and settings
+    ==============================
+    -->
+
+    <!-- Identifiers -->
+    <string name="com_auth0_scheme">app</string>
+
+    <!-- Settings -->
+    <string name="login_scopes">openid profile email read:current_user update:current_user_metadata</string>
+    <string name="login_audience">https://%1$s/api/v2/</string>
+
+
+    <!--
+    Main activity
+    =============
+    -->
+
+    <!-- Title -->
+    <string name="initial_title">Welcome to RemindMed!</string>
+    <string name="logged_in_title">You’re logged in!</string>
+    <string name="logged_out_title">You’re logged out.</string>
+    <string name="log_in_button">Begin</string>
+    <string name="log_out_button">Log Out</string>
+    <string name="name_label">Name</string>
+    <string name="email_label">Email</string>
 </resources>
