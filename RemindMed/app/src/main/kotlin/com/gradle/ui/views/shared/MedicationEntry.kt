@@ -16,6 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
+import com.gradle.constants.GlobalObjects
+import com.gradle.constants.NavArguments
 import com.gradle.constants.Routes
 import com.gradle.ui.components.ButtonSecondary
 import com.gradle.ui.components.CustomDatePicker
@@ -31,7 +33,7 @@ import java.sql.Time
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @SuppressLint("RememberReturnType", "UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun UserMedicationEntryScreen(navController: NavController) {
+fun MedicationEntryScreen(navController: NavController) {
 
     // TODO: Add all these inputs to the page, then call Samir's function that calls the correct endpoint
     // TODO: Use the reusable Date, TimePicker components
@@ -121,7 +123,12 @@ fun UserMedicationEntryScreen(navController: NavController) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                ButtonSecondary(text = "Cancel", onClick = { navController.navigate(Routes.MEDICATION_LIST) }, enabled = true)
+                ButtonSecondary(text = "Cancel", onClick = {
+                    if (GlobalObjects.type == "doctor")
+                        navController.navigate(Routes.PEOPLE_LIST)
+                    else
+                        navController.navigate(Routes.MEDICATION_LIST + "?" +
+                            "${NavArguments.MEDICATION_LIST.PID}=${GlobalObjects.patient.pid}") }, enabled = true)
 
                 ButtonSecondary(text = "Add", onClick = {  }, enabled = true)
             }

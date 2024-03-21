@@ -36,14 +36,9 @@ import java.sql.Time
 @RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun MedicationListScreen(navController: NavController) {
-    var medications: List<Medication> = List(0) { Medication("-1", "", "", Date(0), Date(0), "", "", mutableListOf()) }
-    if(GlobalObjects.type == "patient") {
-        medications = PatientApi().getMedicines(GlobalObjects.patient.pid)
-    } else {
-        //selected patient??
-    }
-    println(GlobalObjects.patient)
+fun MedicationListScreen(navController: NavController, pid: String) {
+    // TODO: Implement some sort async code rot run this on load, and display a loading screen in the meantime
+    var medications: List<Medication> = PatientApi().getMedicines(pid)
 
     AppTheme {
         Scaffold(
