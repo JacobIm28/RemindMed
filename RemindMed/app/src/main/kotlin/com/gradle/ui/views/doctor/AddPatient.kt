@@ -29,6 +29,7 @@ import com.gradle.ui.components.HeadlineLarge
 import com.gradle.ui.components.TitleLarge
 import com.gradle.ui.theme.AppTheme
 import com.gradle.apiCalls.Patient as PatientApi
+import com.gradle.constants.GlobalObjects as GlobalObjects
 import com.gradle.apiCalls.Doctor
 import com.gradle.ui.views.shared.PatientItem
 
@@ -56,8 +57,6 @@ fun AddPatientScreen(navController: NavController) {
     var patientExists by remember{mutableStateOf(false)}
     var successfullyAdded by remember{ mutableStateOf(false) }
     var addPatientRequested by remember{ mutableStateOf(false) }
-    // fake doctor for now as we don't have much in our db atm
-    val proxyDoctor = Doctor().getDoctor("8")
 
     AppTheme {
         Scaffold (
@@ -82,18 +81,15 @@ fun AddPatientScreen(navController: NavController) {
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Row (modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                        Button(onClick = {
+                        ButtonPrimary("Search", {
                             showPatient = true
                             currPatient = PatientApi().getPatientbyEmail(email)
                             if(currPatient.pid != "-1") {
                                 patientExists = true
                             } else {
                                 patientExists = false
-                                showPatient = false
                             }
-                        }) {
-                            Text("Search for Patient")
-                        }
+                        }, true)
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -105,7 +101,7 @@ fun AddPatientScreen(navController: NavController) {
                         Row (modifier = Modifier.align(Alignment.CenterHorizontally)) {
                             ButtonPrimary("Add Patient", {
                                 // need to use the doctor add patient here
-                                successfullyAdded = Doctor().addPatient(proxyDoctor.did, currPatient.pid)
+                                successfullyAdded = Doctor().addPatient(GlobalObjects.doctor.did, currPatient.pid)
                                 addPatientRequested = true
                             }, true)
                         }
