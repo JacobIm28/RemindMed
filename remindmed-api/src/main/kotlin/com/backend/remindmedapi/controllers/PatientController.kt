@@ -103,7 +103,7 @@ class PatientController {
         } else if (email != "") {
             queryStr += "email = '$email'"
         }
-        queryStr += " WHERE pid = $id RETURNING pid;"
+        queryStr += " WHERE pid = '$id' RETURNING pid;"
         databaseService.query(queryStr)
         return "Updated Patient with id: $id"
     }
