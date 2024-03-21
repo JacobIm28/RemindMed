@@ -45,7 +45,7 @@ fun TextInput(
             TextField(
                 value = value,
                 onValueChange = onValueChange,
-                label = { Text(placeholder) },
+                // label = { Text(placeholder) },
                 maxLines = 1,
                 isError = isError,
                 trailingIcon = {
