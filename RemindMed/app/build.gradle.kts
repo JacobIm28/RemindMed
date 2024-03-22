@@ -52,6 +52,7 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment-ktx:2.6.0")
     implementation("androidx.navigation:navigation-ui-ktx:2.6.0")
     implementation("androidx.navigation:navigation-compose:2.7.7")
+    implementation("com.android.support:support-annotations:28.0.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -86,4 +87,6 @@ dependencies {
     implementation("io.coil-kt:coil-compose:+")
     implementation("com.auth0.android:auth0:+")
     implementation("com.auth0.android:jwtdecode:+")
+    // Notifications
+    implementation("androidx.core:core-ktx")
 }

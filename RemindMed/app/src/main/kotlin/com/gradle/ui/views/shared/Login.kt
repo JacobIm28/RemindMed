@@ -1,6 +1,7 @@
 package com.gradle.ui.views.shared
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -183,10 +184,10 @@ fun MainView(
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("RememberReturnType", "UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun Login(mainViewModel: LoginModel = viewModel()) {
+fun Login(mainViewModel: LoginModel = viewModel(), context: Context) {
     AppTheme {
         if(mainViewModel.userIsComplete){
-            RemindMedApp()
+            RemindMedApp(context)
         } else {
             println("Reached here")
             Surface(

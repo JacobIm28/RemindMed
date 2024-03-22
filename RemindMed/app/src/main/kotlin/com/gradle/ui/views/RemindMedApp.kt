@@ -3,6 +3,9 @@ package com.gradle.ui.views
 import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
@@ -18,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavType
@@ -26,6 +30,8 @@ import androidx.navigation.navArgument
 import com.gradle.constants.Routes
 import com.gradle.ui.theme.AppTheme
 import com.gradle.constants.*
+import com.gradle.models.Medication
+import com.gradle.ui.components.ButtonPrimary
 import com.gradle.ui.views.doctor.AddPatientScreen
 import com.gradle.ui.views.patient.HomeScreen
 import com.gradle.ui.views.shared.MedicationEntryScreen
@@ -33,6 +39,8 @@ import com.gradle.ui.views.shared.MedicationInfoScreen
 import com.gradle.ui.views.shared.MedicationListScreen
 import com.gradle.ui.views.shared.PeopleListScreen
 import com.gradle.ui.views.shared.ProfileScreen
+import com.gradle.utilities.notifications.NotificationUtils
+import java.sql.Date
 
 data class NavigationItem(
     val icon: ImageVector,
@@ -44,8 +52,10 @@ data class NavigationItem(
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("RememberReturnType", "UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun RemindMedApp() {
+fun RemindMedApp(context: Context) {
     val navController = rememberNavController();
+    val context = LocalContext.current
+    val CHANNEL_ID = "CHANNEL"
 
     val patientNavBarItems = arrayOf(
         NavigationItem(
@@ -124,8 +134,20 @@ fun RemindMedApp() {
                     .padding(innerPadding)
                     .padding(25.dp)
             ) {
+                // TODO: Remove unused routes from the navhosts
+                ButtonPrimary(text = "asd", onClick = {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        NotificationUtils.scheduleNotifications(
+                            context,
+                            GlobalObjects.patient,
+                            Medication("0", "asdf8s7fas7d8f", "2mg", Date(0), Date(0), "Advil", "Eat with food", mutableListOf()))
+                    }
+                },
+                    enabled = true)
+                
                 NavHost(navController, startDestination = if (GlobalObjects.type == "doctor") Routes.PEOPLE_LIST else Routes.HOME ) {
                     composable(Routes.PEOPLE_LIST) { PeopleListScreen(navController) }
+                
 
                     composable(
                         Routes.MEDICATION_LIST_WITH_ARGS,
