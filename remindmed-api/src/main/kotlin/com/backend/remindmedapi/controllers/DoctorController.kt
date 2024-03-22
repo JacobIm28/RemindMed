@@ -103,13 +103,13 @@ class DoctorController {
 
     @GetMapping("/patients")
     @ResponseBody
-    fun getPatients(@RequestParam("did") did: String): ArrayList<Patient> {
+    fun getPatients(@RequestParam("did") did: String): MutableList<Patient> {
         val result = databaseService.query("SELECT * FROM Patients p WHERE p.pid IN (SELECT t.pid FROM Treatment t WHERE t.did = '$did');")
-        val response = ArrayList<Patient>()
+        val response = mutableListOf<Patient>()
         for (patient in result!!) {
-          if(patient[0] is String && patient[1] is String && patient[2] is String) {
-              response.add(Patient(patient[0] as String, patient[1] as String, patient[2] as String))
-          }
+            if(patient[0] is String && patient[1] is String && patient[2] is String) {
+                response.add(Patient(patient[0] as String, patient[1] as String, patient[2] as String))
+            }
         }
 
         return response

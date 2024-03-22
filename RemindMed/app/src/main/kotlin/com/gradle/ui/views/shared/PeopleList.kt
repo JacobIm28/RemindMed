@@ -20,8 +20,11 @@ import androidx.navigation.navArgument
 import com.gradle.constants.GlobalObjects
 import com.gradle.constants.NavArguments
 import com.gradle.constants.Routes
-import com.gradle.ui.theme.*
+import com.gradle.constants.doctorView
 import com.gradle.models.Doctor
+import com.gradle.models.Medication
+//import com.gradle.ui.components.notifications.NotificationService
+import com.gradle.ui.theme.*
 import com.gradle.models.Patient
 import com.gradle.ui.components.TitleLarge
 import com.gradle.apiCalls.Patient as PatientApi

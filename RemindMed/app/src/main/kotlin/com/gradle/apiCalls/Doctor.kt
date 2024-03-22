@@ -168,9 +168,9 @@ class Doctor {
         }
     }
 
-    fun getPatients(did: String): ArrayList<ArrayList<Patient>> {
+    fun getPatients(did: String): MutableList<Patient> {
         return try {
-            var patients: ArrayList<ArrayList<Patient>>? = null
+            var patients: MutableList<Patient>? = null
             runBlocking {
                 launch {
                     println("Getting all patients for doctor with id: $did")
@@ -178,7 +178,7 @@ class Doctor {
                 }
             }
             if (patients?.isEmpty() == false) {
-                patients as ArrayList<ArrayList<Patient>>
+                patients as MutableList<Patient>
             } else {
                 ArrayList()
             }
