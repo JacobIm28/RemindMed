@@ -28,17 +28,18 @@ import com.gradle.ui.theme.AppTheme
 import com.gradle.constants.*
 import com.gradle.ui.views.doctor.AddPatientScreen
 import com.gradle.ui.views.patient.HomeScreen
+import com.gradle.ui.views.shared.MedicationEntryScreen
 import com.gradle.ui.views.shared.MedicationInfoScreen
 import com.gradle.ui.views.shared.MedicationListScreen
 import com.gradle.ui.views.shared.PeopleListScreen
 import com.gradle.ui.views.shared.ProfileScreen
-import com.gradle.ui.views.shared.UserMedicationEntryScreen
 
 data class NavigationItem(
     val icon: ImageVector,
     val label: String,
     val route: String
 )
+
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("RememberReturnType", "UnusedMaterialScaffoldPaddingParameter")
@@ -55,7 +56,7 @@ fun RemindMedApp() {
         NavigationItem(
             icon = Icons.Rounded.List,
             label = "Medications",
-            route = Routes.MEDICATION_LIST
+            route = Routes.MEDICATION_LIST + "?${NavArguments.MEDICATION_LIST.PID}=${GlobalObjects.patient.pid}"
         ),
         NavigationItem(
             icon = Icons.Rounded.Person,
@@ -123,64 +124,47 @@ fun RemindMedApp() {
                     .padding(innerPadding)
                     .padding(25.dp)
             ) {
-                if (GlobalObjects.type == "doctor") {
-                    NavHost(navController, startDestination = Routes.PEOPLE_LIST) {
-                        composable(Routes.PEOPLE_LIST) { PeopleListScreen(navController) }
-                        composable(
-                            Routes.MEDICATION_LIST,
-                            arguments = listOf(navArgument("medicationId") { type = NavType.StringType})
-                        ) {
-                            MedicationListScreen(navController)
-                        }
-                        composable(Routes.PROFILE) { ProfileScreen(navController) }
-                        composable(Routes.MEDICATION_ENTRY) { UserMedicationEntryScreen(navController) }
-                        composable(
-                            Routes.MEDICATION_INFO,
-                            arguments = listOf(
-                                navArgument(NavArguments.MEDICATION_INFO.MEDICATION_NAME) { type = NavType.StringType },
-                                navArgument(NavArguments.MEDICATION_INFO.START_DATE) { type = NavType.StringType },
-                                navArgument(NavArguments.MEDICATION_INFO.END_DATE) { type = NavType.StringType },
-                                navArgument(NavArguments.MEDICATION_INFO.DOSAGE) { type = NavType.StringType }
-                            )
-                        ) { backStackEntry ->
-                            MedicationInfoScreen(
-                                navController,
-                                medicationName = backStackEntry.arguments?.getString(NavArguments.MEDICATION_INFO.MEDICATION_NAME)?: "",
-                                startDate = backStackEntry.arguments?.getString(NavArguments.MEDICATION_INFO.START_DATE)?: "",
-                                endDate = backStackEntry.arguments?.getString(NavArguments.MEDICATION_INFO.END_DATE)?: "",
-                                dosage = backStackEntry.arguments?.getString(NavArguments.MEDICATION_INFO.DOSAGE)?: ""
-                            )
-                        }
-                        composable(Routes.ADD_PATIENT) { AddPatientScreen(navController) }
+                NavHost(navController, startDestination = if (GlobalObjects.type == "doctor") Routes.PEOPLE_LIST else Routes.HOME ) {
+                    composable(Routes.PEOPLE_LIST) { PeopleListScreen(navController) }
+
+                    composable(
+                        Routes.MEDICATION_LIST_WITH_ARGS,
+                        arguments = listOf(navArgument(NavArguments.MEDICATION_LIST.PID) { type = NavType.StringType })
+                    ) {backStackEntry ->
+                        MedicationListScreen(
+                            navController,
+                            pid = backStackEntry.arguments?.getString(NavArguments.MEDICATION_LIST.PID)?: ""
+                        )
                     }
-                } else {
-                    NavHost(navController, startDestination = Routes.HOME) {
-                        composable(Routes.PEOPLE_LIST) { PeopleListScreen(navController) }
+
+                    composable(Routes.PROFILE) { ProfileScreen(navController) }
+
+                    composable(
+                        Routes.MEDICATION_INFO_WITH_ARGS,
+                        arguments = listOf(
+                            navArgument(NavArguments.MEDICATION_INFO.MEDICATION_NAME) { type = NavType.StringType; defaultValue = "" },
+                            navArgument(NavArguments.MEDICATION_INFO.START_DATE) { type = NavType.StringType; defaultValue = "" },
+                            navArgument(NavArguments.MEDICATION_INFO.END_DATE) { type = NavType.StringType; defaultValue = "" },
+                            navArgument(NavArguments.MEDICATION_INFO.DOSAGE) { type = NavType.StringType; defaultValue = "" }
+                        )
+                    ) { backStackEntry ->
+                        MedicationInfoScreen(
+                            navController,
+                            medicationName = backStackEntry.arguments?.getString(NavArguments.MEDICATION_INFO.MEDICATION_NAME)?: "",
+                            startDate = backStackEntry.arguments?.getString(NavArguments.MEDICATION_INFO.START_DATE)?: "",
+                            endDate = backStackEntry.arguments?.getString(NavArguments.MEDICATION_INFO.END_DATE)?: "",
+                            dosage = backStackEntry.arguments?.getString(NavArguments.MEDICATION_INFO.DOSAGE)?: ""
+                        )
+                    }
+
+                    composable(Routes.MEDICATION_ENTRY) { MedicationEntryScreen(navController) }
+
+                    if (GlobalObjects.type == "patient") {
                         composable(Routes.HOME) { HomeScreen(navController) }
-                        composable(
-                            Routes.MEDICATION_LIST
-                        ) {
-                            MedicationListScreen(navController)
-                        }
-                        composable(Routes.PROFILE) { ProfileScreen(navController) }
-                        composable(Routes.MEDICATION_ENTRY) { UserMedicationEntryScreen(navController) }
-                        composable(
-                            Routes.MEDICATION_INFO_WITH_ARGS,
-                            arguments = listOf(
-                                navArgument(NavArguments.MEDICATION_INFO.MEDICATION_NAME) { type = NavType.StringType; defaultValue = "" },
-                                navArgument(NavArguments.MEDICATION_INFO.START_DATE) { type = NavType.StringType; defaultValue = "" },
-                                navArgument(NavArguments.MEDICATION_INFO.END_DATE) { type = NavType.StringType; defaultValue = "" },
-                                navArgument(NavArguments.MEDICATION_INFO.DOSAGE) { type = NavType.StringType; defaultValue = "" }
-                            )
-                        ) { backStackEntry ->
-                            MedicationInfoScreen(
-                                navController,
-                                medicationName = backStackEntry.arguments?.getString(NavArguments.MEDICATION_INFO.MEDICATION_NAME)?: "",
-                                startDate = backStackEntry.arguments?.getString(NavArguments.MEDICATION_INFO.START_DATE)?: "",
-                                endDate = backStackEntry.arguments?.getString(NavArguments.MEDICATION_INFO.END_DATE)?: "",
-                                dosage = backStackEntry.arguments?.getString(NavArguments.MEDICATION_INFO.DOSAGE)?: ""
-                            )
-                        }
+                    }
+
+                    if (GlobalObjects.type == "doctor") {
+                        composable(Routes.ADD_PATIENT) { AddPatientScreen(navController) }
                     }
                 }
             }

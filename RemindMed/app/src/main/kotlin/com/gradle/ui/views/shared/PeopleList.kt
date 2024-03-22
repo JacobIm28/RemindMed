@@ -16,7 +16,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.navArgument
 import com.gradle.constants.GlobalObjects
+import com.gradle.constants.NavArguments
 import com.gradle.constants.Routes
 import com.gradle.ui.theme.*
 import com.gradle.models.Doctor
@@ -141,8 +143,8 @@ fun PatientItem(patient: Patient, navController: NavController) {
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(onClick = {
-//                    currName = patient.name
-                    navController.navigate(Routes.MEDICATION_LIST)
+                    navController.navigate(Routes.MEDICATION_LIST + "?" +
+                            "${NavArguments.MEDICATION_LIST.PID}=${patient.pid}")
                 }) {
                     Icon(Icons.Default.ArrowForward, contentDescription = "Go to details")
                 }
