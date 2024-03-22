@@ -29,6 +29,7 @@ import com.gradle.models.Doctor
 @OptIn(DelicateCoroutinesApi::class)
 class Patient {
     //TODO: Change host to server's address once API deployed to some server
+
     private val host: String = "http://10.0.2.2:8080"
     private val nullPatient = Patient("-1", "", "")
     private val client = HttpClient(Android) {
@@ -174,13 +175,16 @@ class Patient {
         }
     }
 
-    fun addMedication(pid: String, mid: String, amount: String): Boolean {
+    fun addMedication(medication: Medication): Boolean {
         return try {
             var success = false
             runBlocking {
                 launch {
-                    println("Adding medication with id: $mid to patient with id: $pid")
-                    success = client.post("$host/patient/medicine?pid=$pid&mid=$mid&amount=$amount").status.isSuccess()
+                    println("Adding medication: ${medication}")
+                    success = client.post("$host/patient/medicine"){
+                        contentType(ContentType.Application.Json)
+                        setBody(medication)
+                    }.status.isSuccess()
                 }
             }
             success
@@ -189,13 +193,42 @@ class Patient {
         }
     }
 
-    fun removeMedication(pid: String, mid: String): Boolean {
+//    suspend fun removeMedication(pid: String, mid: String): Boolean {
+//        return try {
+//            println("Removing medication with id: $mid from patient with id: $pid")
+//            val response = client.delete("$host/patient/medicine?pid=$pid&mid=$mid").status.isSuccess()
+//            response
+//        } catch (e: Exception) {
+//            false
+//        }
+//    }
+
+
+     fun removeMedication(pid: String, mid: String): Boolean {
+         return try {
+             var success = false
+             runBlocking {
+                 launch {
+                     println("Removing medication with id: $mid from patient with id: $pid")
+                     success = client.delete("$host/patient/medicine?pid=$pid&mid=$mid").status.isSuccess()
+                 }
+             }
+             success
+         } catch (e: Exception) {
+             throw e
+         }
+     }
+
+    fun updateMedication(medication: Medication): Boolean {
         return try {
             var success = false
             runBlocking {
                 launch {
-                    println("Removing medication with id: $mid from patient with id: $pid")
-                    success = client.delete("$host/patient/medicine?pid=$pid&mid=$mid").status.isSuccess()
+                    println("Updating medication: $medication")
+                    success = client.put("$host/patient/medicine"){
+                        contentType(ContentType.Application.Json)
+                        setBody(medication)
+                    }.status.isSuccess()
                 }
             }
             success

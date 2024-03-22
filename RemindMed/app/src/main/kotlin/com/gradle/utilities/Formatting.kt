@@ -6,7 +6,7 @@ import java.util.Date
 import java.util.Locale
 
 fun Date.toFormattedDateString(): String {
-    val sdf = SimpleDateFormat("EEEE, LLLL dd", Locale.getDefault())
+    val sdf = SimpleDateFormat("LL / dd", Locale.getDefault())
     return sdf.format(this)
 }
 

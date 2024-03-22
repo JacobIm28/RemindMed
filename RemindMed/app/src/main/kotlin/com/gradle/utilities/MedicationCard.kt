@@ -24,7 +24,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun MedicationSummaryCard(name: String, dosage: String, time: String, specifications: String) {
+
+fun MedicationSummaryCard(name: String, dosage: String, time: String, dates: String, specifications: String) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -48,10 +49,11 @@ fun MedicationSummaryCard(name: String, dosage: String, time: String, specificat
 //            )
             Spacer(modifier = Modifier.width(16.dp))
             Column {
-                Text(name, style = MaterialTheme.typography.titleMedium)
-                Text("Dosage: $dosage")
-                Text(time)
-                Text(specifications)
+                Text("Medication: $name", fontWeight = FontWeight.Bold)
+                Text("Dosage: $dosage", style = MaterialTheme.typography.bodyMedium)
+                Text("Dates: $dates", style = MaterialTheme.typography.bodyMedium)
+                Text("Times: $time", style = MaterialTheme.typography.bodyMedium)
+                Text("Notes: $specifications", style = MaterialTheme.typography.bodyMedium)
             }
         }
     }

@@ -1,4 +1,6 @@
 package com.gradle.ui.views.patient
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.ui.graphics.Color
@@ -21,10 +23,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -58,6 +60,8 @@ import com.gradle.ui.theme.AppTheme
 //import com.google.accompanist.permissions.rememberPermissionState
 import java.util.Calendar
 import java.util.Date
+
+import com.gradle.apiCalls.Patient as PatientApi
 
 data class HomeState(
     val greeting: String = "",
@@ -123,12 +127,15 @@ fun MedicationListHomeScreen(
 
     Column {
         Text("Taken:", modifier = Modifier.padding(8.dp),style = MaterialTheme.typography.titleMedium)
+        HorizontalDivider(modifier = Modifier.padding(8.dp))
         takenMedications.forEach { medication ->
             MedicationItem(prescription = medication, taken = true, onCheckedChange = { isChecked ->
                 onCheckedChange(medication, isChecked)
             })
         }
+        Spacer(modifier = Modifier.height(16.dp))
         Text("Not Finished:", modifier = Modifier.padding(8.dp), style = MaterialTheme.typography.titleMedium)
+        HorizontalDivider(modifier = Modifier.padding(8.dp))
         notTakenMedications.forEach { medication ->
             MedicationItem(prescription = medication, taken = false, onCheckedChange = { isChecked ->
                 onCheckedChange(medication, isChecked)
@@ -137,6 +144,7 @@ fun MedicationListHomeScreen(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(
     navController: NavController
@@ -148,21 +156,20 @@ fun HomeScreen(
     var takenMedications by remember { mutableStateOf(listOf<Prescription>()) }
     var notTakenMedications by remember { mutableStateOf(listOf<Prescription>()) }
 
-    val (initialTakenMedications, initialNotTakenMedications) = remember {
-        // TODO: REPLACE WITH THE ACTUAL DATA FROM DATABASE FOR TODAY
-        Pair(
-            listOf(
-                Prescription("Reserphine", "3 ml per usage", "9:00 AM"),
-                Prescription("Advil", "One every 6 hours", "Whenever back starts to hurt")
-            ),
-            listOf(
-                Prescription("Vitamin D", "4g twice per day", "9:00 AM + 12:00 AM")
-            )
-        )
+    var medications = remember { PatientApi().getMedicines(GlobalObjects.patient.pid) }
+    val today = Calendar.getInstance().time
+    var selectedDate by remember { mutableStateOf(today) }
+
+    val medicationsToday = medications.filter { medication ->
+        today.after(medication.startDate) && today.before(medication.endDate)
     }
 
-    takenMedications = initialTakenMedications
-    notTakenMedications = initialNotTakenMedications
+    takenMedications = emptyList()
+    notTakenMedications = medicationsToday.map { medication ->
+        Prescription(medication.name, medication.amount, medication.times.toString())
+    }
+    // create a adding function
+
 
     AppTheme {
         Scaffold(
@@ -170,16 +177,9 @@ fun HomeScreen(
             Column(modifier = Modifier.padding(innerPadding)) {
 
                 DatesHeader(
-                    onDateSelected = {
-            // TODO: Hook up to the actual data from the database for selected date
-            //                    selectedDate ->
-//                        val newMedicationList = state.medications
-//                            .filter { medication ->
-//                                medication.medicationTime.toFormattedDateString() == selectedDate.date.toFormattedDateString()
-//                            }
-//                            .sortedBy { it.medicationTime }
-//
-//                        filteredMedications = newMedicationList
+                    onDateSelected = { newSelectedDate ->
+                        selectedDate = newSelectedDate // need to restrict it so that medications for days other than today cannot be marked taken,
+                        // user can only "take" medications for the current date, selecting a new date just allows for user to see what medications they have for that day
                     }
                 )
                 DailyOverviewCard(medicationsToday = emptyList(), logEvent = {})
@@ -205,6 +205,7 @@ fun HomeScreen(
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview
 @Composable
 fun PreviewHomeScreen() {
@@ -332,7 +333,7 @@ fun DailyOverviewEmptyCard() {
 
 @Composable
 fun DatesHeader(
-    onDateSelected: (CalendarModel.DateModel) -> Unit // Callback to pass the selected date
+    onDateSelected: (Date) -> Unit
 ) {
     val dataSource = CalendarDataSource()
     var calendarModel by remember { mutableStateOf(dataSource.getData(lastSelectedDate = dataSource.today)) }
@@ -344,40 +345,32 @@ fun DatesHeader(
         DateHeader(
             data = calendarModel,
             onPrevClickListener = { startDate ->
-                // refresh the CalendarModel with new data
-                // by get data with new Start Date (which is the startDate-1 from the visibleDates)
                 val calendar = Calendar.getInstance()
                 calendar.time = startDate
-
-                calendar.add(Calendar.DAY_OF_YEAR, -2) // Subtract one day from startDate
+                calendar.add(Calendar.DAY_OF_YEAR, -2)
                 val finalStartDate = calendar.time
-
                 calendarModel = dataSource.getData(startDate = finalStartDate, lastSelectedDate = calendarModel.selectedDate.date)
             },
             onNextClickListener = { endDate ->
-                // refresh the CalendarModel with new data
-                // by get data with new Start Date (which is the endDate+2 from the visibleDates)
                 val calendar = Calendar.getInstance()
                 calendar.time = endDate
-
                 calendar.add(Calendar.DAY_OF_YEAR, 2)
                 val finalStartDate = calendar.time
-
                 calendarModel = dataSource.getData(startDate = finalStartDate, lastSelectedDate = calendarModel.selectedDate.date)
             }
         )
         DateList(
             data = calendarModel,
-            onDateClickListener = { date ->
+            onDateClickListener = { dateModel ->
                 calendarModel = calendarModel.copy(
-                    selectedDate = date,
-                    visibleDates = calendarModel.visibleDates.map {
-                        it.copy(
-                            isSelected = it.date.toFormattedDateString() == date.date.toFormattedDateString()
+                    selectedDate = dateModel,
+                    visibleDates = calendarModel.visibleDates.map { visibleDate ->
+                        visibleDate.copy(
+                            isSelected = visibleDate.date.toFormattedDateString() == dateModel.date.toFormattedDateString()
                         )
                     }
                 )
-                onDateSelected(date)
+                onDateSelected(dateModel.date)
             }
         )
     }
@@ -492,11 +485,11 @@ fun DateHeader(
     }
 }
 
-sealed class MedicationListItem {
-    data class OverviewItem(val medicationsToday: List<Medication>, val isMedicationListEmpty: Boolean) : MedicationListItem()
-    data class MedicationItem(val medication: Medication) : MedicationListItem()
-    data class HeaderItem(val headerText: String) : MedicationListItem()
-}
+//sealed class MedicationListItem {
+//    data class OverviewItem(val medicationsToday: List<Medication>, val isMedicationListEmpty: Boolean) : MedicationListItem()
+//    data class MedicationItem(val medication: Medication) : MedicationListItem()
+//    data class HeaderItem(val headerText: String) : MedicationListItem()
+//}
 
 //@Composable
 //fun DailyMedications(

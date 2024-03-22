@@ -1,5 +1,4 @@
 package com.gradle.apiCalls
-
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.gradle.models.Medication
@@ -20,6 +19,7 @@ import java.sql.Time
 @OptIn(DelicateCoroutinesApi::class)
 class Medication {
     //TODO: Change host to server's address once API deployed to some server
+
     private val host: String = "http://10.0.2.2:8080"
     private val nullMedication = Medication("-1", "", "", Date(0), Date(0), "", "", mutableListOf<Time>())
     private val client = HttpClient(Android) {
@@ -39,6 +39,7 @@ class Medication {
                 launch {
                     println("Getting medication with name: $name")
                     val response = client.get("$host/medicine?name=$name").bodyAsText()
+                    //TODO: check for malformed json
                     medication = JsonParser.parseString(response).asJsonObject
                 }
             }
@@ -66,25 +67,6 @@ class Medication {
                 medications as MutableList<String>
             } else {
                 mutableListOf()
-            }
-        } catch (e: Exception) {
-            throw e
-        }
-    }
-
-    fun getPatientMedications(pid: Int): ArrayList<ArrayList<Medication>> {
-        return try {
-            var medications: ArrayList<ArrayList<Medication>>? = null
-            runBlocking {
-                launch {
-                    println("Getting all medications for patient with id: $pid")
-                    medications = client.get("$host/medicine/patient?pid=$pid").body()
-                }
-            }
-            if (medications != null) {
-                medications as ArrayList<ArrayList<Medication>>
-            } else {
-                ArrayList()
             }
         } catch (e: Exception) {
             throw e
