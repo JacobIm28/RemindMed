@@ -15,6 +15,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TimeInput
@@ -35,7 +36,7 @@ import com.gradle.ui.theme.AppTheme
 @Composable
 fun CustomTimePicker(state: TimePickerState) {
     var time by remember {
-        mutableStateOf("Select time")
+        mutableStateOf("Select Time")
     }
 
     var openDialog by remember {
@@ -44,10 +45,10 @@ fun CustomTimePicker(state: TimePickerState) {
 
     AppTheme {
         Box(contentAlignment = Alignment.Center) {
-            Button(
+            OutlinedButton(
                 onClick = { openDialog = true },
                 colors = ButtonColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    containerColor = MaterialTheme.colorScheme.tertiary,
                     contentColor = MaterialTheme.colorScheme.primary,
                     disabledContainerColor = MaterialTheme.colorScheme.tertiary,
                     disabledContentColor = MaterialTheme.colorScheme.onTertiary
@@ -80,22 +81,25 @@ fun MyTimePickerDialog(state: TimePickerState, onDismiss: () -> Unit, onConfirm:
                     .height(IntrinsicSize.Min)
                     .background(
                         shape = MaterialTheme.shapes.extraLarge,
-                        color = MaterialTheme.colorScheme.primaryContainer
+                        color = MaterialTheme.colorScheme.tertiary
                     )
 //                    .padding(10.dp)
             ) {
                 Column (modifier = Modifier.padding(30.dp)) {
                     TimePicker(state = state)
                     Row (modifier = Modifier
-                        .height(40.dp)
+                        .height(45.dp)
                         .fillMaxWidth()
                     ) {
                         Spacer(modifier = Modifier.weight(1f))
-                        ButtonSecondary(text = "Cancel", onClick = { onDismiss() }, enabled = true)
+                        ButtonPrimary(text = "Cancel", onClick = { onDismiss() }, enabled = true)
                         ButtonPrimary(
                             text = "Ok",
                             onClick = {
-                                onConfirm("${state.hour}:${state.minute}")
+                                val formattedHour = if (state.hour == 0 || state.hour == 12) "12" else String.format("%02d", state.hour % 12)
+                                val paddedMinute = String.format("%02d", state.minute)
+                                val period = if (state.hour < 12) "AM" else "PM"
+                                onConfirm("$formattedHour:$paddedMinute $period")
                                 onDismiss()
                             }, enabled = true)
                     }

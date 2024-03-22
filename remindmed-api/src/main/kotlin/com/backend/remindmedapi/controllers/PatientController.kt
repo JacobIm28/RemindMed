@@ -6,7 +6,8 @@ import com.backend.remindmedapi.services.DatabaseService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.ComponentScan
 import com.backend.remindmedapi.models.Patient
-import kotlinx.serialization.json.JsonObject
+import com.google.gson.stream.JsonReader
+import com.google.gson.JsonObject
 import org.postgresql.util.PGobject
 import org.springframework.web.bind.annotation.*
 import java.sql.Date
@@ -110,17 +111,54 @@ class PatientController {
 
     @PostMapping("/medicine")
     @ResponseBody
-    fun addMedicine(@RequestBody medication: Medication): String {
-        databaseService.query("INSERT INTO Medication (pid, medication_id, amount, start_date, end_date, name, notes, times) VALUES ('${medication.pid}', '${medication.medicationId}', '${medication.amount}', " +
-                "${medication.startDate}, ${medication.endDate}, ${medication.name}, ${medication.notes}, ARRAY ${medication.times}) RETURNING pid;")
-        return "Inserted Medicine with id: ${medication.medicationId} Patient with id: ${medication.pid}"
+    fun addMedicine(@RequestBody medication: JsonObject): String {
+//        databaseService.query("INSERT INTO Medication (pid, medication_id, amount, start_date, end_date, name, notes, times) VALUES ('${medication.pid}', '${medication.medicationId}', '${medication.amount}', " +
+//                "${medication.startDate}, ${medication.endDate}, ${medication.name}, ${medication.notes}, ARRAY ${medication.times}) RETURNING pid;")
+        println(medication)
+        val timeString = "[" + medication["times"].asJsonArray.joinToString(",") { "to_timestamp(\'${it.asString.replace("\"", "")}\', 'hh24:mi:ss')"} + "]"
+        //remove double quotes and use single quotes for string insert values
+        val queryString = "INSERT INTO Medication (pid, medication_id, amount, startDate, endDate, name, notes, times) VALUES ('${medication["pid"].asString.replace("\"", "")}', '${medication["medicationId"].asString.replace("\"", "")}', '${medication["amount"].asString.replace("\"", "")}', " +
+                "'${medication["startDate"].asString.replace("\"", "")}', '${medication["endDate"].asString.replace("\"", "")}', '${medication["name"].asString.replace("\"", "")}', '${medication["notes"].asString.replace("\"", "")}', ARRAY $timeString) RETURNING pid;"
+//        val queryString = "INSERT INTO Medication (pid, medication_id, amount, startDate, endDate, name, notes, times) VALUES ('${medication["pid"]}', '${medication["medicationId"]}', '${medication["amount"]}', " +
+//                "'${medication["startDate"]}', '${medication["endDate"]}', '${medication["name"]}', '${medication["notes"]}', ARRAY [${timeString}]) RETURNING pid;"
+        println(queryString)
+        databaseService.query(queryString)
+        return "Inserted Medicine with id: ${medication["medicationId"]} Patient with id: ${medication["pid"]}"
     }
 
     @DeleteMapping("/medicine")
     @ResponseBody
     fun removeMedicine(@RequestParam("pid") pid: String, @RequestParam("mid") mid: String): String {
-        databaseService.query("DELETE FROM Medication WHERE pid = '$pid' AND mid = '$mid' RETURNING pid;")
+        databaseService.query("DELETE FROM Medication WHERE pid = '$pid' AND medication_id = '$mid' RETURNING pid;")
         return "Removed Medicine with id: $mid from Patient with id: $pid"
+    }
+
+    @PutMapping("/medicine")
+    @ResponseBody
+    fun updateMedicine(@RequestBody medication: Medication): String {
+        var queryStr = "UPDATE Medication SET "
+        if (medication.amount != "") {
+            queryStr += "amount = '${medication.amount}', "
+        }
+        if (medication.startDate != Date(0)) {
+            queryStr += "start_date = '${medication.startDate}', "
+        }
+        if (medication.endDate != Date(0)) {
+            queryStr += "end_date = '${medication.endDate}', "
+        }
+        if (medication.name != "") {
+            queryStr += "name = '${medication.name}', "
+        }
+        if (medication.notes != "") {
+            queryStr += "notes = '${medication.notes}', "
+        }
+        if (medication.times.isNotEmpty()) {
+            queryStr += "times = ARRAY ${medication.times}, "
+        }
+        queryStr = queryStr.dropLast(2)
+        queryStr += " WHERE pid = '${medication.pid}' AND mid = '${medication.medicationId}' RETURNING pid;"
+        databaseService.query(queryStr)
+        return "Updated Medicine with id: ${medication.medicationId} for Patient with id: ${medication.pid}"
     }
 
     @GetMapping("/medicines")

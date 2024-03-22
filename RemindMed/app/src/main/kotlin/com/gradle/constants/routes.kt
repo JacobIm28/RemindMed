@@ -6,6 +6,10 @@ object Routes {
     val PROFILE = "profile"
     val MEDICATION_ENTRY = "medication-entry"
     val PEOPLE_LIST = "people-list"
+    val MEDICATION_EDIT = "medication-edit"
+    // val USER_MEDICATION_ENTRY = "user-medication-entry"
+    val DOCTOR_VIEW_MEDICATION_LIST = "doctor-view-medication"
+    val LIST = "list"
     val MEDICATION_INFO = "medication-info"
     val ADD_PATIENT = "add-patient"
 
@@ -16,7 +20,7 @@ object Routes {
             "${NavArguments.MEDICATION_INFO.DOSAGE}={${NavArguments.MEDICATION_INFO.DOSAGE}}"
 
     val MEDICATION_LIST_WITH_ARGS = MEDICATION_LIST + "?" +
-            "${NavArguments.MEDICATION_LIST}={${NavArguments.MEDICATION_LIST.PID}}"
+            "${NavArguments.MEDICATION_LIST.PID}={${NavArguments.MEDICATION_LIST.PID}}"
 }
 
 object NavArguments {
