@@ -1,55 +1,67 @@
 package remindmed
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
+import com.gradle.models.LoginModel
+import com.gradle.ui.views.shared.Login
+import com.example.remindmed.databinding.ActivityMainBinding
+import com.gradle.constants.CHANNEL_ID
 import com.gradle.ui.views.RemindMedApp
 
-class MainActivity : AppCompatActivity() {
 
-//    private lateinit var appBarConfiguration: AppBarConfiguration
-//    private lateinit var binding: ActivityMainBinding
+class MainActivity : ComponentActivity() {
+    private lateinit var binding: ActivityMainBinding
 
+    private val PERMISSION_NOTIFICATION_CODE: Int = 100
+    private val PERMISSION_SCHEDULE_CODE: Int = 100
+
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val mainViewModel: LoginModel by viewModels()
+        mainViewModel.setContext(this)
 
-//        binding = ActivityMainBinding.inflate(layoutInflater)
-//        setContentView(binding.root)
-//
-//        setSupportActionBar(binding.toolbar)
-//
-////        val navController = findNavController(R.id.nav_host_fragment_content_main)
-////        appBarConfiguration = AppBarConfiguration(navController.graph)
-////        setupActionBarWithNavController(navController, appBarConfiguration)
-//
-//        binding.fab.setOnClickListener { view ->
-//            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                    .setAction("Action", null).show()
-//        }
+        createNotificationChannel()
+
         setContent {
-            RemindMedApp()
+            Login(mainViewModel, applicationContext)
         }
     }
 
-//    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        menuInflater.inflate(R.menu.menu_main, menu)
-//        return true
-//    }
-//
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        return when (item.itemId) {
-//            R.id.action_settings -> true
-//            else -> super.onOptionsItemSelected(item)
-//        }
-//    }
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "medication reminders"
+            val description = "Reminds Patients to take medications"
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val mChannel = NotificationChannel(CHANNEL_ID, name, importance)
+            mChannel.description = description
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(mChannel)
+        }
+    }
 
-//    override fun onSupportNavigateUp(): Boolean {
-//        val navController = findNavController(R.id.nav_host_fragment_content_main)
-//        return navController.navigateUp(appBarConfiguration)
-//                || super.onSupportNavigateUp()
-//    }
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        when (requestCode) {
+            PERMISSION_NOTIFICATION_CODE -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                }
+            }
+        }
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
 }
+
