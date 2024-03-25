@@ -1,5 +1,3 @@
-package com.gradle.ui.components
-
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -41,6 +39,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.gradle.apiCalls.Medication
+import com.gradle.ui.components.ButtonSecondary
+import com.gradle.ui.components.HeadLineMedium
 import com.gradle.ui.theme.AppTheme
 
 @Composable

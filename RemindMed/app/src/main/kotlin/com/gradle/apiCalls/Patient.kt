@@ -28,9 +28,8 @@ import com.gradle.models.Doctor
 
 @OptIn(DelicateCoroutinesApi::class)
 class Patient {
-    //TODO: Change host to server's address once API deployed to some server
 
-    private val host: String = "http://10.0.2.2:8080"
+    private val host: String = "https://remindmed-api-nsjyfltjaa-uk.a.run.app"
     private val nullPatient = Patient("-1", "", "")
     private val client = HttpClient(Android) {
         install(ContentNegotiation) {
