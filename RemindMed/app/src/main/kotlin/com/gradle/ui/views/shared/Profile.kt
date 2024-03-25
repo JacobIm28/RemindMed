@@ -1,5 +1,6 @@
 package com.gradle.ui.views.shared
 
+import TextInput
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,7 +24,6 @@ import androidx.navigation.NavController
 import com.gradle.apiCalls.Patient as PatientApi
 import com.gradle.apiCalls.Doctor as DoctorApi
 import com.gradle.ui.components.ButtonPrimary
-import com.gradle.ui.components.TextInput
 import com.gradle.ui.components.TitleLarge
 import com.gradle.ui.theme.AppTheme
 import com.gradle.constants.GlobalObjects

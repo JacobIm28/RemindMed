@@ -1,5 +1,6 @@
 package com.gradle.ui.views.shared
 
+import TextInput
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
@@ -101,6 +102,9 @@ fun processNewUser(name: String, type: String, email: String, id: String): Boole
 fun MainView(
     viewModel: LoginModel
 ) {
+    // Wake up the API
+    //TODO: temporary fix, need to wake up API in a better way or at a diff spot.
+    PatientApi().getAllPatients()
     Column(
         modifier = Modifier.padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,

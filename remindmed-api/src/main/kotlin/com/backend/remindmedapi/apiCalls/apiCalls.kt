@@ -58,7 +58,6 @@ fun callListOfMedication(strSoFar: String): MutableList<String> {
                         numSoFar += 1;
                     }
                 }
-                res.removeFirst()
             }
         }
         return res
