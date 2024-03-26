@@ -89,4 +89,5 @@ dependencies {
     implementation("com.auth0.android:jwtdecode:+")
     // Notifications
     implementation("androidx.core:core-ktx")
+    implementation(kotlin("reflect"))
 }
