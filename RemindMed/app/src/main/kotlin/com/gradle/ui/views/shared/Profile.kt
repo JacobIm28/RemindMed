@@ -27,38 +27,25 @@ import com.gradle.ui.components.ButtonPrimary
 import com.gradle.ui.components.TitleLarge
 import com.gradle.ui.theme.AppTheme
 import com.gradle.constants.GlobalObjects
+import com.gradle.controller.DoctorController
+import com.gradle.controller.PatientController
 import com.gradle.models.Doctor
 import com.gradle.models.Patient
+import com.gradle.ui.views.DoctorViewModel
+import com.gradle.ui.views.PatientViewModel
 
+enum class ProfileViewEvent {
+    NameEvent,
+    EmailEvent,
+    UpdateEvent
+}
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("RememberReturnType", "UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun ProfileScreen(navController: NavController) {
-
-    var emailChanged by remember{ mutableStateOf(false) }
-    var nameChanged by remember{ mutableStateOf(false) }
-
-    var ogName: String = ""
-    var ogEmail: String = ""
-    var name by remember{ mutableStateOf("") }
-    var email by remember{ mutableStateOf("") }
-    if (GlobalObjects.type == "patient") {
-        ogName = GlobalObjects.patient.name
-        ogEmail = GlobalObjects.patient.email
-        name = GlobalObjects.patient.name
-        email = GlobalObjects.patient.email
-    } else {
-        ogName = GlobalObjects.doctor.name
-        ogEmail = GlobalObjects.doctor.email
-        name = GlobalObjects.doctor.name
-        email = GlobalObjects.doctor.email
-    }
-
-    var errorMessage by remember{mutableStateOf("")}
-
-    var changesSubmitted by remember{mutableStateOf(false)}
-    var isSuccess by remember{mutableStateOf(false)}
-    var isError by remember{mutableStateOf(false)}
+fun ProfileScreen(navController: NavController, doctorViewModel: DoctorViewModel, doctorController: DoctorController) {
+    val viewModel by remember{mutableStateOf(doctorViewModel)}
+    val controller by remember{mutableStateOf(doctorController)}
+    var changesSubmitted by remember{ mutableStateOf(false) }
 
     AppTheme {
         Box(modifier = Modifier.verticalScroll(rememberScrollState())){
@@ -66,51 +53,70 @@ fun ProfileScreen(navController: NavController) {
                 TitleLarge("Profile")
                 Spacer(modifier = Modifier.height(16.dp))
 
-                TextInput("Name", "", name, {
-                    name = it
-                    nameChanged = (name != ogName && name.isNotBlank())
-                }, isError = isError, errorMessage = errorMessage)
+                TextInput("Name", "", viewModel.name.value, {controller.invoke(ProfileViewEvent.NameEvent, it)})
                 Spacer(modifier = Modifier.height(12.dp))
 
-                TextInput("Email", "", email, {
-                    email = it
-                    emailChanged = (email != ogEmail && email.isNotBlank() && "@" in email)
-                    // TODO: Change email in auth02
-                })
+                TextInput("Email", "", viewModel.email.value, {controller.invoke(ProfileViewEvent.EmailEvent, it)})
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Row (modifier = Modifier.align(Alignment.CenterHorizontally)) {
                     ButtonPrimary("Submit", {
-                        if (GlobalObjects.type == "doctor") {
-                            val newDoc: Doctor = Doctor(GlobalObjects.doctor.did, name, email)
-                            try {
-                                isSuccess = DoctorApi().updateDoctor(newDoc)
-                            } catch (e: Exception) {
-                                errorMessage = e.message.toString()
-                                isError = true
-                            }
-                        } else {
-                            val newPat: Patient = Patient(GlobalObjects.patient.pid, name, email)
-                            try {
-                                isSuccess = PatientApi().updatePatient(newPat)
-                            } catch (e: Exception) {
-                                errorMessage = e.message.toString()
-                                isError = true
-                            }
-                        }
                         changesSubmitted = true
-                    }, (emailChanged || nameChanged))
+                        controller.invoke(ProfileViewEvent.UpdateEvent, "")
+                                            }, true)
                 }
-
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Row (modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                    if (changesSubmitted && isSuccess) {
+                    if (changesSubmitted && viewModel.successfulChange.value) {
                         Text("Success!")
                     } else if (changesSubmitted) {
                         Text("Unfortunately, the changes did not go through")
-                        if (errorMessage.isNotBlank()) {
-                            Text(errorMessage)
+                        if (viewModel.errorMessage.value.isNotBlank()) {
+                            Text(viewModel.errorMessage.value)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("RememberReturnType", "UnusedMaterialScaffoldPaddingParameter")
+@Composable
+fun ProfileScreen(navController: NavController, patientViewModel: PatientViewModel, patientController: PatientController) {
+    val viewModel by remember{mutableStateOf(patientViewModel)}
+    val controller by remember{mutableStateOf(patientController)}
+    var changesSubmitted by remember{ mutableStateOf(false) }
+
+    AppTheme {
+        Box(modifier = Modifier.verticalScroll(rememberScrollState())){
+            Column (modifier = androidx.compose.ui.Modifier.padding()) {
+                TitleLarge("Profile")
+                Spacer(modifier = Modifier.height(16.dp))
+
+                TextInput("Name", "", viewModel.name.value, {controller.invoke(ProfileViewEvent.NameEvent, it)})
+                Spacer(modifier = Modifier.height(12.dp))
+
+                TextInput("Email", "", viewModel.email.value, {controller.invoke(ProfileViewEvent.EmailEvent, it)})
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Row (modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                    ButtonPrimary("Submit", {
+                        changesSubmitted = true
+                        controller.invoke(ProfileViewEvent.UpdateEvent, "")
+                    }, true)
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row (modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                    if (changesSubmitted && viewModel.successfulChange.value) {
+                        Text("Success!")
+                    } else if (changesSubmitted) {
+                        Text("Unfortunately, the changes did not go through")
+                        if (viewModel.errorMessage.value.isNotBlank()) {
+                            Text(viewModel.errorMessage.value)
                         }
                     }
                 }

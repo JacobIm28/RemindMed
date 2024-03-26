@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.List
@@ -30,9 +31,14 @@ import androidx.navigation.navArgument
 import com.gradle.constants.Routes
 import com.gradle.ui.theme.AppTheme
 import com.gradle.constants.*
+import com.gradle.controller.AddPatientController
+import com.gradle.controller.DoctorController
+import com.gradle.controller.PatientController
+import com.gradle.models.AddPatient
 import com.gradle.models.Medication
 import com.gradle.ui.components.ButtonPrimary
 import com.gradle.ui.views.doctor.AddPatientScreen
+import com.gradle.ui.views.doctor.AddPatientViewModel
 import com.gradle.ui.views.patient.HomeScreen
 import com.gradle.ui.views.shared.MedicationEntryScreen
 import com.gradle.ui.views.shared.MedicationInfoScreen
@@ -40,6 +46,7 @@ import com.gradle.ui.views.shared.MedicationListScreen
 import com.gradle.ui.views.shared.PeopleListScreen
 import com.gradle.ui.views.shared.ProfileScreen
 import com.gradle.utilities.notifications.NotificationUtils
+import com.gradle.apiCalls.Doctor as DoctorApi
 import java.sql.Date
 
 data class NavigationItem(
@@ -85,6 +92,11 @@ fun RemindMedApp(context: Context) {
             icon = Icons.Rounded.Person,
             label = "Patients",
             route = Routes.PEOPLE_LIST,
+        ),
+        NavigationItem(
+            icon = Icons.Default.Add,
+            label = "Add Patients",
+            route = Routes.ADD_PATIENT
         ),
         NavigationItem(
             icon = Icons.Rounded.AccountCircle,
@@ -159,7 +171,15 @@ fun RemindMedApp(context: Context) {
                         )
                     }
 
-                    composable(Routes.PROFILE) { ProfileScreen(navController) }
+                    if (GlobalObjects.type == "patient") {
+                        val patientModel = PatientViewModel(GlobalObjects.patient)
+                        val patientController = PatientController(GlobalObjects.patient)
+                        composable(Routes.PROFILE) { ProfileScreen(navController, patientModel, patientController) }
+                    } else {
+                        val doctorModel = DoctorViewModel(GlobalObjects.doctor)
+                        val doctorController = DoctorController(GlobalObjects.doctor)
+                        composable(Routes.PROFILE) { ProfileScreen(navController, doctorModel, doctorController) }
+                    }
 
                     composable(
                         Routes.MEDICATION_INFO_WITH_ARGS,

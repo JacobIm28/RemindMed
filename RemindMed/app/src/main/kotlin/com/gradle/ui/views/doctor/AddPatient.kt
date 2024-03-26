@@ -1,5 +1,6 @@
 package com.gradle.ui.views.doctor
 
+import TextInput
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,96 +33,75 @@ import com.gradle.ui.theme.AppTheme
 import com.gradle.apiCalls.Patient as PatientApi
 import com.gradle.constants.GlobalObjects as GlobalObjects
 import com.gradle.apiCalls.Doctor
+import com.gradle.controller.AddPatientController
+import com.gradle.models.AddPatient
 import com.gradle.ui.views.shared.PatientItem
 
-//@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
+enum class AddPatientViewEvent{
+    EmailEvent,
+    SearchPatientEvent,
+    AddPatientEvent,
+    DialogClose
+}
+
 @Composable
 fun AddPatientScreen(navController: NavController) {
-    var patientName by remember{mutableStateOf("")}
-    val birthday = rememberDatePickerState(selectableDates = object : SelectableDates {
-        override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-            return utcTimeMillis <= System.currentTimeMillis()
-        }
-    })
-    var height by remember{mutableStateOf("")}
-    var weight by remember{mutableStateOf("")}
-
-    val possibleBloodTypes = listOf<String>("O-", "O+", "A-", "A+", "B-", "B+", "AB-", "AB+")
-    var bloodType by remember{mutableStateOf(possibleBloodTypes[0])}
-    var expanded by remember { mutableStateOf(false) }
-
-    var email by remember{mutableStateOf("")}
-    val proxyPatient = Patient("-1", "", "")
-    var currPatient by remember{mutableStateOf(proxyPatient)}
-    var showPatient by remember{mutableStateOf(false)}
-    var patientExists by remember{mutableStateOf(false)}
-    var successfullyAdded by remember{ mutableStateOf(false) }
-    var addPatientRequested by remember{ mutableStateOf(false) }
+    var patients: MutableList<Patient> by remember {mutableStateOf(mutableListOf<Patient>())}
+    var addPatientModel : AddPatient by remember{ mutableStateOf(AddPatient("", patients)) }
+    var addPatientViewModel : AddPatientViewModel by remember{mutableStateOf(AddPatientViewModel(addPatientModel))}
+    var addPatientController : AddPatientController by remember{mutableStateOf(AddPatientController(addPatientModel))}
+    var viewModel by remember{ mutableStateOf(addPatientViewModel) }
+    var controller by remember{ mutableStateOf(addPatientController) }
+    LaunchedEffect(Unit) {
+        patients = Doctor().getPatients(GlobalObjects.doctor.did)
+        addPatientModel = AddPatient(GlobalObjects.doctor.did, patients)
+        addPatientViewModel = AddPatientViewModel(addPatientModel)
+        addPatientController = AddPatientController(addPatientModel)
+        viewModel = addPatientViewModel
+        controller = addPatientController
+    }
 
     AppTheme {
-        Scaffold (
-            floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { navController.navigate(Routes.PEOPLE_LIST) },
-                    containerColor = MaterialTheme.colorScheme.primary
-                ) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                }
-            },
-        ) { padding ->
             Box(modifier = Modifier.verticalScroll(rememberScrollState())){
-                Column (modifier = Modifier.padding(padding)) {
+                Column (modifier = androidx.compose.ui.Modifier.padding()) {
                     TitleLarge("Add A New Patient")
 
                     Spacer(modifier = Modifier.height(16.dp))
 
                     HeadlineLarge("Email")
-                    Spacer(modifier = Modifier.height(8.dp))
-                    TextField(label = {Text("Email")}, value = email, onValueChange = {email = it}, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(8.dp), singleLine = true)
+                    TextInput("", "", viewModel.email.value, {controller.invoke(AddPatientViewEvent.EmailEvent, it)}, !viewModel.emailIsValid.value, "Not a valid email")
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Row (modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                        ButtonPrimary("Search", {
-                            showPatient = true
-                            currPatient = PatientApi().getPatientbyEmail(email)
-                            if(currPatient.pid != "-1") {
-                                patientExists = true
-                            } else {
-                                patientExists = false
+                        ButtonPrimary("Search", {controller.invoke(AddPatientViewEvent.SearchPatientEvent, "")}, viewModel.emailIsValid.value)
+                    }
+
+                    if (viewModel.currPatient.value != null && viewModel.patientAlreadyUnderDoctor.value) {
+                        // not a valid patient to add
+                        PatientItem(patient = viewModel.currPatient.value!!, navController = navController, false, true)
+                    } else if (viewModel.currPatient.value != null && !viewModel.patientAlreadyUnderDoctor.value) {
+                        // valid patient to add
+                        PatientItem(patient = viewModel.currPatient.value!!, navController = navController, true, true)
+                    } else {
+                        Spacer(modifier = Modifier.height(76.dp))
+                    }
+
+                    Row (modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                        ButtonPrimary("Add Patient", {controller.invoke(AddPatientViewEvent.AddPatientEvent, "")}, viewModel.currPatient.value != null && !viewModel.patientAlreadyUnderDoctor.value)
+                    }
+
+                    if (viewModel.showDialog.value) {
+                        AlertDialog(
+                            onDismissRequest = { controller.invoke(AddPatientViewEvent.DialogClose, "") },
+                            text = { Text(viewModel.addPatientDialogMessage.value) },
+                            confirmButton = {
+                                Button(onClick = { controller.invoke(AddPatientViewEvent.DialogClose, "") }) {
+                                    Text("OK")
+                                }
                             }
-                        }, true)
+                        )
                     }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    if (showPatient && patientExists) {
-                        PatientItem(patient = currPatient, navController = navController)
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        Row (modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                            ButtonPrimary("Add Patient", {
-                                // need to use the doctor add patient here
-                                successfullyAdded = Doctor().addPatient(GlobalObjects.doctor.did, currPatient.pid)
-                                addPatientRequested = true
-                            }, true)
-                        }
-
-                        Spacer(modifier = Modifier.height(8.dp))
-                        if (successfullyAdded && addPatientRequested) {
-                            Text("Success!")
-                        } else if (addPatientRequested) {
-                            Text("Unfortunately could not add patient")
-                        }
-                    } else if (showPatient) {
-                        HeadlineLarge("Unfortunately this patient does not exist")
-                    }
-
                 }
             }
-        }
-
-
     }
-
 }
