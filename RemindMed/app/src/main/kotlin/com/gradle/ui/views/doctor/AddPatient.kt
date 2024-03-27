@@ -35,7 +35,7 @@ import com.gradle.constants.GlobalObjects as GlobalObjects
 import com.gradle.apiCalls.Doctor
 import com.gradle.controller.AddPatientController
 import com.gradle.models.AddPatient
-import com.gradle.ui.views.shared.PatientItem
+import com.gradle.ui.components.PatientItem
 
 enum class AddPatientViewEvent{
     EmailEvent,

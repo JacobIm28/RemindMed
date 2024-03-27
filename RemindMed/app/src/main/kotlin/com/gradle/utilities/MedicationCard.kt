@@ -32,7 +32,8 @@ fun MedicationSummaryCard(name: String, dosage: String, time: String, dates: Str
             .border(1.dp, Color.LightGray, RoundedCornerShape(15.dp)),
 
 
-        colors = CardColors(containerColor = MaterialTheme.colorScheme.tertiary,
+        colors = CardColors(
+            containerColor = MaterialTheme.colorScheme.tertiary,
             contentColor = MaterialTheme.colorScheme.primary,
             disabledContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
             disabledContentColor = MaterialTheme.colorScheme.onTertiaryContainer
