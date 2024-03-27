@@ -44,6 +44,18 @@ class Doctor(var did: String = "", var _name: String = "", var _email: String = 
             notifySubscribers()
         }
 
+    var submitEnabled = false
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+
+    var changesSubmitted = false
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+
     override fun toString(): String {
         return "Doctor(did=$did, name='$name', email='$email')"
     }

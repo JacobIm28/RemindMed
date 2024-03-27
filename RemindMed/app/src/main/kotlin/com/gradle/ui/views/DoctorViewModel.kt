@@ -9,6 +9,8 @@ class DoctorViewModel(val model: Doctor) : ISubscriber {
     var successfulChange = mutableStateOf(model.successfulChange)
     var errorMessage = mutableStateOf(model.errorMessage)
     var isError = mutableStateOf(model.isError)
+    var submitEnabled = mutableStateOf(model.submitEnabled)
+    var changesSubmitted = mutableStateOf(model.changesSubmitted)
 
     init {
         model.subscribe(this)
@@ -20,5 +22,7 @@ class DoctorViewModel(val model: Doctor) : ISubscriber {
         successfulChange.value = model.successfulChange
         errorMessage.value = model.errorMessage
         isError.value = model.isError
+        submitEnabled.value = model.submitEnabled
+        changesSubmitted.value = model.changesSubmitted
     }
 }
