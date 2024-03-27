@@ -40,11 +40,12 @@ import com.gradle.ui.components.ButtonPrimary
 import com.gradle.ui.views.doctor.AddPatientScreen
 import com.gradle.ui.views.doctor.AddPatientViewModel
 import com.gradle.ui.views.patient.HomeScreen
+import com.gradle.ui.views.shared.DoctorProfileScreen
 import com.gradle.ui.views.shared.MedicationEntryScreen
 import com.gradle.ui.views.shared.MedicationInfoScreen
 import com.gradle.ui.views.shared.MedicationListScreen
+import com.gradle.ui.views.shared.PatientProfileScreen
 import com.gradle.ui.views.shared.PeopleListScreen
-import com.gradle.ui.views.shared.ProfileScreen
 import com.gradle.utilities.notifications.NotificationUtils
 import com.gradle.apiCalls.Doctor as DoctorApi
 import java.sql.Date
@@ -171,14 +172,19 @@ fun RemindMedApp(context: Context) {
                         )
                     }
 
+//                    if (GlobalObjects.type == "patient") {
+//                        val patientModel = PatientViewModel(GlobalObjects.patient)
+//                        val patientController = PatientController(GlobalObjects.patient)
+//                        composable(Routes.PROFILE) { ProfileScreen(navController, patientModel, patientController) }
+//                    } else {
+//                        val doctorModel = DoctorViewModel(GlobalObjects.doctor)
+//                        val doctorController = DoctorController(GlobalObjects.doctor)
+//                        composable(Routes.PROFILE) { ProfileScreen(navController, doctorModel, doctorController) }
+//                    }
                     if (GlobalObjects.type == "patient") {
-                        val patientModel = PatientViewModel(GlobalObjects.patient)
-                        val patientController = PatientController(GlobalObjects.patient)
-                        composable(Routes.PROFILE) { ProfileScreen(navController, patientModel, patientController) }
+                        composable(Routes.PROFILE) { PatientProfileScreen(navController = navController)}
                     } else {
-                        val doctorModel = DoctorViewModel(GlobalObjects.doctor)
-                        val doctorController = DoctorController(GlobalObjects.doctor)
-                        composable(Routes.PROFILE) { ProfileScreen(navController, doctorModel, doctorController) }
+                        composable(Routes.PROFILE) { DoctorProfileScreen(navController = navController)}
                     }
 
                     composable(
