@@ -28,9 +28,13 @@ class AddPatientController(val model: AddPatient) {
                 }
                 if (potentialPatient.pid == "-1") {
                     model.currPatient = null
+                    model.showDialog = true
+                    model.addPatientDialogMessage = "Unfortunately, this patient does not exist"
                 } else if (patientAlreadyUnderDoctor) {
                     model.patientAlreadyUnderDoctor = true
                     model.currPatient = potentialPatient
+                    model.showDialog = true
+                    model.addPatientDialogMessage = "Unfortunately, this patient is already under your care"
                 } else {
                     // it is a valid patient to add
                     model.patientAlreadyUnderDoctor = false
