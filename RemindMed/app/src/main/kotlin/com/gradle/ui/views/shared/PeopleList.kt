@@ -24,6 +24,7 @@ import com.gradle.models.Doctor
 import com.gradle.ui.theme.*
 import com.gradle.models.Patient
 import com.gradle.ui.components.DoctorItem
+import com.gradle.ui.components.LoadingScreen
 import com.gradle.ui.components.PatientItem
 import com.gradle.apiCalls.Patient as PatientApi
 import com.gradle.apiCalls.Doctor as DoctorApi
@@ -31,49 +32,56 @@ import com.gradle.apiCalls.Doctor as DoctorApi
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun PeopleListScreen(navController: NavController) {
-    var patientList: MutableList<Patient> by remember { mutableStateOf(mutableListOf<Patient>()) }
-    var doctorList: MutableList<Doctor> by remember { mutableStateOf(mutableListOf<Doctor>()) }
+    var patientList: MutableList<Patient> by remember {mutableStateOf(mutableListOf<Patient>())}
+    var doctorList : MutableList<Doctor> by remember { mutableStateOf(mutableListOf<Doctor>()) }
+    var isLoading by remember { mutableStateOf(true) }
+
     LaunchedEffect(Unit) {
         if (GlobalObjects.type == "doctor") {
             patientList = DoctorApi().getPatients(GlobalObjects.doctor.did)
         } else {
             doctorList = PatientApi().getDoctors(GlobalObjects.patient.pid)
         }
+        isLoading = false
     }
 
     AppTheme {
-        LazyColumn(modifier = Modifier.padding()) {
-            if (GlobalObjects.type == "doctor") {
-                if (patientList.isEmpty()) {
-                    item {
-                        Text(
-                            "No patients found",
-                            modifier = Modifier.fillMaxSize().wrapContentHeight(),
-                            style = typography.h6,
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center,
-                            color = md_theme_dark_onTertiary
-                        )
+        if (isLoading) {
+            LoadingScreen()
+        } else {
+            LazyColumn(modifier = Modifier.padding()) {
+                if (GlobalObjects.type == "doctor") {
+                    if (patientList.isEmpty()) {
+                        item {
+                            Text(
+                                "No patients found",
+                                modifier = Modifier.fillMaxSize().wrapContentHeight(),
+                                style = typography.h6,
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Center,
+                                color = md_theme_dark_onTertiary
+                            )
+                        }
                     }
-                }
-                items(patientList) { patient ->
-                    PatientItem(patient, navController, true, false)
-                }
-            } else {
-                if (doctorList.isEmpty()) {
-                    item {
-                        Text(
-                            "No doctors found",
-                            modifier = Modifier.fillMaxSize().wrapContentHeight(),
-                            style = typography.h6,
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center,
-                            color = md_theme_dark_onTertiary
-                        )
+                    items(patientList) { patient ->
+                        PatientItem(patient, navController, true, false)
                     }
-                }
-                items(doctorList) { doctor ->
-                    DoctorItem(doctor)
+                } else {
+                    if (doctorList.isEmpty()) {
+                        item {
+                            Text(
+                                "No doctors found",
+                                modifier = Modifier.fillMaxSize().wrapContentHeight(),
+                                style = typography.h6,
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Center,
+                                color = md_theme_dark_onTertiary
+                            )
+                        }
+                    }
+                    items(doctorList) { doctor ->
+                        DoctorItem(doctor)
+                    }
                 }
             }
         }

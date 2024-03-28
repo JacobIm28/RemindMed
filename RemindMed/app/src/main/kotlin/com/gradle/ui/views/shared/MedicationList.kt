@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
@@ -36,12 +37,15 @@ import com.gradle.constants.NavArguments
 import com.gradle.constants.Routes
 import com.gradle.models.LoginModel
 import com.gradle.models.Medication
+import com.gradle.models.Patient
 import com.gradle.ui.components.ButtonSecondary
 import com.gradle.ui.components.HeadlineLarge
+import com.gradle.ui.components.LoadingScreen
 import com.gradle.ui.components.TitleLarge
 import com.gradle.ui.theme.*
 import com.gradle.utilities.toFormattedDateString
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.sql.Date
 import java.sql.Time
@@ -56,12 +60,35 @@ import com.gradle.apiCalls.Medication as MedicationApi
 fun MedicationListScreen(navController: NavController, pid: String) {
     // TODO: Implement some sort async code rot run this on load, and display a loading screen in the meantime
     val coroutineScope = rememberCoroutineScope()
-    val patient = if (GlobalObjects.type == "patient") {
-        GlobalObjects.patient
-    } else {
-        PatientApi().getPatientbyId(pid)
+
+    var medications by remember {
+        mutableStateOf<List<Medication>?>(null)
     }
-    var medications: MutableList<Medication> = PatientApi().getMedicines(pid)
+    var patient by remember {
+        mutableStateOf<Patient?>(null)
+    }
+
+    fun getPatientById() {
+        if (GlobalObjects.type == "patient") {
+            patient = GlobalObjects.patient
+        } else {
+            val patientResult = PatientApi().getPatientbyId(pid)
+            println(patientResult)
+            if (patientResult.pid != "-1") {
+                patient = patientResult
+            }
+        }
+    }
+
+    fun getMedications() {
+        val medicationResult = PatientApi().getMedicines(pid)
+        medications = medicationResult
+    }
+
+    LaunchedEffect(Unit) {
+        getPatientById()
+        getMedications()
+    }
 
     AppTheme {
         Scaffold(
@@ -77,12 +104,14 @@ fun MedicationListScreen(navController: NavController, pid: String) {
             Column (
                 Modifier
                     .padding(padding)
+                    .fillMaxWidth()
             ) {
-
-                TitleLarge("${patient.name.substringBefore(" ")}'s Medication")
+                TitleLarge("${patient?.name?.substringBefore(" ")}'s Medication")
 
                 HeadlineLarge("Medications")
-                if(medications.isEmpty()) {
+                if (patient == null || medications == null) {
+                    LoadingScreen()
+                } else if(medications!!.isEmpty()) {
                     Text(
                         "No Medications found",
                         modifier = Modifier.fillMaxSize().wrapContentHeight(),
@@ -91,44 +120,38 @@ fun MedicationListScreen(navController: NavController, pid: String) {
                         textAlign = TextAlign.Center,
                         color = md_theme_dark_onTertiary
                     )
-                }
+                } else {
 
-                LazyColumn {
-                    items(medications) { medication ->
-                        MedicationItem(
-                            medication = medication,
-                            navController = navController,
-//                            onRemove = {
-//                                coroutineScope.launch {
-//                                    val success = PatientApi().removeMedication(GlobalObjects.patient.pid, medication.medicationId)
-//                                    if (success) {
-//                                        // Fetch the updated medications list
-//                                        medications = PatientApi().getMedicines(GlobalObjects.patient.pid).toList()
-//                                    } else {
-//                                        // Handle the case where medication removal was unsuccessful
-//                                        // This might involve showing an error message to the user
-//                                    }
-//                                }
-//                            },
-                            onRemove = {
-                                val success = PatientApi().removeMedication(GlobalObjects.patient.pid, medication.medicationId)
-                                if (success) { println("Medication Removed")
-                                   medications = PatientApi().getMedicines(GlobalObjects.patient.pid)
-                                } else {
-                                    medications = PatientApi().getMedicines(GlobalObjects.patient.pid)
-                                    println("Medication Not Removed")
+                    LazyColumn {
+                        items(medications!!) { medication ->
+                            MedicationItem(
+                                medication = medication,
+                                navController = navController,
+                                onRemove = {
+                                    val success = PatientApi().removeMedication(
+                                        GlobalObjects.patient.pid,
+                                        medication.medicationId
+                                    )
+                                    if (success) {
+                                        println("Medication Removed")
+                                        medications =
+                                            PatientApi().getMedicines(GlobalObjects.patient.pid)
+                                    } else {
+                                        medications =
+                                            PatientApi().getMedicines(GlobalObjects.patient.pid)
+                                        println("Medication Not Removed")
+                                    }
+                                },
+                                onClick = {
+                                    navController.navigate(
+                                        Routes.MEDICATION_INFO + "?${NavArguments.MEDICATION_INFO.MEDICATION_NAME}=${medication.name}&" +
+                                                "${NavArguments.MEDICATION_INFO.START_DATE}=${medication.startDate}&" +
+                                                "${NavArguments.MEDICATION_INFO.END_DATE}=${medication.endDate}&" +
+                                                "${NavArguments.MEDICATION_INFO.DOSAGE}=${medication.amount}"
+                                    )
                                 }
-                                println(medications)
-                            },
-                            onClick = {
-                                navController.navigate(
-                                    Routes.MEDICATION_INFO + "?${NavArguments.MEDICATION_INFO.MEDICATION_NAME}=${medication.name}&" +
-                                            "${NavArguments.MEDICATION_INFO.START_DATE}=${medication.startDate}&" +
-                                            "${NavArguments.MEDICATION_INFO.END_DATE}=${medication.endDate}&" +
-                                            "${NavArguments.MEDICATION_INFO.DOSAGE}=${medication.amount}"
-                                )
-                            }
-                        )
+                            )
+                        }
                     }
                 }
             }
