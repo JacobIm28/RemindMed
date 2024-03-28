@@ -36,6 +36,8 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.RadioButton
 import androidx.compose.material.RadioButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -47,7 +49,7 @@ import com.gradle.ui.components.*
 import com.gradle.ui.views.RemindMedApp
 import com.gradle.apiCalls.Patient as PatientApi
 import com.gradle.apiCalls.Doctor as DoctorApi
-
+import com.gradle.ui.components.LoadingScreen
 fun validateName(name: String): Boolean {
     return name.isNotEmpty() && name.length > 2 && name.matches(Regex(".*[a-zA-Z0-9].*"))
 }
@@ -102,7 +104,17 @@ fun MainView(
 ) {
     // Wake up the API
     //TODO: temporary fix, need to wake up API in a better way or at a diff spot.
-    PatientApi().getAllPatients()
+    LaunchedEffect(Unit) {
+        PatientApi().getAllPatients()
+    }
+
+    //TODO: Uncomment to skip login process
+
+//    GlobalObjects.type = "patient"
+//    GlobalObjects.patient = PatientApi().getPatientbyId("65f9aa62cd606f2e1413f38e")
+//    viewModel.userIsAuthenticated = true
+//    viewModel.userIsComplete = true
+
     Column(
         modifier = Modifier.padding(20.dp, 50.dp, 20.dp, 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -172,8 +184,8 @@ fun MainView(
         }
 
         var buttonText: String = "Begin"
-        val onClickAction: () -> Unit
-        if (viewModel.userIsAuthenticated) {
+        var onClickAction: () -> Unit = { viewModel.login()}
+        if (viewModel.userIsAuthenticated && !viewModel.userIsComplete) {
             buttonText = "Proceed"
             onClickAction = { if(validateName(viewModel.user.name) && (viewModel.user.type == "patient" || viewModel.user.type == "doctor")) {
                 viewModel.userIsComplete = processNewUser(viewModel.user.name, viewModel.user.type, viewModel.user.email, viewModel.user.id)
@@ -184,7 +196,8 @@ fun MainView(
                     GlobalObjects.doctor = Doctor(viewModel.user.id, viewModel.user.name, viewModel.user.email)
                     GlobalObjects.type = "doctor"
                 }
-            } }
+            }
+            viewModel.isLoading = true}
         } else {
             Image (
                 painter = painterResource(id = R.drawable.logotransparent),
@@ -196,8 +209,14 @@ fun MainView(
         }
         LogButton(
             text = buttonText,
-            onClick = { viewModel.login() },
+            onClick = onClickAction,
         )
+
+        println(viewModel.isLoading)
+
+        if(viewModel.isLoading) {
+            LoadingScreen()
+        }
     }
 }
 @RequiresApi(Build.VERSION_CODES.O)

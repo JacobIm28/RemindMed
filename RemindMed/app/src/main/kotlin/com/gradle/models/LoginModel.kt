@@ -25,6 +25,7 @@ class LoginModel: ViewModel() {
     var userIsAuthenticated by mutableStateOf(false)
     var userIsComplete by mutableStateOf(false)
     var accessToken by mutableStateOf("")
+    var isLoading by mutableStateOf(false)
 
     private val TAG = "MainViewModel"
     private var account: Auth0 = Auth0(R.string.com_auth0_client_id.toString(), R.string.com_auth0_domain.toString())
@@ -70,6 +71,7 @@ class LoginModel: ViewModel() {
 
                     userIsAuthenticated = true
                     appJustLaunched = false
+                    isLoading = true
                 }
 
             })

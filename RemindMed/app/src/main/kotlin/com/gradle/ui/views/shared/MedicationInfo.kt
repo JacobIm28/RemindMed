@@ -42,6 +42,7 @@ import com.gradle.constants.Routes
 import com.gradle.models.Medication
 import com.gradle.ui.components.BoldText
 import com.gradle.ui.components.HeadLineMedium
+import com.gradle.ui.components.LoadingScreen
 import com.gradle.ui.components.TitleLarge
 import com.gradle.ui.theme.AppTheme
 import com.gradle.ui.theme.container_colour
@@ -72,7 +73,7 @@ fun MedicationInfoScreen(navController: NavController, medicationName: String, s
                 .padding(padding)
                 .verticalScroll(rememberScrollState())) {
                 if (isLoading) {
-                    Text("Loading...")
+                    LoadingScreen()
                 } else {
 //                IconButton(onClick = { navController.navigate(Routes.MEDICATION_EDIT) }) {
 //                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
