@@ -146,13 +146,7 @@ fun MedicationListHomeScreen(
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun HomeScreen(
-    navController: NavController
-) {
-    if (GlobalObjects.type == "doctor") {
-        navController.navigate(Routes.PEOPLE_LIST)
-    }
-
+fun HomeScreen() {
     var takenMedications by remember { mutableStateOf(listOf<Prescription>()) }
     var notTakenMedications by remember { mutableStateOf(listOf<Prescription>()) }
 
@@ -205,12 +199,12 @@ fun HomeScreen(
 }
 
 
-@RequiresApi(Build.VERSION_CODES.O)
-@Preview
-@Composable
-fun PreviewHomeScreen() {
-    HomeScreen(navController = rememberNavController())
-}
+//@RequiresApi(Build.VERSION_CODES.O)
+//@Preview
+//@Composable
+//fun PreviewHomeScreen() {
+//    HomeScreen(navController = rememberNavController())
+//}
 
 @Composable
 fun Greeting() {

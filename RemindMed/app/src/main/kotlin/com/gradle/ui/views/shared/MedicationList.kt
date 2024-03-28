@@ -57,7 +57,12 @@ import com.gradle.apiCalls.Medication as MedicationApi
 @RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun MedicationListScreen(navController: NavController, pid: String) {
+fun MedicationListScreen(
+    pid: String,
+    onNavigateToMedicationEntry: () -> Unit,
+    onNavigateToMedicationEdit: () -> Unit,
+    onNavigateToMedicationInfo: (Medication) -> Unit,
+) {
     // TODO: Implement some sort async code rot run this on load, and display a loading screen in the meantime
     val coroutineScope = rememberCoroutineScope()
 
@@ -94,7 +99,7 @@ fun MedicationListScreen(navController: NavController, pid: String) {
         Scaffold(
             floatingActionButton = {
                 FloatingActionButton(
-                    onClick = { navController.navigate(Routes.MEDICATION_ENTRY)},
+                    onClick = { onNavigateToMedicationEntry() },
                     containerColor = MaterialTheme.colorScheme.primary
                 ) {
                     Icon(Icons.Default.Add, contentDescription = "Add Medication")
@@ -109,6 +114,7 @@ fun MedicationListScreen(navController: NavController, pid: String) {
                 TitleLarge("${patient?.name?.substringBefore(" ")}'s Medication")
 
                 HeadlineLarge("Medications")
+                
                 if (patient == null || medications == null) {
                     LoadingScreen()
                 } else if(medications!!.isEmpty()) {
@@ -121,38 +127,27 @@ fun MedicationListScreen(navController: NavController, pid: String) {
                         color = md_theme_dark_onTertiary
                     )
                 } else {
-
-                    LazyColumn {
-                        items(medications!!) { medication ->
-                            MedicationItem(
-                                medication = medication,
-                                navController = navController,
-                                onRemove = {
-                                    val success = PatientApi().removeMedication(
-                                        GlobalObjects.patient.pid,
-                                        medication.medicationId
-                                    )
-                                    if (success) {
-                                        println("Medication Removed")
-                                        medications =
-                                            PatientApi().getMedicines(GlobalObjects.patient.pid)
-                                    } else {
-                                        medications =
-                                            PatientApi().getMedicines(GlobalObjects.patient.pid)
-                                        println("Medication Not Removed")
-                                    }
-                                },
-                                onClick = {
-                                    navController.navigate(
-                                        Routes.MEDICATION_INFO + "?${NavArguments.MEDICATION_INFO.MEDICATION_NAME}=${medication.name}&" +
-                                                "${NavArguments.MEDICATION_INFO.START_DATE}=${medication.startDate}&" +
-                                                "${NavArguments.MEDICATION_INFO.END_DATE}=${medication.endDate}&" +
-                                                "${NavArguments.MEDICATION_INFO.DOSAGE}=${medication.amount}"
-                                    )
+                  LazyColumn {
+                    items(medications!!) { medication ->
+                        MedicationItem(
+                            medication = medication,
+                            onRemove = {
+                                val success = PatientApi().removeMedication(GlobalObjects.patient.pid, medication.medicationId)
+                                if (success) { println("Medication Removed")
+                                   medications = PatientApi().getMedicines(GlobalObjects.patient.pid).toList()
+                                } else {
+                                    medications = PatientApi().getMedicines(GlobalObjects.patient.pid).toList()
+                                    println("Medication Not Removed")
                                 }
-                            )
-                        }
+                                println(medications)
+                            },
+                            onClick = {
+                                onNavigateToMedicationInfo(medication)
+                            },
+                            onNavigateToMedicationEdit
+                        )
                     }
+                  }
                 }
             }
         }
@@ -164,9 +159,9 @@ fun MedicationListScreen(navController: NavController, pid: String) {
 @Composable
 fun MedicationItem(
     medication: Medication,
-    navController: NavController,
     onRemove: () -> Unit,
-    onClick: () -> Unit // Click listener for the entire item
+    onClick: () -> Unit, // Click listener for the entire item
+    onNavigateToMedicationEdit: () -> Unit
 ) {
     var showDialog by remember { mutableStateOf(false) }
 
@@ -205,7 +200,7 @@ fun MedicationItem(
             Spacer(modifier = Modifier.weight(1f))
 
             Column {
-                IconButton(onClick = { navController.navigate(Routes.MEDICATION_EDIT) }) {
+                IconButton(onClick = { onNavigateToMedicationEdit() }) {
                     Icon(Icons.Filled.Edit, contentDescription = "Edit")
                 }
                 // Remove icon

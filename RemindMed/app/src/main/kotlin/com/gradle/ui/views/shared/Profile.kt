@@ -47,7 +47,7 @@ enum class ProfileViewEvent {
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("RememberReturnType", "UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun DoctorProfileScreen(navController: NavController) {
+fun ProfileScreen(doctorViewModel: DoctorViewModel, doctorController: DoctorController) {
     var doctorModel : DoctorViewModel by remember{ mutableStateOf(DoctorViewModel(Doctor())) }
     var doctorController : DoctorController by remember{ mutableStateOf(DoctorController(Doctor())) }
     var viewModel by remember{ mutableStateOf(doctorModel) }
@@ -123,18 +123,18 @@ fun DoctorProfileScreen(navController: NavController) {
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("RememberReturnType", "UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun PatientProfileScreen(navController: NavController) {
-    var patientModel : PatientViewModel by remember{ mutableStateOf(PatientViewModel(Patient())) }
-    var patientController : PatientController by remember{ mutableStateOf(PatientController(Patient())) }
-    var viewModel by remember{ mutableStateOf(patientModel) }
-    var controller by remember{ mutableStateOf(patientController) }
-    LaunchedEffect(Unit) {
-        val patient : Patient = PatientApi().getPatientbyId(GlobalObjects.patient.pid)
-        patientModel = PatientViewModel(patient)
-        patientController = PatientController(patient)
-        viewModel = patientModel
-        controller = patientController
-    }
+fun ProfileScreen(patientViewModel: PatientViewModel, patientController: PatientController) {
+  var patientModel : PatientViewModel by remember{ mutableStateOf(PatientViewModel(Patient())) }
+  var patientController : PatientController by remember{ mutableStateOf(PatientController(Patient())) }
+  var viewModel by remember{ mutableStateOf(patientModel) }
+  var controller by remember{ mutableStateOf(patientController) }
+  LaunchedEffect(Unit) {
+      val patient : Patient = PatientApi().getPatientbyId(GlobalObjects.patient.pid)
+      patientModel = PatientViewModel(patient)
+      patientController = PatientController(patient)
+      viewModel = patientModel
+      controller = patientController
+  }
 
     AppTheme {
         Box(modifier = Modifier.verticalScroll(rememberScrollState())){

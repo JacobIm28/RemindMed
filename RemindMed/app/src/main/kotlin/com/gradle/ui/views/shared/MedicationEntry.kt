@@ -56,7 +56,10 @@ import com.gradle.models.Medication as Medication
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @SuppressLint("RememberReturnType", "UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun MedicationEntryScreen(navController: NavController) {
+fun MedicationEntryScreen(
+    onNavigateToPeopleList: () -> Unit,
+    onNavigateToMedicationList: (String) -> Unit
+) {
 
     // TODO: Add all these inputs to the page, then call Samir's function that calls the correct endpoint
     // TODO: Use the reusable Date, TimePicker components
@@ -339,12 +342,17 @@ fun MedicationEntryScreen(navController: NavController) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                ButtonSecondary(text = "Cancel", onClick = {
-                    if (GlobalObjects.type == "doctor")
-                        navController.navigate(Routes.PEOPLE_LIST)
-                    else
-                        navController.navigate(Routes.MEDICATION_LIST + "?" +
-                            "${NavArguments.MEDICATION_LIST.PID}=${GlobalObjects.patient.pid}") }, enabled = true)
+                ButtonSecondary(
+                    text = "Cancel",
+                    onClick = {
+                        if (GlobalObjects.type == "doctor") {
+                            onNavigateToPeopleList()
+                        } else {
+                            onNavigateToMedicationList(GlobalObjects.patient.pid)
+                        }
+                    },
+                    enabled = true
+                )
 
                 ButtonSecondary(text = "Add", onClick = {if (validateInputs(medicationName, dosage, times, notes)) { // need to make validation more robust later on
                     println("HI3")
@@ -366,7 +374,7 @@ fun MedicationEntryScreen(navController: NavController) {
 //                    println(medication)
                     val success = Patient().addMedication(medication)
                     if (success) {
-                        navController.navigate(Routes.MEDICATION_LIST + "?" + "${NavArguments.MEDICATION_LIST.PID}=${GlobalObjects.patient.pid}")
+                        onNavigateToMedicationList(GlobalObjects.patient.pid)
                     } else {
                         showAddMedicationErrorDialog.value = true
                     }

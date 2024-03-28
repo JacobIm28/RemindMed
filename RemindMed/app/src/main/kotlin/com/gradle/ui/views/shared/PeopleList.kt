@@ -31,7 +31,7 @@ import com.gradle.apiCalls.Doctor as DoctorApi
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun PeopleListScreen(navController: NavController) {
+fun PeopleListScreen(onNavigateToMedicationList: (String) -> Unit) {
     var patientList: MutableList<Patient> by remember {mutableStateOf(mutableListOf<Patient>())}
     var doctorList : MutableList<Doctor> by remember { mutableStateOf(mutableListOf<Doctor>()) }
     var isLoading by remember { mutableStateOf(true) }
@@ -64,7 +64,7 @@ fun PeopleListScreen(navController: NavController) {
                         }
                     }
                     items(patientList) { patient ->
-                        PatientItem(patient, navController, true, false)
+                        PatientItem(patient, onNavigateToMedicationList, true, false)
                     }
                 } else {
                     if (doctorList.isEmpty()) {
