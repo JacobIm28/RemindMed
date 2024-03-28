@@ -28,6 +28,7 @@ import androidx.navigation.NavDeepLinkBuilder
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.style.TextAlign
 
 import com.gradle.constants.GlobalObjects
 import com.gradle.apiCalls.Patient as PatientApi
@@ -55,8 +56,12 @@ import com.gradle.apiCalls.Medication as MedicationApi
 fun MedicationListScreen(navController: NavController, pid: String) {
     // TODO: Implement some sort async code rot run this on load, and display a loading screen in the meantime
     val coroutineScope = rememberCoroutineScope()
-    var patient = PatientApi().getPatientbyId(pid)
-    var medications: List<Medication> = PatientApi().getMedicines(pid)
+    val patient = if (GlobalObjects.type == "patient") {
+        GlobalObjects.patient
+    } else {
+        PatientApi().getPatientbyId(pid)
+    }
+    var medications: MutableList<Medication> = PatientApi().getMedicines(pid)
 
     AppTheme {
         Scaffold(
@@ -77,6 +82,17 @@ fun MedicationListScreen(navController: NavController, pid: String) {
                 TitleLarge("${patient.name.substringBefore(" ")}'s Medication")
 
                 HeadlineLarge("Medications")
+                if(medications.isEmpty()) {
+                    Text(
+                        "No Medications found",
+                        modifier = Modifier.fillMaxSize().wrapContentHeight(),
+                        style = androidx.compose.material.MaterialTheme.typography.h6,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        color = md_theme_dark_onTertiary
+                    )
+                }
+
                 LazyColumn {
                     items(medications) { medication ->
                         MedicationItem(
@@ -97,9 +113,9 @@ fun MedicationListScreen(navController: NavController, pid: String) {
                             onRemove = {
                                 val success = PatientApi().removeMedication(GlobalObjects.patient.pid, medication.medicationId)
                                 if (success) { println("Medication Removed")
-                                   medications = PatientApi().getMedicines(GlobalObjects.patient.pid).toList()
+                                   medications = PatientApi().getMedicines(GlobalObjects.patient.pid)
                                 } else {
-                                    medications = PatientApi().getMedicines(GlobalObjects.patient.pid).toList()
+                                    medications = PatientApi().getMedicines(GlobalObjects.patient.pid)
                                     println("Medication Not Removed")
                                 }
                                 println(medications)
@@ -114,11 +130,6 @@ fun MedicationListScreen(navController: NavController, pid: String) {
                             }
                         )
                     }
-                }
-
-                Spacer(modifier = (Modifier.height(16.dp)))
-                Row (modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                    ButtonSecondary(text = "See More", onClick = {}, enabled = true)
                 }
             }
         }

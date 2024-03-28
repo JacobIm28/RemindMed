@@ -16,6 +16,7 @@ import com.example.remindmed.R
 import com.gradle.constants.GlobalObjects
 import com.gradle.apiCalls.Patient as PatientApi
 import com.gradle.apiCalls.Doctor as DoctorApi
+import com.auth0.android.management.UsersAPIClient
 
 
 class LoginModel: ViewModel() {
@@ -23,10 +24,11 @@ class LoginModel: ViewModel() {
     var appJustLaunched by mutableStateOf(true)
     var userIsAuthenticated by mutableStateOf(false)
     var userIsComplete by mutableStateOf(false)
+    var accessToken by mutableStateOf("")
 
-    private val TAG = "MainViewModel"  // 1
-    private var account: Auth0 = Auth0(R.string.com_auth0_client_id.toString(), R.string.com_auth0_domain.toString())  // 2
-    private lateinit var context: Context  // 3
+    private val TAG = "MainViewModel"
+    private var account: Auth0 = Auth0(R.string.com_auth0_client_id.toString(), R.string.com_auth0_domain.toString())
+    private lateinit var context: Context
 
     var user by mutableStateOf(User())
 
@@ -41,9 +43,9 @@ class LoginModel: ViewModel() {
                 }
 
                 override fun onSuccess(result: Credentials) {
-                    val idToken = result.idToken
+                    val accessToken = result.idToken
 
-                    var jwt = JWT(idToken ?: "").subject ?: "1"
+                    var jwt = JWT(accessToken ?: "").subject ?: "1"
                     if(jwt.startsWith("auth0|")) {
                         jwt = jwt.slice(6 until jwt.length)
                     }
@@ -52,17 +54,18 @@ class LoginModel: ViewModel() {
                     val doctor: Doctor = DoctorApi().getDoctor(jwt)
 
                     if(patient.pid != "-1") {
-                        user = User(patient.pid, patient.name, "patient")
+                        user = User(accessToken, patient.name, "patient")
+                        println(user)
                         userIsComplete = true
                         GlobalObjects.patient = patient
                         GlobalObjects.type = "patient"
                     } else if(doctor.did != "-1") {
-                        user = User(doctor.did, doctor.name, "doctor")
+                        user = User(accessToken, doctor.name, "doctor")
                         GlobalObjects.doctor = doctor
                         GlobalObjects.type = "doctor"
                         userIsComplete = true
                     } else {
-                        user = User(idToken)
+                        user = User(accessToken)
                     }
 
                     userIsAuthenticated = true
@@ -87,8 +90,11 @@ class LoginModel: ViewModel() {
                     // The user successfully logged out.
                     user = User()
                     userIsAuthenticated = false
+                    userIsComplete = false
+                    GlobalObjects.type = ""
+                    GlobalObjects.patient = Patient()
+                    GlobalObjects.doctor = Doctor()
                 }
-
             })
     }
 
