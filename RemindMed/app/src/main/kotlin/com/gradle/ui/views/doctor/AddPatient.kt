@@ -45,7 +45,7 @@ enum class AddPatientViewEvent{
 }
 
 @Composable
-fun AddPatientScreen(navController: NavController) {
+fun AddPatientScreen(onNavigateToMedicationList: (String) -> Unit) {
     var patients: MutableList<Patient> by remember {mutableStateOf(mutableListOf<Patient>())}
     var addPatientModel : AddPatient by remember{ mutableStateOf(AddPatient("", patients)) }
     var addPatientViewModel : AddPatientViewModel by remember{mutableStateOf(AddPatientViewModel(addPatientModel))}
@@ -78,10 +78,10 @@ fun AddPatientScreen(navController: NavController) {
 
                     if (viewModel.currPatient.value != null && viewModel.patientAlreadyUnderDoctor.value) {
                         // not a valid patient to add
-                        PatientItem(patient = viewModel.currPatient.value!!, navController = navController, false, true)
+                        PatientItem(patient = viewModel.currPatient.value!!, onNavigateToMedicationList, false, true)
                     } else if (viewModel.currPatient.value != null && !viewModel.patientAlreadyUnderDoctor.value) {
                         // valid patient to add
-                        PatientItem(patient = viewModel.currPatient.value!!, navController = navController, true, true)
+                        PatientItem(patient = viewModel.currPatient.value!!, onNavigateToMedicationList , true, true)
                     } else {
                         Spacer(modifier = Modifier.height(76.dp))
                     }

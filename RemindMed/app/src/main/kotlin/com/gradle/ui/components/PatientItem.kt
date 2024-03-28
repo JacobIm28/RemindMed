@@ -28,7 +28,7 @@ import com.gradle.models.Patient
 import com.gradle.ui.theme.AppTheme
 
 @Composable
-fun PatientItem(patient: Patient, navController: NavController, isValid: Boolean, isAddPatient: Boolean) {
+fun PatientItem(patient: Patient, onNavigateMedicationList: (String) -> Unit, isValid: Boolean, isAddPatient: Boolean) {
     AppTheme {
         Card(
             modifier = Modifier.padding(6.dp),
@@ -44,7 +44,7 @@ fun PatientItem(patient: Patient, navController: NavController, isValid: Boolean
             ),
             onClick = {
                 if (!isAddPatient) {
-                    navController.navigate(Routes.MEDICATION_LIST + "?" + "${NavArguments.MEDICATION_LIST.PID}=${patient.pid}")
+                    onNavigateMedicationList(patient.pid)
                 }
             }
         ) {

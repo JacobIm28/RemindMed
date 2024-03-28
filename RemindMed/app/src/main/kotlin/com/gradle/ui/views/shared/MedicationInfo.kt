@@ -54,7 +54,7 @@ import com.gradle.apiCalls.Medication as MedicationApi
 @RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun MedicationInfoScreen(navController: NavController, medicationName: String, startDate: String, endDate: String, dosage: String) {
+fun MedicationInfoScreen(medicationName: String, startDate: String, endDate: String, dosage: String) {
     // TODO: Get medication as a prop passed in from medication card
     var medicationInfo: JsonObject = JsonObject()
 
@@ -111,38 +111,38 @@ fun MedicationInfoScreen(navController: NavController, medicationName: String, s
                             }
                         }
                     }
-                    Spacer(modifier = Modifier.size(10.dp))
-                    Column() {
-                        HeadLineMedium(text = "Purpose")
-                        Text(text = medicationInfo["results"].asJsonArray[0].asJsonObject["purpose"].asString)
-                    }
-                    Spacer(modifier = Modifier.size(10.dp))
-                    Column() {
-                        HeadLineMedium(text = "Indications and Usage")
-                        Text(text = medicationInfo["results"].asJsonArray[0].asJsonObject["indications_and_usage"].asString)
-                    }
-                    Spacer(modifier = Modifier.size(10.dp))
-                    Column() {
-                        HeadLineMedium(text = "Side Effects")
-                        Text(text = medicationInfo["results"].asJsonArray[0].asJsonObject["warnings"].asString)
-                    }
-                    Spacer(modifier = Modifier.size(10.dp))
-                    Column() {
-                        HeadLineMedium(text = "Warnings")
-                        Text(text = medicationInfo["results"].asJsonArray[0].asJsonObject["do_not_use"].asString)
-                        Text(text = medicationInfo["results"].asJsonArray[0].asJsonObject["ask_doctor"].asString)
-                        Text(text = medicationInfo["results"].asJsonArray[0].asJsonObject["ask_doctor_or_pharmacist"].asString)
-                    }
-                    Spacer(modifier = Modifier.size(10.dp))
-                    Column() {
-                        HeadLineMedium(text = "Dosage and Administration")
-                        Text(text = medicationInfo["results"].asJsonArray[0].asJsonObject["dosage_and_administration"].asString)
-                    }
-                    Spacer(modifier = Modifier.size(10.dp))
-                    Column() {
-                        HeadLineMedium(text = "Storage and Handling")
-                        Text(text = medicationInfo["results"].asJsonArray[0].asJsonObject["storage_and_handling"].asString)
-                    }
+//                    Spacer(modifier = Modifier.size(10.dp))
+//                    Column() {
+//                        HeadLineMedium(text = "Purpose")
+//                        Text(text = medicationInfo["results"].asJsonArray[0].asJsonObject["purpose"].asString)
+//                    }
+//                    Spacer(modifier = Modifier.size(10.dp))
+//                    Column() {
+//                        HeadLineMedium(text = "Indications and Usage")
+//                        Text(text = medicationInfo["results"].asJsonArray[0].asJsonObject["indications_and_usage"].asString)
+//                    }
+//                    Spacer(modifier = Modifier.size(10.dp))
+//                    Column() {
+//                        HeadLineMedium(text = "Side Effects")
+//                        Text(text = medicationInfo["results"].asJsonArray[0].asJsonObject["warnings"].asString)
+//                    }
+//                    Spacer(modifier = Modifier.size(10.dp))
+//                    Column() {
+//                        HeadLineMedium(text = "Warnings")
+//                        Text(text = medicationInfo["results"].asJsonArray[0].asJsonObject["do_not_use"].asString)
+//                        Text(text = medicationInfo["results"].asJsonArray[0].asJsonObject["ask_doctor"].asString)
+//                        Text(text = medicationInfo["results"].asJsonArray[0].asJsonObject["ask_doctor_or_pharmacist"].asString)
+//                    }
+//                    Spacer(modifier = Modifier.size(10.dp))
+//                    Column() {
+//                        HeadLineMedium(text = "Dosage and Administration")
+//                        Text(text = medicationInfo["results"].asJsonArray[0].asJsonObject["dosage_and_administration"].asString)
+//                    }
+//                    Spacer(modifier = Modifier.size(10.dp))
+//                    Column() {
+//                        HeadLineMedium(text = "Storage and Handling")
+//                        Text(text = medicationInfo["results"].asJsonArray[0].asJsonObject["storage_and_handling"].asString)
+//                    }
                 }
             }
         }

@@ -3,8 +3,6 @@ package com.gradle.ui.views
 import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -31,23 +29,18 @@ import androidx.navigation.navArgument
 import com.gradle.constants.Routes
 import com.gradle.ui.theme.AppTheme
 import com.gradle.constants.*
-import com.gradle.controller.AddPatientController
 import com.gradle.controller.DoctorController
 import com.gradle.controller.PatientController
-import com.gradle.models.AddPatient
 import com.gradle.models.Medication
 import com.gradle.ui.components.ButtonPrimary
 import com.gradle.ui.views.doctor.AddPatientScreen
-import com.gradle.ui.views.doctor.AddPatientViewModel
 import com.gradle.ui.views.patient.HomeScreen
-import com.gradle.ui.views.shared.DoctorProfileScreen
 import com.gradle.ui.views.shared.MedicationEntryScreen
 import com.gradle.ui.views.shared.MedicationInfoScreen
 import com.gradle.ui.views.shared.MedicationListScreen
-import com.gradle.ui.views.shared.PatientProfileScreen
 import com.gradle.ui.views.shared.PeopleListScreen
+import com.gradle.ui.views.shared.ProfileScreen
 import com.gradle.utilities.notifications.NotificationUtils
-import com.gradle.apiCalls.Doctor as DoctorApi
 import java.sql.Date
 
 data class NavigationItem(
@@ -108,8 +101,30 @@ fun RemindMedApp(context: Context) {
 
     val navBarItems = if (GlobalObjects.type == "doctor") doctorNavBarItems else patientNavBarItems
 
-    fun onNavigateToMedicationInfo(medicationId: String) {
-        navController.navigate(Routes.MEDICATION_INFO)
+    fun onNavigateToMedicationList(pid: String) {
+        navController.navigate(Routes.MEDICATION_LIST + "?" +
+                "${NavArguments.MEDICATION_LIST.PID}=${pid}")
+    }
+
+    fun onNavigateToPeopleList() {
+        navController.navigate(Routes.PEOPLE_LIST)
+    }
+
+    fun onNavigateToMedicationEntry() {
+        navController.navigate(Routes.MEDICATION_ENTRY)
+    }
+
+    fun onNavigateToMedicationEdit() {
+        navController.navigate(Routes.MEDICATION_EDIT)
+    }
+
+    fun onNavigateToMedicationInfo(medication: Medication) {
+        navController.navigate(
+            Routes.MEDICATION_INFO + "?${NavArguments.MEDICATION_INFO.MEDICATION_NAME}=${medication.name}&" +
+                    "${NavArguments.MEDICATION_INFO.START_DATE}=${medication.startDate}&" +
+                    "${NavArguments.MEDICATION_INFO.END_DATE}=${medication.endDate}&" +
+                    "${NavArguments.MEDICATION_INFO.DOSAGE}=${medication.amount}"
+        )
     }
 
     AppTheme {
@@ -129,13 +144,7 @@ fun RemindMedApp(context: Context) {
                             label = { Text(navItem.label, style = MaterialTheme.typography.bodySmall) },
                             selected = currentDestination?.hierarchy?.any { it.route == navItem.route} == true,
                             onClick = {
-                                navController.navigate(navItem.route) {
-//                                    popUpTo(navController.graph.findStartDestination().id) {
-//                                        saveState = true
-//                                    }
-//                                    launchSingleTop = true
-//                                    restoreState = true
-                                }
+                                navController.navigate(navItem.route)
                             }
                         )
                     }
@@ -159,16 +168,19 @@ fun RemindMedApp(context: Context) {
                     enabled = true)
                 
                 NavHost(navController, startDestination = if (GlobalObjects.type == "doctor") Routes.PEOPLE_LIST else Routes.HOME ) {
-                    composable(Routes.PEOPLE_LIST) { PeopleListScreen(navController) }
-                
+                    composable(Routes.PEOPLE_LIST) {
+                        PeopleListScreen(onNavigateToMedicationList = { pid: String -> onNavigateToMedicationList(pid)})
+                    }
 
                     composable(
                         Routes.MEDICATION_LIST_WITH_ARGS,
                         arguments = listOf(navArgument(NavArguments.MEDICATION_LIST.PID) { type = NavType.StringType })
                     ) {backStackEntry ->
                         MedicationListScreen(
-                            navController,
-                            pid = backStackEntry.arguments?.getString(NavArguments.MEDICATION_LIST.PID)?: ""
+                            pid = backStackEntry.arguments?.getString(NavArguments.MEDICATION_LIST.PID)?: "",
+                            onNavigateToMedicationEntry = { onNavigateToMedicationEntry() },
+                            onNavigateToMedicationEdit = { onNavigateToMedicationEdit() },
+                            onNavigateToMedicationInfo = { medication: Medication -> onNavigateToMedicationInfo(medication) }
                         )
                     }
 
@@ -182,9 +194,13 @@ fun RemindMedApp(context: Context) {
 //                        composable(Routes.PROFILE) { ProfileScreen(navController, doctorModel, doctorController) }
 //                    }
                     if (GlobalObjects.type == "patient") {
-                        composable(Routes.PROFILE) { PatientProfileScreen(navController = navController)}
+                        val patientModel = PatientViewModel(GlobalObjects.patient)
+                        val patientController = PatientController(GlobalObjects.patient)
+                        composable(Routes.PROFILE) { ProfileScreen(patientModel, patientController) }
                     } else {
-                        composable(Routes.PROFILE) { DoctorProfileScreen(navController = navController)}
+                        val doctorModel = DoctorViewModel(GlobalObjects.doctor)
+                        val doctorController = DoctorController(GlobalObjects.doctor)
+                        composable(Routes.PROFILE) { ProfileScreen(doctorModel, doctorController) }
                     }
 
                     composable(
@@ -197,7 +213,6 @@ fun RemindMedApp(context: Context) {
                         )
                     ) { backStackEntry ->
                         MedicationInfoScreen(
-                            navController,
                             medicationName = backStackEntry.arguments?.getString(NavArguments.MEDICATION_INFO.MEDICATION_NAME)?: "",
                             startDate = backStackEntry.arguments?.getString(NavArguments.MEDICATION_INFO.START_DATE)?: "",
                             endDate = backStackEntry.arguments?.getString(NavArguments.MEDICATION_INFO.END_DATE)?: "",
@@ -205,14 +220,19 @@ fun RemindMedApp(context: Context) {
                         )
                     }
 
-                    composable(Routes.MEDICATION_ENTRY) { MedicationEntryScreen(navController) }
+                    composable(Routes.MEDICATION_ENTRY) {
+                        MedicationEntryScreen(
+                            onNavigateToPeopleList = { onNavigateToPeopleList() },
+                            onNavigateToMedicationList = { pid: String -> onNavigateToMedicationList(pid) }
+                        )
+                    }
 
                     if (GlobalObjects.type == "patient") {
-                        composable(Routes.HOME) { HomeScreen(navController) }
+                        composable(Routes.HOME) { HomeScreen() }
                     }
 
                     if (GlobalObjects.type == "doctor") {
-                        composable(Routes.ADD_PATIENT) { AddPatientScreen(navController) }
+                        composable(Routes.ADD_PATIENT) { AddPatientScreen(onNavigateToMedicationList = { pid: String -> onNavigateToMedicationList(pid) }) }
                     }
                 }
             }
