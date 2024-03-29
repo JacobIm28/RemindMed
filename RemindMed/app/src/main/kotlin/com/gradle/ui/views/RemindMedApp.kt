@@ -43,6 +43,7 @@ import com.gradle.ui.views.shared.MedicationListScreen
 import com.gradle.ui.views.shared.PeopleListScreen
 import com.gradle.ui.views.shared.ProfileScreen
 import com.gradle.utilities.notifications.NotificationUtils
+import com.gradle.utilities.notifications.NotificationUtils.Companion.scheduleNotifications
 import java.sql.Date
 import java.sql.Time
 
@@ -52,7 +53,7 @@ data class NavigationItem(
     val route: String
 )
 
-@RequiresApi(Build.VERSION_CODES.O)
+@RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("RememberReturnType", "UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -113,8 +114,10 @@ fun RemindMedApp(context: Context) {
         navController.navigate(Routes.PEOPLE_LIST)
     }
 
-    fun onNavigateToMedicationEntry() {
-        navController.navigate(Routes.MEDICATION_ENTRY)
+    fun onNavigateToMedicationEntry(pid: String) {
+        navController.navigate(Routes.MEDICATION_ENTRY + "?" +
+                "${NavArguments.MEDICATION_ENTRY.PID}=${pid}"
+        )
     }
 
     fun onNavigateToMedicationEdit(medication: Medication) {
@@ -160,17 +163,22 @@ fun RemindMedApp(context: Context) {
                     .padding(innerPadding)
                     .padding(25.dp)
             ) {
-                // TODO: Remove unused routes from the navhosts
-                ButtonPrimary(text = "asd", onClick = {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        NotificationUtils.scheduleNotifications(
-                            context,
-                            GlobalObjects.patient,
-                            Medication("0", "asdf8s7fas7d8f", "2mg", Date(0), Date(0), "Advil", "Eat with food", mutableListOf()))
-                    }
-                },
-                    enabled = true)
-                
+//                ButtonPrimary(text = "Asdasdasd", onClick = {
+//                    scheduleNotifications(context, GlobalObjects.patient, Medication(
+//                        "a",
+//                        "b",
+//                        "c",
+//                        Date(System.currentTimeMillis()),
+//                        Date(System.currentTimeMillis() + 20000),
+//                        "d",
+//                        "e",
+//                        mutableListOf<Time>(
+//                            Time(System.currentTimeMillis() + 60000),
+//                            Time(System.currentTimeMillis() + 61000),
+//                            Time(System.currentTimeMillis() + 62000),
+//                        )
+//                    ))
+//                }, enabled = true)
                 NavHost(navController, startDestination = if (GlobalObjects.type == "doctor") Routes.PEOPLE_LIST else Routes.HOME ) {
                     composable(Routes.PEOPLE_LIST) {
                         PeopleListScreen(onNavigateToMedicationList = { pid: String -> onNavigateToMedicationList(pid)})
@@ -182,7 +190,7 @@ fun RemindMedApp(context: Context) {
                     ) {backStackEntry ->
                         MedicationListScreen(
                             pid = backStackEntry.arguments?.getString(NavArguments.MEDICATION_LIST.PID)?: "",
-                            onNavigateToMedicationEntry = { onNavigateToMedicationEntry() },
+                            onNavigateToMedicationEntry = { pid: String -> onNavigateToMedicationEntry(pid) },
                             onNavigateToMedicationEdit = { medication: Medication -> onNavigateToMedicationEdit(medication) },
                             onNavigateToMedicationInfo = { medication: Medication -> onNavigateToMedicationInfo(medication) }
                         )
@@ -234,12 +242,18 @@ fun RemindMedApp(context: Context) {
                     val medicationModel = MedicationViewModel(nullMedication) // null medication for entry
                     val medicationController = MedicationController(nullMedication)
 
-                    composable(Routes.MEDICATION_ENTRY) {
+                    composable(
+                        Routes.MEDICATION_ENTRY_WITH_ARGS,
+                        arguments = listOf(
+                            navArgument(NavArguments.MEDICATION_ENTRY.PID) { type = NavType.StringType; defaultValue = "" }
+                        )
+                    ) {
                         MedicationEntryScreen(
                             onNavigateToPeopleList = { onNavigateToPeopleList() },
                             onNavigateToMedicationList = { pid: String -> onNavigateToMedicationList(pid) },
                             medicationViewModel = medicationModel,
-                            medicationController = medicationController
+                            medicationController = medicationController,
+                            pid = it.arguments?.getString(NavArguments.MEDICATION_ENTRY.PID)?: ""
                         )
                     }
 

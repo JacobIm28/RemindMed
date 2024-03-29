@@ -42,6 +42,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -66,6 +67,7 @@ import com.gradle.models.Medication as Medication
 import com.gradle.controller.MedicationController
 import com.gradle.controller.PatientController
 import com.gradle.ui.views.MedicationViewModel
+import com.gradle.utilities.notifications.NotificationUtils.Companion.scheduleNotifications
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -88,19 +90,27 @@ enum class MedicationViewEvent {
     RemoveEvent
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
+@RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @SuppressLint("RememberReturnType", "UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit, onNavigateToMedicationList: (String) -> Unit, medicationViewModel: MedicationViewModel, medicationController: MedicationController) {
+fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit,
+                          onNavigateToMedicationList: (String) -> Unit,
+                          medicationViewModel: MedicationViewModel,
+                          medicationController: MedicationController,
+                          pid: String) {
 //    val coroutineScope = rememberCoroutineScope()
+
+    val context = LocalContext.current
 
     var medications by remember { mutableStateOf(emptyList<Medication>()) }
 //    var patient by remember { mutableStateOf(Patient("")) }
+    var user by remember { mutableStateOf<Patient?>(null) }
 
     LaunchedEffect(Unit) {
 //        patient = PatientApi().getPatientbyId(GlobalObjects.patient.pid)
         medications = PatientApi().getMedicines(GlobalObjects.patient.pid)
+        user = PatientApi().getPatientbyId(pid)
     }
 
     val controller by remember{mutableStateOf(medicationController)}
@@ -271,6 +281,7 @@ fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit, onNavigateToMedica
     }
 
     @SuppressLint("SuspiciousIndentation")
+    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     fun MedicationSearchBar(
         onSearch: () -> Unit,
@@ -499,6 +510,7 @@ fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit, onNavigateToMedica
                                 controller.invoke(MedicationViewEvent.AddEvent, medicationViewModel)
 
                                 if (medicationViewModel.successfulAdd.value) {
+                                    scheduleNotifications(context, user, medicationViewModel.model)
                                     onNavigateToMedicationList(GlobalObjects.patient.pid)
                                     medicationViewModel.clearAll()
                                 } else {

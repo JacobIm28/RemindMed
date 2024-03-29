@@ -174,6 +174,7 @@ class Patient {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.S)
     fun addMedication(medication: Medication): Boolean {
         return try {
             var success = false

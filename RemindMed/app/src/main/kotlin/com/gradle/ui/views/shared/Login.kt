@@ -86,6 +86,9 @@ fun LogButton(
 }
 
 fun processNewUser(name: String, type: String, email: String, id: String): Boolean {
+    println(name)
+    println(type)
+    println(email)
     if(type == "patient" && name.isNotEmpty() && email.isNotEmpty() && id.isNotEmpty()) {
         PatientApi().addPatient(Patient(id, name, email))
         return true
@@ -181,6 +184,9 @@ fun MainView(
 
             viewModel.user.name = name
             viewModel.user.type = type
+            println(viewModel.user.name)
+            println(viewModel.user.type)
+            println(name)
         }
 
         var buttonText: String = "Begin"

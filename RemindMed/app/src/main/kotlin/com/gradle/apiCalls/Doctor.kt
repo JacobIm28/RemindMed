@@ -97,6 +97,10 @@ class Doctor {
             runBlocking {
                 launch {
                     println("Adding doctor")
+                    println(doctor)
+                    println(doctor.did)
+                    println(doctor.name)
+                    println(doctor.email)
                     success = client.post("$host/doctor") {
                         contentType(ContentType.Application.Json)
                         setBody(doctor)
