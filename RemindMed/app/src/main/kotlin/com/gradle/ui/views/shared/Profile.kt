@@ -37,6 +37,7 @@ import com.gradle.models.Patient
 import com.gradle.ui.views.DoctorViewModel
 import com.gradle.ui.views.PatientViewModel
 import android.os.Handler
+import androidx.compose.foundation.layout.fillMaxWidth
 
 enum class ProfileViewEvent {
     NameEvent,

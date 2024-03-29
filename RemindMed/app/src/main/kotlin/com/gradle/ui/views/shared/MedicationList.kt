@@ -48,7 +48,7 @@ enum class MedicationListViewEvent {
 @Composable
 fun MedicationListScreen(
     pid: String,
-    onNavigateToMedicationEntry: () -> Unit,
+    onNavigateToMedicationEntry: (String) -> Unit,
     onNavigateToMedicationEdit: (Medication) -> Unit,
     onNavigateToMedicationInfo: (Medication) -> Unit,
 ) {
@@ -81,7 +81,7 @@ fun MedicationListScreen(
         Scaffold(
             floatingActionButton = {
                 FloatingActionButton(
-                    onClick = { onNavigateToMedicationEntry() },
+                    onClick = { onNavigateToMedicationEntry(pid) },
                     containerColor = MaterialTheme.colorScheme.primary
                 ) {
                     Icon(Icons.Default.Add, contentDescription = "Add Medication")

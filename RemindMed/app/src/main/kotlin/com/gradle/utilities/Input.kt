@@ -68,7 +68,8 @@ fun TextInput(
                 isError = isError,
                 trailingIcon = {
                     if (isError) Icon(Icons.Filled.Info, contentDescription = null, tint = MaterialTheme.colorScheme.error)
-                }
+                },
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }

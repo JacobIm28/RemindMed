@@ -21,6 +21,9 @@ object Routes {
 
     val MEDICATION_LIST_WITH_ARGS = MEDICATION_LIST + "?" +
             "${NavArguments.MEDICATION_LIST.PID}={${NavArguments.MEDICATION_LIST.PID}}"
+
+    val MEDICATION_ENTRY_WITH_ARGS = MEDICATION_ENTRY + "?" +
+            "${NavArguments.MEDICATION_ENTRY.PID}={${NavArguments.MEDICATION_ENTRY.PID}}"
 }
 
 object NavArguments {
@@ -36,6 +39,10 @@ object NavArguments {
     }
 
     object MEDICATION_LIST {
+        val PID = "pid"
+    }
+
+    object MEDICATION_ENTRY {
         val PID = "pid"
     }
 }
