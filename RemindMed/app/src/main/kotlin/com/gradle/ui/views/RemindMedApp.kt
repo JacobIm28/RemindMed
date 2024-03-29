@@ -126,16 +126,10 @@ fun RemindMedApp(context: Context) {
                     navBarItems.forEach {navItem ->
                         BottomNavigationItem(
                             icon = { Icon(navItem.icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
-                            label = { Text(navItem.label, style = MaterialTheme.typography.bodySmall) },
+                            label = { Text(navItem.label, style = MaterialTheme.typography.bodySmall, maxLines = 1) },
                             selected = currentDestination?.hierarchy?.any { it.route == navItem.route} == true,
                             onClick = {
-                                navController.navigate(navItem.route) {
-//                                    popUpTo(navController.graph.findStartDestination().id) {
-//                                        saveState = true
-//                                    }
-//                                    launchSingleTop = true
-//                                    restoreState = true
-                                }
+                                navController.navigate(navItem.route)
                             }
                         )
                     }
