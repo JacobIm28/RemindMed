@@ -63,11 +63,6 @@ import java.util.Date
 
 import com.gradle.apiCalls.Patient as PatientApi
 
-data class HomeState(
-    val greeting: String = "",
-    val userName: String = "",
-    val medications: List<Medication> = emptyList()
-)
 
 class Prescription (
     val name: String,

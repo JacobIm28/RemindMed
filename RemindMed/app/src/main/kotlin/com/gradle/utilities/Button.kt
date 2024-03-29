@@ -18,9 +18,6 @@ fun ButtonPrimary(text: String, onClick: () -> Unit, enabled: Boolean) {
         Button(
             onClick,
             colors = ButtonColors(
-                // primary: text
-                // secondary: button
-                // container: medication cards
                 containerColor = MaterialTheme.colorScheme.secondary,
                 contentColor = Color.White,
                 disabledContainerColor = MaterialTheme.colorScheme.tertiary,
@@ -41,7 +38,7 @@ fun ButtonSecondary(text: String, onClick: () -> Unit, enabled: Boolean) {
             onClick,
             shape = MaterialTheme.shapes.medium,
             colors = ButtonColors(
-                containerColor = MaterialTheme.colorScheme.secondary,
+                containerColor = MaterialTheme.colorScheme.tertiary,
                 contentColor = Color.White,
                 disabledContainerColor = MaterialTheme.colorScheme.tertiary,
                 disabledContentColor = MaterialTheme.colorScheme.onTertiary
