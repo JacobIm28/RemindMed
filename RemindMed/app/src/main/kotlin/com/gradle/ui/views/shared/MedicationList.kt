@@ -7,12 +7,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.Info
@@ -24,34 +21,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.NavDeepLinkBuilder
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.text.style.TextAlign
 
 import com.gradle.constants.GlobalObjects
+import com.gradle.controller.MedicationListController
+import com.gradle.models.AddPatient
 import com.gradle.apiCalls.Patient as PatientApi
-import com.gradle.constants.NavArguments
-import com.gradle.constants.Routes
-import com.gradle.models.LoginModel
 import com.gradle.models.Medication
+import com.gradle.models.MedicationList
 import com.gradle.models.Patient
-import com.gradle.ui.components.ButtonSecondary
-import com.gradle.ui.components.HeadlineLarge
-import com.gradle.ui.components.LoadingScreen
 import com.gradle.ui.components.TitleLarge
 import com.gradle.ui.theme.*
 import com.gradle.utilities.toFormattedDateString
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.sql.Date
-import java.sql.Time
 import java.time.format.DateTimeFormatter
 
-import com.gradle.apiCalls.Medication as MedicationApi
+enum class MedicationListViewEvent {
+    MedicationRemove
+}
 
 //@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
@@ -60,20 +49,19 @@ import com.gradle.apiCalls.Medication as MedicationApi
 fun MedicationListScreen(
     pid: String,
     onNavigateToMedicationEntry: () -> Unit,
-    onNavigateToMedicationEdit: () -> Unit,
+    onNavigateToMedicationEdit: (Medication) -> Unit,
     onNavigateToMedicationInfo: (Medication) -> Unit,
 ) {
     // TODO: Implement some sort async code rot run this on load, and display a loading screen in the meantime
     val coroutineScope = rememberCoroutineScope()
+    var medications by remember { mutableStateOf(mutableListOf<Medication>()) }
+    var patient by remember { mutableStateOf(Patient()) }
+    var model by remember{ mutableStateOf(MedicationList(medications, patient)) }
+    var viewModel by remember{mutableStateOf(MedicationListViewModel(model))}
+    var controller by remember{ mutableStateOf(MedicationListController(model)) }
 
-    var medications by remember {
-        mutableStateOf<List<Medication>?>(null)
-    }
-    var patient by remember {
-        mutableStateOf<Patient?>(null)
-    }
-
-    fun getPatientById() {
+    LaunchedEffect(Unit) {
+        medications = PatientApi().getMedicines(pid)
         if (GlobalObjects.type == "patient") {
             patient = GlobalObjects.patient
         } else {
@@ -83,16 +71,10 @@ fun MedicationListScreen(
                 patient = patientResult
             }
         }
-    }
 
-    fun getMedications() {
-        val medicationResult = PatientApi().getMedicines(pid)
-        medications = medicationResult
-    }
-
-    LaunchedEffect(Unit) {
-        getPatientById()
-        getMedications()
+        model = MedicationList(medications, patient)
+        viewModel = MedicationListViewModel(model)
+        controller = MedicationListController(model)
     }
 
     AppTheme {
@@ -113,37 +95,18 @@ fun MedicationListScreen(
             ) {
                 TitleLarge("${patient?.name?.substringBefore(" ")}'s Medication")
 
-                HeadlineLarge("Medications")
-                
-                if (patient == null || medications == null) {
-                    LoadingScreen()
-                } else if(medications!!.isEmpty()) {
-                    Text(
-                        "No Medications found",
-                        modifier = Modifier.fillMaxSize().wrapContentHeight(),
-                        style = androidx.compose.material.MaterialTheme.typography.h6,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center,
-                        color = md_theme_dark_onTertiary
-                    )
-                } else {
-                  LazyColumn {
-                    items(medications!!) { medication ->
+                HorizontalDivider()
+//                HeadlineLarge("Medications")
+                LazyColumn {
+                    items(viewModel.medicationList.value) { medication ->
                         MedicationItem(
                             medication = medication,
                             onRemove = {
-                                val success = PatientApi().removeMedication(GlobalObjects.patient.pid, medication.medicationId)
-                                if (success) { println("Medication Removed")
-                                   medications = PatientApi().getMedicines(GlobalObjects.patient.pid).toList()
-                                } else {
-                                    medications = PatientApi().getMedicines(GlobalObjects.patient.pid).toList()
-                                    println("Medication Not Removed")
+                                coroutineScope.launch {
+                                    controller.invoke(MedicationListViewEvent.MedicationRemove, medication.medicationId)
                                 }
-                                println(medications)
                             },
-                            onClick = {
-                                onNavigateToMedicationInfo(medication)
-                            },
+                            onClick = { onNavigateToMedicationInfo(medication) },
                             onNavigateToMedicationEdit
                         )
                     }
@@ -152,8 +115,6 @@ fun MedicationListScreen(
             }
         }
     }
-}
-
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -161,7 +122,7 @@ fun MedicationItem(
     medication: Medication,
     onRemove: () -> Unit,
     onClick: () -> Unit, // Click listener for the entire item
-    onNavigateToMedicationEdit: () -> Unit
+    onNavigateToMedicationEdit: (Medication) -> Unit
 ) {
     var showDialog by remember { mutableStateOf(false) }
 
@@ -200,7 +161,7 @@ fun MedicationItem(
             Spacer(modifier = Modifier.weight(1f))
 
             Column {
-                IconButton(onClick = { onNavigateToMedicationEdit() }) {
+                IconButton(onClick = { onNavigateToMedicationEdit(medication) }) {
                     Icon(Icons.Filled.Edit, contentDescription = "Edit")
                 }
                 // Remove icon

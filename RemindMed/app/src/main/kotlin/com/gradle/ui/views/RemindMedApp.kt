@@ -30,18 +30,21 @@ import com.gradle.constants.Routes
 import com.gradle.ui.theme.AppTheme
 import com.gradle.constants.*
 import com.gradle.controller.DoctorController
+import com.gradle.controller.MedicationController
 import com.gradle.controller.PatientController
 import com.gradle.models.Medication
 import com.gradle.ui.components.ButtonPrimary
 import com.gradle.ui.views.doctor.AddPatientScreen
 import com.gradle.ui.views.patient.HomeScreen
 import com.gradle.ui.views.shared.MedicationEntryScreen
+import com.gradle.ui.views.shared.MedicationEditScreen
 import com.gradle.ui.views.shared.MedicationInfoScreen
 import com.gradle.ui.views.shared.MedicationListScreen
 import com.gradle.ui.views.shared.PeopleListScreen
 import com.gradle.ui.views.shared.ProfileScreen
 import com.gradle.utilities.notifications.NotificationUtils
 import java.sql.Date
+import java.sql.Time
 
 data class NavigationItem(
     val icon: ImageVector,
@@ -114,8 +117,9 @@ fun RemindMedApp(context: Context) {
         navController.navigate(Routes.MEDICATION_ENTRY)
     }
 
-    fun onNavigateToMedicationEdit() {
-        navController.navigate(Routes.MEDICATION_EDIT)
+    fun onNavigateToMedicationEdit(medication: Medication) {
+        navController.navigate(Routes.MEDICATION_EDIT + "?" +
+                "${NavArguments.MEDICATION_EDIT.MEDICATION_ID}=${medication.medicationId}")
     }
 
     fun onNavigateToMedicationInfo(medication: Medication) {
@@ -179,9 +183,10 @@ fun RemindMedApp(context: Context) {
                         MedicationListScreen(
                             pid = backStackEntry.arguments?.getString(NavArguments.MEDICATION_LIST.PID)?: "",
                             onNavigateToMedicationEntry = { onNavigateToMedicationEntry() },
-                            onNavigateToMedicationEdit = { onNavigateToMedicationEdit() },
+                            onNavigateToMedicationEdit = { medication: Medication -> onNavigateToMedicationEdit(medication) },
                             onNavigateToMedicationInfo = { medication: Medication -> onNavigateToMedicationInfo(medication) }
                         )
+
                     }
 
 //                    if (GlobalObjects.type == "patient") {
@@ -220,12 +225,56 @@ fun RemindMedApp(context: Context) {
                         )
                     }
 
+                    var nullMedication = Medication("-1", "", "", Date(0), Date(0), "", "", mutableListOf<Time>()) // null medication for entry
+
+                    if (GlobalObjects.type == "patient") {
+                        nullMedication = Medication(GlobalObjects.patient.pid, "", "", Date(0), Date(0), "", "", mutableListOf<Time>())
+                    }
+
+                    val medicationModel = MedicationViewModel(nullMedication) // null medication for entry
+                    val medicationController = MedicationController(nullMedication)
+
                     composable(Routes.MEDICATION_ENTRY) {
                         MedicationEntryScreen(
                             onNavigateToPeopleList = { onNavigateToPeopleList() },
-                            onNavigateToMedicationList = { pid: String -> onNavigateToMedicationList(pid) }
+                            onNavigateToMedicationList = { pid: String -> onNavigateToMedicationList(pid) },
+                            medicationViewModel = medicationModel,
+                            medicationController = medicationController
                         )
                     }
+
+                    composable(
+                        Routes.MEDICATION_INFO_WITH_ARGS,
+                        arguments = listOf(
+                            navArgument(NavArguments.MEDICATION_INFO.MEDICATION_NAME) { type = NavType.StringType; defaultValue = "" },
+                            navArgument(NavArguments.MEDICATION_INFO.START_DATE) { type = NavType.StringType; defaultValue = "" },
+                            navArgument(NavArguments.MEDICATION_INFO.END_DATE) { type = NavType.StringType; defaultValue = "" },
+                            navArgument(NavArguments.MEDICATION_INFO.DOSAGE) { type = NavType.StringType; defaultValue = "" }
+                        )
+                    ) { backStackEntry ->
+                        MedicationInfoScreen(
+                            medicationName = backStackEntry.arguments?.getString(NavArguments.MEDICATION_INFO.MEDICATION_NAME)?: "",
+                            startDate = backStackEntry.arguments?.getString(NavArguments.MEDICATION_INFO.START_DATE)?: "",
+                            endDate = backStackEntry.arguments?.getString(NavArguments.MEDICATION_INFO.END_DATE)?: "",
+                            dosage = backStackEntry.arguments?.getString(NavArguments.MEDICATION_INFO.DOSAGE)?: ""
+                        )
+                    }
+
+                    composable(
+                        Routes.MEDICATION_EDIT,
+                        arguments = listOf(
+                            navArgument(NavArguments.MEDICATION_EDIT.MEDICATION_ID) { type = NavType.StringType; defaultValue = "" },
+                        )
+                    ) {backStackEntry ->
+                        MedicationEditScreen(
+                            medicationId = backStackEntry.arguments?.getString(NavArguments.MEDICATION_EDIT.MEDICATION_ID)?: "",
+                            onNavigateToPeopleList = { onNavigateToPeopleList() },
+                            onNavigateToMedicationList = { pid: String -> onNavigateToMedicationList(pid) },
+                            medicationViewModel = medicationModel,
+                            medicationController = medicationController
+                        )
+                    }
+
 
                     if (GlobalObjects.type == "patient") {
                         composable(Routes.HOME) { HomeScreen() }

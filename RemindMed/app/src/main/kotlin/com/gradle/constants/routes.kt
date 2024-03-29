@@ -31,6 +31,10 @@ object NavArguments {
         val DOSAGE = "dosage"
     }
 
+    object MEDICATION_EDIT {
+        val MEDICATION_ID = "medicationId"
+    }
+
     object MEDICATION_LIST {
         val PID = "pid"
     }

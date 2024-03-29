@@ -33,6 +33,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,15 +52,24 @@ import com.gradle.utilities.toFormattedDateShortString
 import com.gradle.utilities.toFormattedDateString
 import com.gradle.utilities.toFormattedMonthDateString
 import com.example.remindmed.R
+import com.gradle.apiCalls.Doctor
 import com.gradle.constants.GlobalObjects
 import com.gradle.constants.Routes
+import com.gradle.controller.AddPatientController
+import com.gradle.models.AddPatient
 import com.gradle.models.Medication
+import com.gradle.models.Patient
 import com.gradle.ui.theme.AppTheme
+import com.gradle.ui.views.doctor.AddPatientViewModel
+import io.ktor.util.date.Month
+import kotlinx.coroutines.selects.select
+import java.time.LocalDateTime
 //import com.google.accompanist.permissions.ExperimentalPermissionsApi
 //import com.google.accompanist.permissions.isGranted
 //import com.google.accompanist.permissions.rememberPermissionState
 import java.util.Calendar
 import java.util.Date
+import java.util.concurrent.TimeUnit
 
 import com.gradle.apiCalls.Patient as PatientApi
 
@@ -105,6 +115,7 @@ fun MedicationItem(
             ) {
                 Text(prescription.name, fontWeight = FontWeight.Bold)
                 Text("Dosage: ${prescription.amount}", style = MaterialTheme.typography.bodyMedium)
+
                 Text("Time: ${prescription.times}", style = MaterialTheme.typography.bodyMedium)
             }
             Checkbox(
@@ -149,21 +160,48 @@ fun MedicationListHomeScreen(
 fun HomeScreen() {
     var takenMedications by remember { mutableStateOf(listOf<Prescription>()) }
     var notTakenMedications by remember { mutableStateOf(listOf<Prescription>()) }
-
-    var medications = remember { PatientApi().getMedicines(GlobalObjects.patient.pid) }
     val today = Calendar.getInstance().time
     var selectedDate by remember { mutableStateOf(today) }
 
-    val medicationsToday = medications.filter { medication ->
-        today.after(medication.startDate) && today.before(medication.endDate)
+    var medications by remember { mutableStateOf(emptyList<Medication>()) }
+    var patient by remember { mutableStateOf(Patient("")) }
+    var greeting by remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+        patient = PatientApi().getPatientbyId(GlobalObjects.patient.pid)
+        medications = PatientApi().getMedicines(GlobalObjects.patient.pid)
+        greeting = when (LocalDateTime.now().hour) {
+            in 0..11 -> "Good Morning"
+            in 12..16 -> "Good Afternoon"
+            else -> "Good Evening"
+        }
     }
+
+    var medicationsToday = medications.filter { medication ->
+        (selectedDate >= medication.startDate && selectedDate < Date(medication.endDate.time + TimeUnit.DAYS.toMillis(1)))
+    }
+    notTakenMedications = medicationsToday.map { medication ->
+        Prescription(medication.name, medication.amount, medication.times.toString())
+    }
+
+    // some weird issue here with slight UI lag, come back to this
+//    takenMedications = emptyList() // Clear the taken medications list
+//    LaunchedEffect(selectedDate) {
+//        println(selectedDate)
+//        medications = PatientApi().getMedicines(GlobalObjects.patient.pid)
+//        medicationsToday = medications.filter { medication ->
+//            (selectedDate >= medication.startDate  && selectedDate <= medication.endDate)
+//        }
+//        notTakenMedications = medicationsToday.map { medication ->
+//            Prescription(medication.name, medication.amount, medication.times.toString())
+//        }
+//        takenMedications = emptyList() // Clear the taken medications list
+//    }
 
     takenMedications = emptyList()
     notTakenMedications = medicationsToday.map { medication ->
         Prescription(medication.name, medication.amount, medication.times.toString())
     }
-    // create a adding function
-
 
     AppTheme {
         Scaffold(
@@ -176,7 +214,7 @@ fun HomeScreen() {
                         // user can only "take" medications for the current date, selecting a new date just allows for user to see what medications they have for that day
                     }
                 )
-                DailyOverviewCard(medicationsToday = emptyList(), logEvent = {})
+                DailyOverviewCard(medicationsToday = emptyList(), logEvent = {}, greeting, patient)
                 Spacer(modifier = Modifier.height(16.dp))
 
                 MedicationListHomeScreen(
@@ -206,30 +244,13 @@ fun HomeScreen() {
 //    HomeScreen(navController = rememberNavController())
 //}
 
-@Composable
-fun Greeting() {
-    Column {
-        // NOT SURE IF NECESSARY BUT SOMETHING WE CAN DO
-        // TODO: Add greeting based on time of day e.g. Good Morning, Good Afternoon, Good evening.
-        // TODO: Get name from DB and show user's first name.
-        Text(
-            text = "Good morning,",
-            style = MaterialTheme.typography.displaySmall
-        )
-        Text(
-            text = "Kathryn!",
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.displaySmall
-        )
-        Spacer(modifier = Modifier.padding(8.dp))
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DailyOverviewCard(
     medicationsToday: List<Medication>,
-    logEvent: (String) -> Unit
+    logEvent: (String) -> Unit,
+    greeting: String,
+    patient: Patient
 ) {
 
     Card(
@@ -254,7 +275,11 @@ fun DailyOverviewCard(
                     .align(Alignment.CenterVertically),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-
+                Text(
+                    text = "${greeting} ${patient.name.substringBefore(" ")},",
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleMedium,
+                )
                 Text(
                     text = "Check off the medications that you have taken today ",
                     fontWeight = FontWeight.Bold,
@@ -303,7 +328,7 @@ fun DailyOverviewEmptyCard() {
                 Text(
                     text = "Medication Break",
                     fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.bodyLarge,
                 )
 
                 Text(
@@ -324,6 +349,21 @@ fun DailyOverviewEmptyCard() {
         }
     }
 }
+
+val monthNames = mapOf(
+    1 to "Jan",
+    2 to "Feb",
+    3 to "Mar",
+    4 to "Apr",
+    5 to "May",
+    6 to "Jun",
+    7 to "Jul",
+    8 to "Aug",
+    9 to "Sep",
+    10 to "Oct",
+    11 to "Nov",
+    12 to "Dec"
+)
 
 @Composable
 fun DatesHeader(
@@ -401,7 +441,7 @@ fun DateItem(
         )
         Card(
             modifier = Modifier
-                .padding(vertical = 4.dp, horizontal = 2.dp),
+                .padding(horizontal = 2.dp),
             onClick = { onClickListener(date) },
             colors = cardColors(
                 // background colors of the selected date
@@ -417,7 +457,7 @@ fun DateItem(
                 modifier = Modifier
                     .width(42.dp)
                     .height(42.dp)
-                    .padding(8.dp)
+                    .padding(2.dp)
                     .fillMaxSize(), // Fill the available size in the Column
                 verticalArrangement = Arrangement.Center, // Center vertically
                 horizontalAlignment = Alignment.CenterHorizontally // Center horizontally
@@ -432,7 +472,18 @@ fun DateItem(
                     }
                 )
             }
+
         }
+        Text(
+            text = monthNames[date.date.month.plus(1)] ?: "",
+            style = MaterialTheme.typography.bodySmall,
+            fontWeight = if (date.isSelected) {
+                FontWeight.Bold
+            } else {
+                FontWeight.Bold
+            },
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+        )
     }
 }
 

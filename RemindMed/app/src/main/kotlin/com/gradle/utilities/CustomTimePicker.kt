@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,10 +32,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.gradle.ui.theme.AppTheme
+import com.gradle.ui.views.MedicationViewModel
+import java.sql.Time
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CustomTimePicker(state: TimePickerState) {
+fun CustomTimePicker(medicationViewModel: MedicationViewModel, state: TimePickerState) {
     var time by remember {
         mutableStateOf("Select Time")
     }
@@ -46,7 +49,9 @@ fun CustomTimePicker(state: TimePickerState) {
     AppTheme {
         Box(contentAlignment = Alignment.Center) {
             OutlinedButton(
-                onClick = { openDialog = true },
+                onClick = {
+                    openDialog = true
+                },
                 colors = ButtonColors(
                     containerColor = MaterialTheme.colorScheme.tertiary,
                     contentColor = MaterialTheme.colorScheme.primary,
@@ -62,18 +67,29 @@ fun CustomTimePicker(state: TimePickerState) {
 
     if (openDialog) {
         MyTimePickerDialog(
+            medicationViewModel = medicationViewModel,
             state = state,
             onDismiss = { openDialog = false },
-            onConfirm = { time = it })
+            onConfirm = { time = it }
+        )
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyTimePickerDialog(state: TimePickerState, onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
+fun MyTimePickerDialog(
+    medicationViewModel: MedicationViewModel,
+    state: TimePickerState,
+    onDismiss: () -> Unit,
+    onConfirm: (String) -> Unit
+) {
+    var dialogState by remember {
+        mutableStateOf(false)
+    }
+
     AppTheme {
         Dialog(onDismissRequest = onDismiss) {
-            Surface (
+            Surface(
                 shape = MaterialTheme.shapes.extraLarge,
                 tonalElevation = 6.dp,
                 modifier = Modifier
@@ -83,30 +99,67 @@ fun MyTimePickerDialog(state: TimePickerState, onDismiss: () -> Unit, onConfirm:
                         shape = MaterialTheme.shapes.extraLarge,
                         color = MaterialTheme.colorScheme.tertiary
                     )
-//                    .padding(10.dp)
             ) {
-                Column (modifier = Modifier.padding(30.dp)) {
+                Column(modifier = Modifier.padding(30.dp)) {
                     TimePicker(state = state)
-                    Row (modifier = Modifier
-                        .height(45.dp)
-                        .fillMaxWidth()
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(45.dp)
                     ) {
-                        Spacer(modifier = Modifier.weight(1f))
-                        ButtonPrimary(text = "Cancel", onClick = { onDismiss() }, enabled = true)
-                        ButtonPrimary(
-                            text = "Ok",
+                        Spacer(modifier = Modifier.weight(2f))
+                        Button(
+                            onClick = { onDismiss() },
+                            enabled = true
+                        ) {
+                            Text(text = "Cancel")
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Button(
                             onClick = {
-                                val formattedHour = if (state.hour == 0 || state.hour == 12) "12" else String.format("%02d", state.hour % 12)
+                                val formattedHour = if (state.hour == 0 || state.hour == 12) "12" else String.format(
+                                    "%02d",
+                                    state.hour % 12
+                                )
                                 val paddedMinute = String.format("%02d", state.minute)
                                 val period = if (state.hour < 12) "AM" else "PM"
                                 onConfirm("$formattedHour:$paddedMinute $period")
+
+                                val selectedTimes = medicationViewModel.timeStates.map { timeState ->
+                                    Time(timeState.hour, timeState.minute, 0)
+                                }.toMutableList().dropLast(1)
+
+                                if (selectedTimes.any { it == Time(state.hour, state.minute, 0) }) {
+                                    dialogState = true
+                                    println("Dialog State: $dialogState")
+                                    return@Button
+                                }
+                                println("SELECTED TIMES:")
+                                println(selectedTimes)
+                                println(Time(state.hour, state.minute, 0))
                                 onDismiss()
-                            }, enabled = true)
+                            },
+                            enabled = true
+                        ) {
+                            Text(text = "OK")
+                        }
                     }
                 }
             }
-
-
+            if (dialogState) {
+                AlertDialog(
+                    onDismissRequest = { dialogState = false },
+                    title = { Text(text = "Error") },
+                    text = { Text(text = "The selected time has already been added.") },
+                    confirmButton = {
+                        Button(
+                            onClick = { dialogState = false },
+                        ) {
+                            Text(text = "OK")
+                        }
+                    }
+                )
+            }
         }
     }
 }

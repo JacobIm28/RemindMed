@@ -7,6 +7,7 @@ plugins {
 	kotlin("jvm") version "1.9.22"
 	kotlin("plugin.spring") version "1.9.22"
 	id("com.google.cloud.tools.jib") version "3.4.1"
+	id("org.jetbrains.kotlin.plugin.serialization") version "1.9.22"
 }
 
 group = "com.backend"
@@ -45,7 +46,8 @@ dependencies {
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
 
 	// for deserializing strings to objects
-	implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2")
+	implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+	implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.8")
 
 	// for parsing JSON
 	implementation("com.google.code.gson:gson:2.8.9")

@@ -18,13 +18,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import com.gradle.ui.theme.AppTheme
+import com.gradle.ui.views.MedicationViewModel
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
+import java.util.Locale
 import java.util.TimeZone
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CustomDatePicker(state: DatePickerState, date: String) {
+fun CustomDatePicker(state: DatePickerState, date: String, onDateSelected: (String) -> Unit) {
     var date by remember {
         mutableStateOf(date)
     }
@@ -53,7 +56,9 @@ fun CustomDatePicker(state: DatePickerState, date: String) {
     if (openDialog) {
         MyDatePickerDialog(
             state = state,
-            onDateSelected = { date = it },
+            onDateSelected = { date = it
+                onDateSelected(date)
+                             },
             onDismiss = { openDialog = false }
         )
     }
@@ -66,15 +71,18 @@ fun MyDatePickerDialog(
     onDateSelected: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
+    println(state.selectedDateMillis)
     val selectedDate = state.selectedDateMillis?.let {
         convertMillisToDate(it)
     } ?: ""
+
+    println(selectedDate)
 
     AppTheme {
         DatePickerDialog(
             onDismissRequest = { onDismiss() },
             confirmButton = {
-                ButtonSecondary(text = "Ok", onClick = {
+                ButtonSecondary(text = "OK", onClick = {
                     onDateSelected(selectedDate)
                     onDismiss()
                 }, enabled = true)
@@ -91,9 +99,12 @@ fun MyDatePickerDialog(
 }
 
 private fun convertMillisToDate(millis: Long): String {
-    val formatter = SimpleDateFormat("dd/MM/yyyy")
-    formatter.timeZone = TimeZone.getTimeZone("UTC")
-    return formatter.format(Date(millis))
+    val calendar = Calendar.getInstance()
+    calendar.timeInMillis = millis
+    calendar.add(Calendar.DAY_OF_MONTH, 1)
+
+    val formatter = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
+    return formatter.format(calendar.time)
 }
 
 //import android.widget.DatePicker

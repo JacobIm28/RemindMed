@@ -66,17 +66,98 @@ object TimeSerializer : KSerializer<Time> {
 //            return times
 //        }
 @Serializable
-data class Medication(
-    @SerialName("pid") val pid: String,
-    @SerialName("medicationId") val medicationId: String,
-    @SerialName("amount") val amount: String,
-    @SerialName("startDate")  @Serializable(with = DateSerializer::class) val startDate: Date,
-    @SerialName("endDate") @Serializable(with = DateSerializer::class) val endDate: Date,
-    @SerialName("name") val name: String,
-    @SerialName("notes") val notes: String,
-    @SerialName("times") val times: MutableList< @Serializable(with = TimeSerializer::class)Time>
+class Medication(
+    var initialPid: String,
+    var initialMedicationId: String,
+    var initialAmount: String,
+    @Serializable(with = DateSerializer::class) var initialStartDate: Date,
+    @Serializable(with = DateSerializer::class) var initialEndDate: Date,
+    var initialName: String,
+    var initialNotes: String,
+    var initialTimes: MutableList<@Serializable(with = TimeSerializer::class) Time>
+) : IPresenter() {
 
-    ) {
+    var pid: String = initialPid
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+
+    var medicationId: String = initialMedicationId
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+
+    var amount: String = initialAmount
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+
+    var startDate: @Serializable(with = DateSerializer::class) Date = initialStartDate
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+
+    var endDate: @Serializable(with = DateSerializer::class) Date = initialEndDate
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+
+    var name: String = initialName
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+
+    var notes: String = initialNotes
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+
+    var times: MutableList<@Serializable(with = TimeSerializer::class) Time> = initialTimes
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+
+    var successfulAdd = false
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+
+    var successfulChange = false
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+
+    var successfulRemove = false
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+
+    var errorMessage = ""
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+
+    var isError = false
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+
+//    override fun notifySubscribers() {
+//        // Notification logic here
+//    }
     override fun toString(): String {
         return "Medication(pid=$pid, medicationId=$medicationId, amount='$amount', startDate=${startDate}, endDate=${endDate}, name=$name, notes=$notes) times=${times}"
     }

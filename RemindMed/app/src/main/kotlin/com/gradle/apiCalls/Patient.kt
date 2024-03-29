@@ -180,6 +180,7 @@ class Patient {
             runBlocking {
                 launch {
                     println("Adding medication: ${medication}")
+                    println("${medication}")
                     success = client.post("$host/patient/medicine"){
                         contentType(ContentType.Application.Json)
                         setBody(medication)
@@ -240,39 +241,14 @@ class Patient {
     @RequiresApi(Build.VERSION_CODES.O)
     fun getMedicines(pid: String): MutableList<Medication> {
         return try {
-            var medicines: MutableList<Medication>? = null
+            var meds = mutableListOf<Medication>()
             runBlocking {
                 launch {
-                    val meds = JsonParser.parseString(client.get("$host/patient/medicines?pid=$pid").bodyAsText()).asJsonArray
-                    medicines = mutableListOf()
-                    meds.forEach {
-                        val med = it.asJsonObject
-                        val parsedDate = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH).parse(med["startDate"].asString)
-                        val startDate = Date.valueOf(SimpleDateFormat("yyyy-MM-dd").format(parsedDate!!))
-                        val parsedDate2 = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH).parse(med["endDate"].asString)
-                        val endDate = Date.valueOf(SimpleDateFormat("yyyy-MM-dd").format(parsedDate2!!))
-                        val times = mutableListOf<Time>()
-                        med["times"].asJsonArray.forEach {
-                            val parsedTime = SimpleDateFormat("hh:mm:ss", Locale.ENGLISH).parse(it.asString)
-                            val time = Time.valueOf(SimpleDateFormat("hh:mm:ss").format(parsedTime!!))
-                            times.add(time)
-                        }
-                        medicines?.add(Medication(
-                            med["pid"].asString,
-                            med["medicationId"].asString,
-                            med["amount"].asString,
-                            startDate,
-                            endDate,
-                            med["name"].asString,
-                            med["notes"].asString,
-                            times
-                        ))
-                    }
+                    meds = client.get("$host/patient/medicines?pid=$pid").body<MutableList<Medication>>()
+
                 }
             }
-            if (medicines?.isEmpty() == false) {
-                medicines!!
-            } else {
+            meds.ifEmpty {
                 mutableListOf<Medication>()
             }
         } catch (e: Exception) {
