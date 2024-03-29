@@ -4,6 +4,7 @@ import com.gradle.constants.GlobalObjects
 import com.gradle.models.Doctor
 import com.gradle.ui.views.shared.ProfileViewEvent
 import com.gradle.apiCalls.Doctor as DoctorApi
+import com.gradle.apiCalls.User as UserApi
 
 class DoctorController(val model: Doctor) {
     fun invoke(event: ProfileViewEvent, value: Any?) {
@@ -22,7 +23,7 @@ class DoctorController(val model: Doctor) {
                 model.changesSubmitted = true
                 val newDoc: Doctor = Doctor(GlobalObjects.doctor.did, model.name, model.email)
                 try {
-                    model.successfulChange = DoctorApi().updateDoctor(newDoc)
+                    model.successfulChange = DoctorApi().updateDoctor(newDoc) && UserApi().changeEmail(newDoc.did, model.email)
                     if (model.successfulChange) {
                         model._name = model.name
                         model._email = model.email

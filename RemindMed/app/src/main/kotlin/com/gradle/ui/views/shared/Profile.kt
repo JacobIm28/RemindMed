@@ -37,6 +37,7 @@ import com.gradle.models.Patient
 import com.gradle.ui.views.DoctorViewModel
 import com.gradle.ui.views.PatientViewModel
 import android.os.Handler
+import androidx.compose.foundation.layout.fillMaxWidth
 
 enum class ProfileViewEvent {
     NameEvent,
@@ -138,7 +139,7 @@ fun ProfileScreen(patientViewModel: PatientViewModel, patientController: Patient
 
     AppTheme {
         Box(modifier = Modifier.verticalScroll(rememberScrollState())){
-            Column (modifier = androidx.compose.ui.Modifier.padding()) {
+            Column (modifier = androidx.compose.ui.Modifier.padding().fillMaxWidth()) {
                 TitleLarge("Profile")
                 Spacer(modifier = Modifier.height(16.dp))
 
