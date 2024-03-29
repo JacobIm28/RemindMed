@@ -135,10 +135,10 @@ class PatientController {
             queryStr += "amount = '${medication.amount}', "
         }
         if (medication.startDate != Date(0)) {
-            queryStr += "start_date = '${medication.startDate}', "
+            queryStr += "startDate = '${medication.startDate}', "
         }
         if (medication.endDate != Date(0)) {
-            queryStr += "end_date = '${medication.endDate}', "
+            queryStr += "endDate = '${medication.endDate}', "
         }
         if (medication.name != "") {
             queryStr += "name = '${medication.name}', "
@@ -147,10 +147,11 @@ class PatientController {
             queryStr += "notes = '${medication.notes}', "
         }
         if (medication.times.isNotEmpty()) {
-            queryStr += "times = ARRAY ${medication.times}, "
+            val timeString = "[" + medication.times.joinToString(",") { "to_timestamp(\'${it}\', 'hh24:mi:ss')"} + "]"
+            queryStr += "times = ARRAY ${timeString}, "
         }
         queryStr = queryStr.dropLast(2)
-        queryStr += " WHERE pid = '${medication.pid}' AND mid = '${medication.medicationId}' RETURNING pid;"
+        queryStr += " WHERE pid = '${medication.pid}' AND medication_id = '${medication.medicationId}' RETURNING pid;"
         databaseService.query(queryStr)
         return "Updated Medicine with id: ${medication.medicationId} for Patient with id: ${medication.pid}"
     }
