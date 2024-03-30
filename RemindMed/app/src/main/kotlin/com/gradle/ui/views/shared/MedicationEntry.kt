@@ -170,13 +170,13 @@ fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit,
 
     fun validateInputs(
     ): Boolean {
-        println("HERE MEDICATION")
-        println(medicationViewModel.name.value.isNotBlank())
-        println("HERE DOSAGE")
-        println(medicationViewModel.startDate.value != null)
-        println("HERE TIMES")
-        println(medicationViewModel.times)
-        println(medicationViewModel.times.value.isNotEmpty())
+//        println("HERE MEDICATION")
+//        println(medicationViewModel.name.value.isNotBlank())
+//        println("HERE DOSAGE")
+//        println(medicationViewModel.startDate.value != null)
+//        println("HERE TIMES")
+//        println(medicationViewModel.times)
+//        println(medicationViewModel.times.value.isNotEmpty())
         return medicationViewModel.name.value.isNotBlank() &&
                 medicationViewModel.startDate.value != null &&
                 medicationViewModel.endDate.value != null &&
@@ -473,8 +473,8 @@ fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit,
             )
             Spacer(modifier = Modifier.height(30.dp))
 
-            println("HI3")
-            println(times)
+//            println("HI3")
+//            println(times)
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -510,7 +510,7 @@ fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit,
                                 controller.invoke(MedicationViewEvent.AddEvent, medicationViewModel)
 
                                 if (medicationViewModel.successfulAdd.value) {
-                                    scheduleNotifications(context, user, medicationViewModel.model)
+                                    scheduleNotifications(context, user!!, medicationViewModel.model)
                                     onNavigateToMedicationList(GlobalObjects.patient.pid)
                                     medicationViewModel.clearAll()
                                 } else {

@@ -14,36 +14,23 @@ import com.gradle.models.Medication
 import com.gradle.models.Patient
 import com.gradle.utilities.toFormattedDateString
 import io.ktor.util.date.getTimeMillis
+import java.sql.Date
+import java.sql.Time
 import java.time.LocalDate
+import kotlin.time.Duration.Companion.days
 
 //import java.util.Calendar
 
 class NotificationUtils {
 
     companion object {
+        private var requestCode = 0
+
         @RequiresApi(Build.VERSION_CODES.S)
         fun scheduleNotifications(context: Context, patient: Patient, medication: Medication) {
-            println("In scheduleNotifications")
-            print(notificationServicePermission(context))
-//            if (notificationServicePermission(context)) {
-                val intent = Intent(context, NotificationReceiver::class.java)
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-                intent.putExtra("title", "Reminder to take your " + medication.name
-                )
-                intent.putExtra("content", "Hey ${patient.name}, rememeber to take ${medication.amount} of your ${medication.name}.")
-                intent.putExtra("end", medication.endDate.time)
-
-                val pendingIntent = PendingIntent.getBroadcast(
-                    context,
-                    1,
-                    intent,
-                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-                )
-
-                val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-
-                print(alarmManager.canScheduleExactAlarms())
-
+            if (notificationServicePermission(context)) {
                 if (alarmManager.canScheduleExactAlarms() == false) {
                     Intent().also { intent ->
                         intent.action = Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
@@ -52,31 +39,56 @@ class NotificationUtils {
                 }
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && alarmManager.canScheduleExactAlarms()) {
-                    // This is only here for testing purpose, the loop below will run normally
-                    print("Scheduling notifications for 5 sec in the future")
-                    alarmManager.setExactAndAllowWhileIdle(
-                        AlarmManager.RTC_WAKEUP,
-                        System.currentTimeMillis() + 5000,
-                        pendingIntent
-                    )
+                    for (time in medication.times) {
+                        val alarm = Calendar.getInstance()
+                        alarm.set(Calendar.HOUR_OF_DAY, time.hours)
+                        alarm.set(Calendar.MINUTE, time.minutes)
+                        alarm.set(Calendar.SECOND, time.seconds)
+                        alarm.set(Calendar.DAY_OF_YEAR, dayOfYear(medication.startDate.time))
 
-//                    for (time in medication.times) {
-//                        val alarm = Calendar.getInstance()
-//                        alarm.set(Calendar.HOUR_OF_DAY, time.hours)
-//                        alarm.set(Calendar.MINUTE, time.minutes)
-//                        alarm.set(Calendar.SECOND, time.seconds)
-//                        alarm.set(Calendar.DAY_OF_YEAR, LocalDate.now().dayOfYear + 1)
-//
-//                        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, alarm.timeInMillis, AlarmManager.INTERVAL_DAY, pendingIntent)
-//                    }
+                        val pendingIntent = createPendingIntent(
+                            context,
+                            "Reminder to take your " + medication.name,
+                            "Hey ${patient.name}, remember to take ${medication.amount} of your ${medication.name}.",
+                            medication.endDate.time
+                        )
+
+                        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, alarm.timeInMillis, pendingIntent)
+                    }
                 }
+            }
         }
 
-        fun cancelNotification(context: Context, intent: Intent) {
+        fun createPendingIntent(
+            context: Context,
+            title: String?,
+            content: String?,
+            endTime: Long?
+        ): PendingIntent {
+            if (title == null || content == null || endTime == null) {
+                return PendingIntent.getBroadcast(context, 0, Intent(), PendingIntent.FLAG_IMMUTABLE)
+            }
+
+            val intent = Intent(context, NotificationReceiver::class.java)
+            intent.putExtra("title", title)
+            intent.putExtra("content", content)
+            intent.putExtra("end", endTime)
+            intent.putExtra("requestCode", requestCode)
+
+            val pendingIntent = PendingIntent.getBroadcast(
+                context,
+                requestCode,
+                intent,
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            )
+            requestCode += 1
+
+            return pendingIntent
+        }
+
+        fun cancelNotification(context: Context, intent: PendingIntent) {
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            val pendingIntent = PendingIntent.getService(context, 100, intent,
-                PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE)
-            alarmManager.cancel(pendingIntent)
+            alarmManager.cancel(intent)
         }
 
         private fun notificationServicePermission(context: Context): Boolean {
@@ -99,6 +111,21 @@ class NotificationUtils {
                 }
             }
             return true
+        }
+
+        fun dayOfYear(epochMilliseconds: Long): Int {
+            // Convert epoch milliseconds to java.sql.Time
+            val time = Time(epochMilliseconds)
+
+            // Convert java.sql.Time to java.util.Date
+            val date = Date(time.time)
+
+            // Convert java.util.Date to Calendar
+            val calendar = Calendar.getInstance()
+            calendar.time = date
+
+            // Extract day of the year
+            return calendar.get(Calendar.DAY_OF_YEAR)
         }
     }
 }
