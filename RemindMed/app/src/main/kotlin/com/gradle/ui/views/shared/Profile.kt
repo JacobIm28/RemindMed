@@ -139,7 +139,7 @@ fun ProfileScreen(patientViewModel: PatientViewModel, patientController: Patient
 
     AppTheme {
         Box(modifier = Modifier.verticalScroll(rememberScrollState())){
-            Column (modifier = androidx.compose.ui.Modifier.padding()) {
+            Column (modifier = androidx.compose.ui.Modifier.padding().fillMaxWidth()) {
                 TitleLarge("Profile")
                 Spacer(modifier = Modifier.height(16.dp))
 
