@@ -462,8 +462,8 @@ fun MedicationEditScreen(
             )
             Spacer(modifier = Modifier.height(30.dp))
 
-            println("HI3")
-            println(times)
+//            println("HI3")
+//            println(times)
 
             Row(
                 modifier = Modifier.fillMaxWidth(),

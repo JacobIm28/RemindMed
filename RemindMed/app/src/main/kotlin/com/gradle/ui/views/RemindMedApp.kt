@@ -163,22 +163,6 @@ fun RemindMedApp(context: Context) {
                     .padding(innerPadding)
                     .padding(25.dp)
             ) {
-//                ButtonPrimary(text = "Asdasdasd", onClick = {
-//                    scheduleNotifications(context, GlobalObjects.patient, Medication(
-//                        "a",
-//                        "b",
-//                        "c",
-//                        Date(System.currentTimeMillis()),
-//                        Date(System.currentTimeMillis() + 20000),
-//                        "d",
-//                        "e",
-//                        mutableListOf<Time>(
-//                            Time(System.currentTimeMillis() + 60000),
-//                            Time(System.currentTimeMillis() + 61000),
-//                            Time(System.currentTimeMillis() + 62000),
-//                        )
-//                    ))
-//                }, enabled = true)
                 NavHost(navController, startDestination = if (GlobalObjects.type == "doctor") Routes.PEOPLE_LIST else Routes.HOME ) {
                     composable(Routes.PEOPLE_LIST) {
                         PeopleListScreen(onNavigateToMedicationList = { pid: String -> onNavigateToMedicationList(pid)})
