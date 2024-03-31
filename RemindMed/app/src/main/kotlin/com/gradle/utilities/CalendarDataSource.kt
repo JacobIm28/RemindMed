@@ -1,6 +1,7 @@
 package com.gradle.utilities
 
 import com.gradle.models.CalendarModel
+import com.gradle.models.DateModel
 import java.util.Calendar
 import java.util.Date
 
@@ -49,8 +50,8 @@ class CalendarDataSource {
         )
     }
 
-    private fun toItemModel(date: Date, isSelectedDate: Boolean): CalendarModel.DateModel {
-        return CalendarModel.DateModel(
+    private fun toItemModel(date: Date, isSelectedDate: Boolean): DateModel {
+        return DateModel(
             isSelected = isSelectedDate,
             isToday = isToday(date),
             date = date

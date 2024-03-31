@@ -23,6 +23,7 @@ import androidx.compose.material3.TimeInput
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,6 +41,13 @@ import java.sql.Time
 fun CustomTimePicker(medicationViewModel: MedicationViewModel, state: TimePickerState) {
     var time by remember {
         mutableStateOf("Select Time")
+    }
+
+    LaunchedEffect(state.hour, state.minute) {
+        val formattedHour = if (state.hour == 0 || state.hour == 12) "12" else String.format("%02d", state.hour % 12)
+        val paddedMinute = String.format("%02d", state.minute)
+        val period = if (state.hour < 12) "AM" else "PM"
+        time = "$formattedHour:$paddedMinute $period"
     }
 
     var openDialog by remember {

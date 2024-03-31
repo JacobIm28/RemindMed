@@ -259,7 +259,7 @@ fun RemindMedApp(context: Context) {
                     }
 
                     composable(
-                        Routes.MEDICATION_EDIT,
+                        Routes.MEDICATION_EDIT_WITH_ARGS,
                         arguments = listOf(
                             navArgument(NavArguments.MEDICATION_EDIT.MEDICATION_ID) { type = NavType.StringType; defaultValue = "" },
                         )
@@ -268,8 +268,6 @@ fun RemindMedApp(context: Context) {
                             medicationId = backStackEntry.arguments?.getString(NavArguments.MEDICATION_EDIT.MEDICATION_ID)?: "",
                             onNavigateToPeopleList = { onNavigateToPeopleList() },
                             onNavigateToMedicationList = { pid: String -> onNavigateToMedicationList(pid) },
-                            medicationViewModel = medicationModel,
-                            medicationController = medicationController
                         )
                     }
 
