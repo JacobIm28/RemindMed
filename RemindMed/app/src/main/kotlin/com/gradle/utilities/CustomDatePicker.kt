@@ -12,6 +12,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,8 +29,10 @@ import java.util.TimeZone
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomDatePicker(state: DatePickerState, date: String, onDateSelected: (String) -> Unit) {
-    var date by remember {
-        mutableStateOf(date)
+    var displayedDate by remember { mutableStateOf(date) }
+
+    LaunchedEffect(date) {
+        displayedDate = date
     }
 
     var openDialog by remember {
@@ -48,7 +51,7 @@ fun CustomDatePicker(state: DatePickerState, date: String, onDateSelected: (Stri
                 ),
                 enabled = true
             ) {
-                Text(text = date)
+                Text(text = displayedDate)
             }
         }
     }
@@ -56,7 +59,7 @@ fun CustomDatePicker(state: DatePickerState, date: String, onDateSelected: (Stri
     if (openDialog) {
         MyDatePickerDialog(
             state = state,
-            onDateSelected = { date = it
+            onDateSelected = { displayedDate = it
                 onDateSelected(date)
                              },
             onDismiss = { openDialog = false }

@@ -3,6 +3,7 @@ package com.gradle.ui.views.shared
 import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -37,6 +38,10 @@ import com.gradle.ui.theme.*
 import com.gradle.utilities.toFormattedDateString
 import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
+import com.example.remindmed.R
 
 enum class MedicationListViewEvent {
     MedicationRemove
@@ -150,7 +155,13 @@ fun MedicationItem(
             val formattedStartDate = medication.startDate.toFormattedDateString().format(formatter)
             val formattedEndDate = medication.endDate.toFormattedDateString().format(formatter)
 
-            Icon(Icons.Outlined.Info, contentDescription = null, Modifier.size(50.dp))
+//                painter = painterResource(id = R.drawable.Medicine),
+//                contentDescription = "RemindMed Logo",
+//                modifier = Modifier
+//                    .size(500.dp)
+//                    .padding(20.dp)
+//            )
+            Image(painter = painterResource(R.drawable.medicine), contentDescription = null, Modifier.size(50.dp))
             Spacer(modifier = Modifier.width(8.dp))
             Column {
                 Text(medication.name, fontWeight = FontWeight.Bold)

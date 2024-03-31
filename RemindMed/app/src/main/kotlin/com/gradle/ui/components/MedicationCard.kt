@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun MedicationSummaryCard(name: String, dosage: String, time: String, dates: String, specifications: String) {
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -52,7 +53,6 @@ fun MedicationSummaryCard(name: String, dosage: String, time: String, dates: Str
                 Text("Medication: $name", fontWeight = FontWeight.Bold)
                 Text("Dosage: $dosage", style = MaterialTheme.typography.bodyMedium)
                 Text("Dates: $dates", style = MaterialTheme.typography.bodyMedium)
-                // TODO: This will become an array of times
                 Text("Times: $time", style = MaterialTheme.typography.bodyMedium)
                 Text("Notes: $specifications", style = MaterialTheme.typography.bodyMedium)
             }

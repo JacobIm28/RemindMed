@@ -99,16 +99,13 @@ fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit,
                           medicationViewModel: MedicationViewModel,
                           medicationController: MedicationController,
                           pid: String) {
-//    val coroutineScope = rememberCoroutineScope()
 
     val context = LocalContext.current
 
     var medications by remember { mutableStateOf(emptyList<Medication>()) }
-//    var patient by remember { mutableStateOf(Patient("")) }
     var user by remember { mutableStateOf<Patient?>(null) }
 
     LaunchedEffect(Unit) {
-//        patient = PatientApi().getPatientbyId(GlobalObjects.patient.pid)
         medications = PatientApi().getMedicines(GlobalObjects.patient.pid)
         user = PatientApi().getPatientbyId(pid)
     }
@@ -164,19 +161,8 @@ fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit,
 
     var endDateState = rememberDatePickerState()
 
-    // TODO: Implement some sort of error, and pass the boolean and the error message to the input fields
-    // TODO: Also make the inputs span the width of the screen
-    // TODO: Implement validation
-
     fun validateInputs(
     ): Boolean {
-//        println("HERE MEDICATION")
-//        println(medicationViewModel.name.value.isNotBlank())
-//        println("HERE DOSAGE")
-//        println(medicationViewModel.startDate.value != null)
-//        println("HERE TIMES")
-//        println(medicationViewModel.times)
-//        println(medicationViewModel.times.value.isNotEmpty())
         return medicationViewModel.name.value.isNotBlank() &&
                 medicationViewModel.startDate.value != null &&
                 medicationViewModel.endDate.value != null &&
@@ -196,7 +182,6 @@ fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit,
 
     var searchResults by remember { mutableStateOf<List<String>>(emptyList()) }
     var searchTerm by remember { mutableStateOf(TextFieldValue("")) }
-    var selectedSuggestion by remember { mutableStateOf("") }
 
     val scope = CoroutineScope(Dispatchers.Main)
     var searchJob: Job? = null
@@ -296,11 +281,6 @@ fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit,
             searchJob = scope.launch {
                 delay(300)
                 onSearch()
-//                if (term.text.isNotBlank()) {
-//                    onSearch()
-//                } else {
-//                    searchResults = emptyList()
-//                }
             }
         }
     
@@ -342,14 +322,11 @@ fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
-//                                        coroutineScope.launch {
-////                                        onSuggestionSelected(suggestion) {
                                         suggestionClicked = true
                                         controller.invoke(
                                             MedicationViewEvent.NameEvent,
                                             suggestion
                                         )
-                                        println(medicationViewModel.name.value)
 
                                         controller.invoke(
                                             MedicationViewEvent.MedicationIdEvent,
@@ -373,14 +350,6 @@ fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit,
                     }
                 }
             }
-
-            // Text input for entering medication manually
-//            TextInput(
-//                label = "Enter your medication",
-//                placeholder = "Medication Name",
-//                value = searchTerm,
-//                onValueChange = { searchTerm = it }
-//            )
         }
         DisposableEffect(Unit) {
             onDispose {
@@ -430,12 +399,9 @@ fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit,
                 CustomDatePicker(startDateState, "Start Date") {
                     controller.invoke(MedicationViewEvent.StartDateEvent, Date(startDateState.selectedDateMillis?.let { it + TimeUnit.DAYS.toMillis(1) } ?: System.currentTimeMillis()))
 
-                    // controller.invoke(MedicationViewEvent.StartDateEvent, startDateState.selectedDateMillis?.let { Date(it) } ?: Date(System.currentTimeMillis()))
                 }
                 CustomDatePicker(endDateState, "End Date") {
                     controller.invoke(MedicationViewEvent.EndDateEvent, Date(endDateState.selectedDateMillis?.let { it + TimeUnit.DAYS.toMillis(1) } ?: System.currentTimeMillis()))
-
-                    // controller.invoke(MedicationViewEvent.EndDateEvent, endDateState.selectedDateMillis?.let { Date(it) } ?: Date(System.currentTimeMillis()))
                 }
             }
 
@@ -456,25 +422,14 @@ fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit,
             )
             Spacer(modifier = Modifier.height(30.dp))
 
-
-            val times = medicationViewModel.getSelectedTimes()
-            var formattedTimes = ""
-
-            if (times.isNotEmpty()) {
-                formattedTimes = medicationViewModel.getSelectedFormattedTimes().joinToString(separator = ", ")
-            }
-
             MedicationSummaryCard(
                 name = medicationViewModel.name.value,
                 dosage = medicationViewModel.amount.value,
-                time = formattedTimes,
+                time = "${medicationViewModel.getSelectedFormattedTimes()}",
                 dates = "${medicationViewModel.startDate.value} - ${medicationViewModel.endDate.value}",
                 specifications = medicationViewModel.notes.value,
             )
             Spacer(modifier = Modifier.height(30.dp))
-
-//            println("HI3")
-//            println(times)
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -496,17 +451,13 @@ fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit,
                     text = "Add",
                     onClick = {
                         if (validateInputs()) {
-                            // Check for duplicate medication
                             if (duplicateMedication()) {
                                 showDuplicateMedicationErrorDialog.value = true
                             } else {
-                                // If not a duplicate, proceed with adding the medication
-                                println("MEDICATION HERE")
                                 controller.invoke(
                                     MedicationViewEvent.TimeEvent,
                                     medicationViewModel.getSelectedTimes()
                                 )
-                                println(medicationViewModel.times)
                                 controller.invoke(MedicationViewEvent.AddEvent, medicationViewModel)
 
                                 if (medicationViewModel.successfulAdd.value) {

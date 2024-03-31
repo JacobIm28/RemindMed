@@ -56,7 +56,9 @@ class MedicationViewModel(val model: Medication) : ISubscriber {
     }
 
 
-
+    fun clearTimePickerState() {
+        _timeStates.clear()
+    }
 
     fun addTimePickerState() {
         _timeStates.add(TimePickerState(0,0,false))

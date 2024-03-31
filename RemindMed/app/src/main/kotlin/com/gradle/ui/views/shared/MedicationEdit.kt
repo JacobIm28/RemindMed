@@ -15,6 +15,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.WindowInsets
+
 
 import com.gradle.models.Patient
 
@@ -82,34 +84,58 @@ import java.util.concurrent.TimeUnit
 fun MedicationEditScreen(
     medicationId: String,
     onNavigateToPeopleList: () -> Unit,
-    onNavigateToMedicationList: (String) -> Unit,
-    medicationViewModel: MedicationViewModel,
-    medicationController: MedicationController
+    onNavigateToMedicationList: (String) -> Unit
 ) {
-//    val coroutineScope = rememberCoroutineScope()
-
     var medication by remember { mutableStateOf<Medication?>(null) }
-
     var medications by remember { mutableStateOf(emptyList<Medication>()) }
-//    var patient by remember { mutableStateOf(Patient("")) }
+    var medicationViewModel by remember { mutableStateOf<MedicationViewModel?>(null) }
+    var medicationController by remember { mutableStateOf<MedicationController?>(null) }
+
+    var dosageValue by remember { mutableStateOf("") }
+    var notesValue by remember { mutableStateOf("") }
+    var timeStatesValue: List<TimePickerState> by remember { mutableStateOf(emptyList()) }
+    var times by remember { mutableStateOf<List<Time>?>(emptyList()) }
+
+    var searchResults by remember { mutableStateOf<List<String>>(emptyList()) }
+    var searchTerm by remember { mutableStateOf(TextFieldValue("")) }
+
+    val scope = CoroutineScope(Dispatchers.Main)
+    var searchJob: Job? = null
 
     LaunchedEffect(Unit) {
-//        patient = PatientApi().getPatientbyId(GlobalObjects.patient.pid)
-        medications = PatientApi().getMedicines(GlobalObjects.patient.pid)
-        for (med in medications) {
-            if (med.medicationId == medicationId) {
-                medication = med
-            }
+        val medications = PatientApi().getMedicines(GlobalObjects.patient.pid)
+        medication = medications.find { it.medicationId == medicationId }
+
+        medication?.let { med ->
+            medicationViewModel = MedicationViewModel(med)
+            medicationController = MedicationController(med)
         }
+        searchTerm = medicationViewModel?.name?.value?.let { TextFieldValue(it) } ?: TextFieldValue("")
+        dosageValue = medicationViewModel?.amount?.value?: ""
+        notesValue = medicationViewModel?.notes?.value?: ""
+
+        timeStatesValue = medicationViewModel?.times?.value?.map { time ->
+            val (hour, minute) = time.hours to time.minutes
+            TimePickerState(hour, minute, false)
+        }?: emptyList()
+
+        medicationViewModel?.clearTimePickerState()
+        medicationViewModel?._timeStates?.addAll(timeStatesValue)
+        medicationViewModel?.timeStates = medicationViewModel?._timeStates?: emptyList()
+
+        times = medicationViewModel?.times?.value?: emptyList()
+
     }
 
-    val controller by remember{mutableStateOf(medicationController)}
 
     val showAddMedicationErrorDialog = remember { mutableStateOf(false) }
 
     val showValidationErrorDialog = remember { mutableStateOf(false) }
 
     val showDuplicateMedicationErrorDialog = remember { mutableStateOf(false) }
+
+
+    val showDateInvalidRangeErrorDialog = remember { mutableStateOf(false) }
 
     if (showAddMedicationErrorDialog.value) {
         AlertDialog(
@@ -149,47 +175,40 @@ fun MedicationEditScreen(
             }
         )
     }
+    if (showDateInvalidRangeErrorDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showDateInvalidRangeErrorDialog.value = false },
+            title = { Text("Date Error") },
+            text = { Text("The start date must be before or equal to the end date.") },
+            confirmButton = {
+                Button(onClick = { showDateInvalidRangeErrorDialog.value = false }) {
+                    Text("OK")
+                }
+            }
+        )
+    }
 
     var startDateState = rememberDatePickerState()
-
     var endDateState = rememberDatePickerState()
-
-    // TODO: Implement some sort of error, and pass the boolean and the error message to the input fields
-    // TODO: Also make the inputs span the width of the screen
-    // TODO: Implement validation
 
     fun validateInputs(
     ): Boolean {
-        println("HERE MEDICATION")
-        println(medicationViewModel.name.value.isNotBlank())
-        println("HERE DOSAGE")
-        println(medicationViewModel.startDate.value != null)
-        println("HERE TIMES")
-        println(medicationViewModel.times)
-        println(medicationViewModel.times.value.isNotEmpty())
-        return medicationViewModel.name.value.isNotBlank() &&
-                medicationViewModel.startDate.value != null &&
-                medicationViewModel.endDate.value != null &&
-                medicationViewModel.getSelectedTimes().isNotEmpty()
-    }
+        return medicationViewModel?.name?.value?.isNotBlank() ?: false &&
+                medicationViewModel?.startDate?.value != null &&
+                medicationViewModel?.endDate?.value != null &&
+                !medicationViewModel?.getSelectedTimes().isNullOrEmpty()
+        }
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun duplicateMedication(): Boolean {
         for (medication in medications) {
-            if (medication.name == medicationViewModel.name.value) {
+            if (medication.name == medicationViewModel?.name?.value) {
                 return true
             }
         }
         return false
     }
 
-
-    var searchResults by remember { mutableStateOf<List<String>>(emptyList()) }
-    var searchTerm by remember { mutableStateOf(TextFieldValue("")) }
-    var selectedSuggestion by remember { mutableStateOf("") }
-
-    val scope = CoroutineScope(Dispatchers.Main)
-    var searchJob: Job? = null
 
     @Composable
     fun TimeInput(medicationViewModel: MedicationViewModel) {
@@ -207,6 +226,7 @@ fun MedicationEditScreen(
                 Column {
                     medicationViewModel.timeStates.forEachIndexed { index, timeState ->
                         Row(verticalAlignment = Alignment.CenterVertically) {
+                            println("TIME STATE" + timeState.hour)
                             CustomTimePicker(medicationViewModel, timeState)
                             Spacer(modifier = Modifier.width(8.dp))
                             if (medicationViewModel.timeStates.size > 1) {
@@ -235,22 +255,6 @@ fun MedicationEditScreen(
                                     .size(50.dp)
                                     .background(MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(5.dp))
                             )
-                            // button without container
-//                            IconButton(
-////                                label = "Add Time",
-//                                onClick = { viewModel.addTimePickerState() },
-////                                shape = RoundedCornerShape(5.dp),
-////                                containerColor = MaterialTheme.colorScheme.primary
-////                                colors = ButtonDefaults.buttonColors(
-////                                    containerColor = MaterialTheme.colorScheme.primary,
-////                                    contentColor = Color.White,
-////                                    disabledContainerColor = MaterialTheme.colorScheme.primary,
-////                                    disabledContentColor = MaterialTheme.colorScheme.onTertiary
-////                                ),
-//                                modifier = Modifier.padding(horizontal = 20.dp, vertical = 2.dp)
-//                            ) {
-//                                Icon(Icons.Default.Add, contentDescription = "Add Time")
-//                            }
                             IconButton(
                                 onClick = {
                                     medicationViewModel.addTimePickerState()
@@ -280,16 +284,16 @@ fun MedicationEditScreen(
 
         var suggestionClicked by remember { mutableStateOf(false) }
 
+        DisposableEffect(Unit) {
+            onDispose {
+                suggestionClicked = false
+            }
+        }
         fun searchWithDelay(term: TextFieldValue) {
             searchJob?.cancel()
             searchJob = scope.launch {
                 delay(300)
                 onSearch()
-//                if (term.text.isNotBlank()) {
-//                    onSearch()
-//                } else {
-//                    searchResults = emptyList()
-//                }
             }
         }
 
@@ -306,7 +310,6 @@ fun MedicationEditScreen(
                     expanded = (term.text.isNotBlank() && !suggestionClicked) // Expand dropdown only when there's text
                 },
                 label = { Text("Search Medication") },
-                placeholder = { Text("Enter Medication Name") },
                 modifier = Modifier.fillMaxWidth(),
                 trailingIcon = {
                     IconButton(onClick = { expanded = !expanded }) {
@@ -331,16 +334,14 @@ fun MedicationEditScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
-//                                        coroutineScope.launch {
-////                                        onSuggestionSelected(suggestion) {
                                         suggestionClicked = true
-                                        controller.invoke(
+                                        medicationController?.invoke(
                                             MedicationViewEvent.NameEvent,
                                             suggestion
                                         )
-                                        println(medicationViewModel.name.value)
+                                        println(medicationViewModel?.name?.value)
 
-                                        controller.invoke(
+                                        medicationController?.invoke(
                                             MedicationViewEvent.MedicationIdEvent,
                                             suggestion
                                         )
@@ -362,25 +363,12 @@ fun MedicationEditScreen(
                     }
                 }
             }
-
-            // Text input for entering medication manually
-//            TextInput(
-//                label = "Enter your medication",
-//                placeholder = "Medication Name",
-//                value = searchTerm,
-//                onValueChange = { searchTerm = it }
-//            )
-        }
-        DisposableEffect(Unit) {
-            onDispose {
-                suggestionClicked = false
-            }
         }
     }
 
     AppTheme {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-            TitleLarge("Enter Medication")
+            TitleLarge("Edit Medication")
             Spacer(modifier = Modifier.height(16.dp))
 
             MedicationSearchBar(
@@ -392,9 +380,12 @@ fun MedicationEditScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
-                value = medicationViewModel.amount.value,
+                value = dosageValue,
+                placeholder = { Text(medicationViewModel?.amount?.value ?: "") },
                 onValueChange = {
-                    controller.invoke(MedicationViewEvent.AmountEvent, it)
+                    dosageValue = it
+                    medicationController?.invoke(MedicationViewEvent.AmountEvent, it)
+
                 },
                 label = { Text("Dosage") },
                 modifier = Modifier.fillMaxWidth()
@@ -415,55 +406,42 @@ fun MedicationEditScreen(
                         textAlign = TextAlign.Center
                     )
                 }
+                CustomDatePicker(startDateState, medicationViewModel?.startDate?.value.toString()) {
+                    medicationController?.invoke(MedicationViewEvent.StartDateEvent, Date(startDateState.selectedDateMillis?.let { it + TimeUnit.DAYS.toMillis(1) } ?: System.currentTimeMillis()))
 
-                CustomDatePicker(startDateState, "Start Date") {
-                    controller.invoke(MedicationViewEvent.StartDateEvent, Date(startDateState.selectedDateMillis?.let { it + TimeUnit.DAYS.toMillis(1) } ?: System.currentTimeMillis()))
-
-                    // controller.invoke(MedicationViewEvent.StartDateEvent, startDateState.selectedDateMillis?.let { Date(it) } ?: Date(System.currentTimeMillis()))
                 }
-                CustomDatePicker(endDateState, "End Date") {
-                    controller.invoke(MedicationViewEvent.EndDateEvent, Date(endDateState.selectedDateMillis?.let { it + TimeUnit.DAYS.toMillis(1) } ?: System.currentTimeMillis()))
-
-                    // controller.invoke(MedicationViewEvent.EndDateEvent, endDateState.selectedDateMillis?.let { Date(it) } ?: Date(System.currentTimeMillis()))
+                CustomDatePicker(endDateState, medicationViewModel?.endDate?.value.toString()) {
+                    medicationController?.invoke(MedicationViewEvent.EndDateEvent, Date(endDateState.selectedDateMillis?.let { it + TimeUnit.DAYS.toMillis(1) } ?: System.currentTimeMillis()))
                 }
             }
 
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            TimeInput(medicationViewModel)
+            println(medicationViewModel != null)
+            TimeInput(medicationViewModel?: MedicationViewModel(medication?: Medication("", "", "", Date(0L), Date(0L), "", "", mutableListOf())))
 
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
-                value = medicationViewModel.notes.value,
+                value = notesValue,
                 onValueChange = {
-                    controller.invoke(MedicationViewEvent.NotesEvent, it)
+                    notesValue = it
+                    medicationController?.invoke(MedicationViewEvent.NotesEvent, it)
                 },
                 label = { Text("Notes") },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(30.dp))
 
-
-            val times = medicationViewModel.getSelectedTimes()
-            var formattedTimes = ""
-
-            if (times.isNotEmpty()) {
-                formattedTimes = medicationViewModel.getSelectedFormattedTimes().joinToString(separator = ", ")
-            }
-
             MedicationSummaryCard(
-                name = medicationViewModel.name.value,
-                dosage = medicationViewModel.amount.value,
-                time = formattedTimes,
-                dates = "${medicationViewModel.startDate.value} - ${medicationViewModel.endDate.value}",
-                specifications = medicationViewModel.notes.value,
+                name = searchTerm.text,
+                dosage = dosageValue,
+                time = "${medicationViewModel?.getSelectedFormattedTimes()}",
+                dates = "${medicationViewModel?.startDate?.value} - ${medicationViewModel?.endDate?.value}",
+                specifications = notesValue,
             )
             Spacer(modifier = Modifier.height(30.dp))
-
-//            println("HI3")
-//            println(times)
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -485,24 +463,34 @@ fun MedicationEditScreen(
                     text = "Change",
                     onClick = {
                         if (validateInputs()) {
-                            // Check for duplicate medication
                             if (duplicateMedication()) {
                                 showDuplicateMedicationErrorDialog.value = true
                             } else {
-                                // If not a duplicate, proceed with adding the medication
-                                println("MEDICATION HERE")
-                                controller.invoke(
-                                    MedicationViewEvent.TimeEvent,
-                                    medicationViewModel.getSelectedTimes()
-                                )
-                                println(medicationViewModel.times)
-                                controller.invoke(MedicationViewEvent.UpdateEvent, medicationViewModel)
+                                val startDate = medicationViewModel?.startDate?.value
+                                val endDate = medicationViewModel?.endDate?.value
 
-                                if (medicationViewModel.successfulChange.value) {
-                                    onNavigateToMedicationList(GlobalObjects.patient.pid)
-                                    medicationViewModel.clearAll()
+                                if (startDate != null && endDate != null && startDate > endDate) {
+                                    showDateInvalidRangeErrorDialog.value = true
                                 } else {
-                                    showAddMedicationErrorDialog.value = true
+                                    // if pass error checks proceed with adding the medication
+                                    println("MEDICATION HERE")
+
+                                    medicationController?.invoke(
+                                        MedicationViewEvent.TimeEvent,
+                                        medicationViewModel?.getSelectedTimes()
+                                    )
+
+                                    medicationController?.invoke(
+                                        MedicationViewEvent.UpdateEvent,
+                                        medicationViewModel
+                                    )
+
+                                    if (medicationViewModel?.successfulChange?.value == true) {
+                                        onNavigateToMedicationList(GlobalObjects.patient.pid)
+                                        medicationViewModel?.clearAll()
+                                    } else {
+                                        showAddMedicationErrorDialog.value = true
+                                    }
                                 }
                             }
                         } else {
