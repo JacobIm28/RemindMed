@@ -4,17 +4,13 @@ import TextInput
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
-import android.os.Bundle
-import androidx.activity.compose.setContent
 import com.example.remindmed.R
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -26,9 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -37,13 +31,12 @@ import androidx.compose.material.RadioButton
 import androidx.compose.material.RadioButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gradle.constants.GlobalObjects
 import com.gradle.models.Doctor
-import com.gradle.models.LoginModel
+import com.gradle.ui.viewModels.LoginViewModel
 import com.gradle.models.Patient
 import com.gradle.ui.components.*
 import com.gradle.ui.views.RemindMedApp
@@ -100,7 +93,7 @@ fun processNewUser(name: String, type: String, email: String, id: String): Boole
 }
 @Composable
 fun MainView(
-    viewModel: LoginModel
+    viewModel: LoginViewModel
 ) {
     // Wake up the API
     //TODO: temporary fix, need to wake up API in a better way or at a diff spot.
@@ -223,7 +216,7 @@ fun MainView(
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("RememberReturnType", "UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun Login(mainViewModel: LoginModel = viewModel(), context: Context) {
+fun Login(mainViewModel: LoginViewModel = viewModel(), context: Context) {
     AppTheme {
         if(mainViewModel.userIsComplete){
             RemindMedApp(context)

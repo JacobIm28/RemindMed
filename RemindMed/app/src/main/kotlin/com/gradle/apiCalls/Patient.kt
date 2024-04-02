@@ -85,11 +85,7 @@ class Patient {
             runBlocking {
                 launch {
                     println("Getting all doctors")
-                    val res = client.get("$host/patient/doctors?pid=$pid").bodyAsText()
-                    doctors = JsonParser.parseString(res).asJsonArray.map {
-                        val doc = it.asJsonObject
-                        Doctor(doc["did"].asString, doc["name"].asString, doc["email"].asString)
-                    }.toMutableList()
+                    doctors = client.get("$host/patient/doctors?pid=$pid").body()
                 }
             }
             if (doctors?.isEmpty() == false) {

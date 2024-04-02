@@ -1,6 +1,6 @@
 package com.gradle.models
 
-import com.gradle.ui.views.ISubscriber
+import com.gradle.ui.viewModels.ISubscriber
 
 abstract class IPresenter {
     private val subscribers = mutableListOf<ISubscriber>()

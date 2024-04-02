@@ -10,9 +10,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 
@@ -23,15 +21,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.navigation.NavController
 import com.gradle.apiCalls.Patient as PatientApi
-import com.gradle.constants.NavArguments
-import com.gradle.constants.Routes
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -39,14 +32,12 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.zIndex
 import com.gradle.constants.GlobalObjects
 import com.gradle.ui.components.ButtonSecondary
@@ -55,25 +46,19 @@ import com.gradle.ui.components.CustomTimePicker
 import com.gradle.ui.components.MedicationSummaryCard
 import com.gradle.ui.components.TitleLarge
 import com.gradle.ui.theme.AppTheme
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import java.sql.Date
-import java.sql.Time
 
-import java.time.LocalTime
 import com.gradle.apiCalls.Medication as MedicationApi
 import com.gradle.models.Medication as Medication
 
 import com.gradle.controller.MedicationController
-import com.gradle.controller.PatientController
-import com.gradle.ui.views.MedicationViewModel
+import com.gradle.ui.viewModels.MedicationViewModel
 import com.gradle.utilities.notifications.NotificationUtils.Companion.scheduleNotifications
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
 
@@ -106,8 +91,9 @@ fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit,
     var user by remember { mutableStateOf<Patient?>(null) }
 
     LaunchedEffect(Unit) {
-        medications = PatientApi().getMedicines(GlobalObjects.patient.pid)
         user = PatientApi().getPatientbyId(pid)
+        medications = PatientApi().getMedicines(pid)
+        medicationController.model.pid = pid
     }
 
     val controller by remember{mutableStateOf(medicationController)}
@@ -461,7 +447,9 @@ fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit,
                                 controller.invoke(MedicationViewEvent.AddEvent, medicationViewModel)
 
                                 if (medicationViewModel.successfulAdd.value) {
-                                    scheduleNotifications(context, user!!, medicationViewModel.model)
+                                    if(GlobalObjects.type == "patient") {
+                                        scheduleNotifications(context, user!!, medicationViewModel.model)
+                                    }
                                     onNavigateToMedicationList(GlobalObjects.patient.pid)
                                     medicationViewModel.clearAll()
                                 } else {

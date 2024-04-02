@@ -33,7 +33,9 @@ import com.gradle.controller.DoctorController
 import com.gradle.controller.MedicationController
 import com.gradle.controller.PatientController
 import com.gradle.models.Medication
-import com.gradle.ui.components.ButtonPrimary
+import com.gradle.ui.viewModels.DoctorViewModel
+import com.gradle.ui.viewModels.MedicationViewModel
+import com.gradle.ui.viewModels.PatientViewModel
 import com.gradle.ui.views.doctor.AddPatientScreen
 import com.gradle.ui.views.patient.HomeScreen
 import com.gradle.ui.views.shared.MedicationEntryScreen
@@ -42,8 +44,6 @@ import com.gradle.ui.views.shared.MedicationInfoScreen
 import com.gradle.ui.views.shared.MedicationListScreen
 import com.gradle.ui.views.shared.PeopleListScreen
 import com.gradle.ui.views.shared.ProfileScreen
-import com.gradle.utilities.notifications.NotificationUtils
-import com.gradle.utilities.notifications.NotificationUtils.Companion.scheduleNotifications
 import java.sql.Date
 import java.sql.Time
 
@@ -277,7 +277,8 @@ fun RemindMedApp(context: Context) {
                     }
 
                     if (GlobalObjects.type == "doctor") {
-                        composable(Routes.ADD_PATIENT) { AddPatientScreen(onNavigateToMedicationList = { pid: String -> onNavigateToMedicationList(pid) }) }
+                        composable(Routes.ADD_PATIENT) { AddPatientScreen(onNavigateToMedicationList = { pid: String -> onNavigateToMedicationList(pid) },
+                            { onNavigateToPeopleList() }) }
                     }
                 }
             }

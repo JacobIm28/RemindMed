@@ -10,11 +10,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
-import com.gradle.models.LoginModel
+import com.gradle.ui.viewModels.LoginViewModel
 import com.gradle.ui.views.shared.Login
 import com.example.remindmed.databinding.ActivityMainBinding
 import com.gradle.constants.CHANNEL_ID
-import com.gradle.ui.views.RemindMedApp
 import android.provider.Settings;
 
 class MainActivity : ComponentActivity() {
@@ -26,7 +25,7 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val mainViewModel: LoginModel by viewModels()
+        val mainViewModel: LoginViewModel by viewModels()
         mainViewModel.setContext(this)
 
         createNotificationChannel()

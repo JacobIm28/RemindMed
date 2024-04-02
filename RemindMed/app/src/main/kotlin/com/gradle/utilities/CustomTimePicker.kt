@@ -1,6 +1,5 @@
 package com.gradle.ui.components
 
-import android.app.TimePickerDialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,7 +18,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TimeInput
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TimePickerState
 import androidx.compose.runtime.Composable
@@ -33,7 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.gradle.ui.theme.AppTheme
-import com.gradle.ui.views.MedicationViewModel
+import com.gradle.ui.viewModels.MedicationViewModel
 import java.sql.Time
 
 @OptIn(ExperimentalMaterial3Api::class)

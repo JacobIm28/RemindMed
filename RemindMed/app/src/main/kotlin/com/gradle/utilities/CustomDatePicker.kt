@@ -1,8 +1,6 @@
 package com.gradle.ui.components
 
-import android.widget.DatePicker
 import androidx.compose.foundation.layout.Box
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.DatePicker
@@ -19,12 +17,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import com.gradle.ui.theme.AppTheme
-import com.gradle.ui.views.MedicationViewModel
 import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Date
 import java.util.Locale
-import java.util.TimeZone
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

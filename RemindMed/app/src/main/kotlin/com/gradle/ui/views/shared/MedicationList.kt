@@ -13,7 +13,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -28,7 +27,6 @@ import androidx.compose.runtime.setValue
 
 import com.gradle.constants.GlobalObjects
 import com.gradle.controller.MedicationListController
-import com.gradle.models.AddPatient
 import com.gradle.apiCalls.Patient as PatientApi
 import com.gradle.models.Medication
 import com.gradle.models.MedicationList
@@ -38,10 +36,9 @@ import com.gradle.ui.theme.*
 import com.gradle.utilities.toFormattedDateString
 import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.vectorResource
 import com.example.remindmed.R
+import com.gradle.ui.viewModels.MedicationListViewModel
 
 enum class MedicationListViewEvent {
     MedicationRemove
