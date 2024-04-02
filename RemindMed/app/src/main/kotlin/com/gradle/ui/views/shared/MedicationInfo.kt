@@ -43,6 +43,7 @@ import com.gradle.ui.components.TitleLarge
 import com.gradle.ui.components.ToggleList
 import com.gradle.ui.theme.AppTheme
 import com.gradle.utilities.formatJSONKey
+import kotlinx.coroutines.delay
 import com.gradle.apiCalls.Medication as MedicationApi
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -56,6 +57,7 @@ fun MedicationInfoScreen(medicationName: String, startDate: String, endDate: Str
 
     LaunchedEffect(Unit) {
         println("Fetching Medication Info for " + medicationName)
+        delay(1)
         val result: JsonObject = MedicationApi().getMedicationbyName(medicationName)
         if (result.size() > 0) {
             medicationInfo = result["results"].asJsonArray[0].asJsonObject

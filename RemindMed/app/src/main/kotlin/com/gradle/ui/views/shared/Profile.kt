@@ -34,8 +34,8 @@ import com.gradle.controller.DoctorController
 import com.gradle.controller.PatientController
 import com.gradle.models.Doctor
 import com.gradle.models.Patient
-import com.gradle.ui.views.DoctorViewModel
-import com.gradle.ui.views.PatientViewModel
+import com.gradle.ui.viewModels.DoctorViewModel
+import com.gradle.ui.viewModels.PatientViewModel
 import android.os.Handler
 import androidx.compose.foundation.layout.fillMaxWidth
 
