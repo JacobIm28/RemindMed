@@ -45,6 +45,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.text.font.FontWeight
 import com.gradle.ui.viewModels.LoginViewModel
+import com.gradle.ui.components.ButtonSecondary
 
 enum class ProfileViewEvent {
     NameEvent,
@@ -96,10 +97,10 @@ fun ProfileScreen(doctorViewModel: DoctorViewModel, doctorController: DoctorCont
                 Spacer(modifier = Modifier.height(16.dp))
 
                 TextInput("Name", "", viewModel.name.value, {controller.invoke(ProfileViewEvent.NameEvent, it)})
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
                 TextInput("Email", "", viewModel.email.value, {controller.invoke(ProfileViewEvent.EmailEvent, it)})
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
                 Row (modifier = Modifier.align(Alignment.CenterHorizontally)) {
                     ButtonPrimary("Submit", {
@@ -212,7 +213,7 @@ fun ProfileScreen(patientViewModel: PatientViewModel, patientController: Patient
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Row (modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                    ButtonPrimary("Submit", {
+                    ButtonSecondary("Submit", {
                         viewModel.changesSubmitted.value = true
                         controller.invoke(ProfileViewEvent.UpdateEvent, "")
                     }, viewModel.submitEnabled.value)

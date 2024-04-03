@@ -37,6 +37,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -53,11 +54,16 @@ import com.gradle.utilities.toFormattedDateString
 import com.gradle.utilities.toFormattedMonthDateString
 import com.example.remindmed.R
 import com.gradle.constants.GlobalObjects
+import com.gradle.controller.MedicationController
 import com.gradle.models.DateModel
 import com.gradle.models.Medication
 import com.gradle.models.Patient
 import com.gradle.ui.theme.AppTheme
+import com.gradle.ui.viewModels.MedicationViewModel
+import com.gradle.ui.views.shared.MedicationViewEvent
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
 //import com.google.accompanist.permissions.ExperimentalPermissionsApi
 //import com.google.accompanist.permissions.isGranted
 //import com.google.accompanist.permissions.rememberPermissionState
@@ -68,16 +74,17 @@ import java.util.concurrent.TimeUnit
 import com.gradle.apiCalls.PatientApi as PatientApi
 
 
-class Prescription (
-    val name: String,
-    val amount: String,
-    val times: List<String>
-)
+//class Prescription (
+//    val name: String,
+//    val amount: String,
+//    val times: List<String>
+//)
 
 @Composable
 fun MedicationItem(
-    prescription: Prescription,
+    medication: Medication,
     taken: Boolean = false,
+    enabled: Boolean = true,
     onCheckedChange: (Boolean) -> Unit
 ) {
     Card(
@@ -102,60 +109,87 @@ fun MedicationItem(
                 modifier = Modifier
                     .weight(1f)
             ) {
-                Text(prescription.name, fontWeight = FontWeight.Bold)
-                Text("Dosage: ${prescription.amount}", style = MaterialTheme.typography.bodyMedium)
+                Text(medication.name, fontWeight = FontWeight.Bold)
+                Text("Dosage: ${medication.amount}", style = MaterialTheme.typography.bodyMedium)
 
-                Text("Time: ${prescription.times}", style = MaterialTheme.typography.bodyMedium)
+                Text("Time: ${medication.getFormattedTimes()}", style = MaterialTheme.typography.bodyMedium)
             }
             Checkbox(
                 checked = taken,
                 onCheckedChange = onCheckedChange,
                 colors = CheckboxDefaults.colors(checkmarkColor = Color.White),
-                modifier = Modifier.padding(start = 8.dp)
+                modifier = Modifier.padding(start = 8.dp),
+                enabled = enabled
             )
         }
     }
     Spacer(modifier = Modifier.height(16.dp))
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MedicationListHomeScreen(
-    takenMedications: List<Prescription>,
-    notTakenMedications: List<Prescription>,
-    onCheckedChange: (Prescription, Boolean) -> Unit
+    selectedDate: Date,
+    takenMedications: List<Medication>,
+    notTakenMedications: List<Medication>,
+    onCheckedChange: (Medication, Boolean) -> Unit
 ) {
+    val isToday = selectedDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate() == LocalDate.now()
 
+
+    val updatedTakenMedications = if (!isToday) {
+        emptyList()
+    } else {
+        takenMedications
+    }
+    val updatedNotTakenMedications = if (!isToday) {
+        notTakenMedications + takenMedications
+    } else {
+        notTakenMedications
+    }
     Column {
         Text("Taken:", modifier = Modifier.padding(8.dp),style = MaterialTheme.typography.titleMedium)
         HorizontalDivider(modifier = Modifier.padding(8.dp))
-        takenMedications.forEach { medication ->
-            MedicationItem(prescription = medication, taken = true, onCheckedChange = { isChecked ->
+
+        updatedTakenMedications.forEach { medication ->
+            MedicationItem(medication = medication, taken = true, enabled = isToday, onCheckedChange = { isChecked ->
                 onCheckedChange(medication, isChecked)
             })
         }
         Spacer(modifier = Modifier.height(16.dp))
         Text("Not Finished:", modifier = Modifier.padding(8.dp), style = MaterialTheme.typography.titleMedium)
         HorizontalDivider(modifier = Modifier.padding(8.dp))
-        notTakenMedications.forEach { medication ->
-            MedicationItem(prescription = medication, taken = false, onCheckedChange = { isChecked ->
-                onCheckedChange(medication, isChecked)
+
+        updatedNotTakenMedications.forEach { medication ->
+            MedicationItem(medication = medication, taken = false, enabled = isToday, onCheckedChange = { isChecked ->
+                if (!isToday) {
+                    onCheckedChange(medication, false)
+                } else {
+                    onCheckedChange(medication, isChecked)
+                }
             })
         }
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
+@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 //fun HomeScreen(viewModel: HomepageViewModel, controller: HomepageController) {
 fun HomeScreen() {
-    var takenMedications by remember { mutableStateOf(listOf<Prescription>()) }
-    var notTakenMedications by remember { mutableStateOf(listOf<Prescription>()) }
+    var takenMedications by remember { mutableStateOf(listOf<Medication>()) }
+    var notTakenMedications by remember { mutableStateOf(listOf<Medication>()) }
     var medicationsToday by remember { mutableStateOf(listOf<Medication>()) }
+
+    var medicationViewModelList = remember { mutableStateListOf<MedicationViewModel>() }
+
     var selectedDate by remember { mutableStateOf(Date()) }
 
     var medications by remember { mutableStateOf(emptyList<Medication>()) }
     var patient by remember { mutableStateOf(Patient("")) }
     var greeting by remember { mutableStateOf("") }
+
+    var medicationViewModel by remember { mutableStateOf<MedicationViewModel?>(null) }
+    var medicationController by remember { mutableStateOf<MedicationController?>(null) }
 
     LaunchedEffect(Unit) {
         selectedDate = Calendar.getInstance().time
@@ -164,30 +198,31 @@ fun HomeScreen() {
         medicationsToday = medications.filter { medication ->
             (selectedDate >= medication.startDate && selectedDate < Date(medication.endDate.time + TimeUnit.DAYS.toMillis(1)))
         }
+
+//        medicationsToday.map { medication ->
+//            MedicationViewModel(medication)
+//        }.also { medicationViewModelList ->
+//            medicationViewModelList.forEach { medicationViewModel ->
+//                 medicationViewModelList.add(medicationViewModel)
+//            }
+//        }
+        medicationsToday.forEach { medication ->
+            medicationViewModelList.add(MedicationViewModel(medication))
+        }
+        notTakenMedications = medicationsToday.filter { medication ->
+            medication.taken == false
+        }
+        takenMedications = medicationsToday.filter { medication ->
+            medication.taken == true
+        }
+
         greeting = when (LocalDateTime.now().hour) {
             in 0..11 -> "Good Morning"
             in 12..16 -> "Good Afternoon"
             else -> "Good Evening"
         }
     }
-    notTakenMedications = medicationsToday.map { medication ->
-        Prescription(medication.name, medication.amount, medication.getFormattedTimes())
-    }
-    takenMedications = emptyList()
 
-    // some weird issue here with slight UI lag, come back to this
-//    takenMedications = emptyList() // Clear the taken medications list
-//    LaunchedEffect(selectedDate) {
-//        println(selectedDate)
-//        medications = PatientApi().getMedicines(GlobalObjects.patient.pid)
-//        medicationsToday = medications.filter { medication ->
-//            (selectedDate >= medication.startDate  && selectedDate <= medication.endDate)
-//        }
-//        notTakenMedications = medicationsToday.map { medication ->
-//            Prescription(medication.name, medication.amount, medication.times.toString())
-//        }
-//        takenMedications = emptyList() // Clear the taken medications list
-//    }
     AppTheme {
         Scaffold(
         ) { innerPadding ->
@@ -206,15 +241,23 @@ fun HomeScreen() {
 
                     MedicationListHomeScreen(
                         takenMedications = takenMedications,
-                        notTakenMedications = notTakenMedications
+                        notTakenMedications = notTakenMedications,
+                                selectedDate = selectedDate
                     ) { medication, isChecked ->
+                        val medicationViewModel = MedicationViewModel(medication)
+                        val medicationController = MedicationController(medication)
                         if (isChecked) {
                             notTakenMedications = notTakenMedications.filterNot { it == medication }
                             takenMedications = takenMedications + medication
+//                            medication.taken = true
+                            medicationController.invoke(MedicationViewEvent.TakenEvent, true)
                         } else {
                             takenMedications = takenMedications.filterNot { it == medication }
                             notTakenMedications = notTakenMedications + medication
+//                            medication.taken = false
+                            medicationController.invoke(MedicationViewEvent.TakenEvent, false)
                         }
+                        medicationController.invoke(MedicationViewEvent.UpdateEvent, medicationViewModel)
                     }
                 }
             }

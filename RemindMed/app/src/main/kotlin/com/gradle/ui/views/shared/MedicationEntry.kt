@@ -431,7 +431,7 @@ fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit,
                         if (GlobalObjects.type == "doctor") {
                             onNavigateToPeopleList()
                         } else {
-                            onNavigateToMedicationList(GlobalObjects.patient.pid)
+                            onNavigateToMedicationList(pid)
                         }
                     },
                     enabled = true
@@ -476,6 +476,7 @@ fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit,
                                         } else {
                                             onNavigateToMedicationList(medicationViewModel.pid.value)
                                         }
+                                        onNavigateToMedicationList(pid)
                                         medicationViewModel.clearAll()
                                     } else {
                                         showAddMedicationErrorDialog.value = true

@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -109,6 +110,7 @@ fun MedicationListScreen(
 //                HeadlineLarge("Medications")
                 LazyColumn {
                     items(viewModel.medicationList.value) { medication ->
+                        Spacer(modifier = Modifier.height(8.dp))
                         MedicationItem(
                             context = LocalContext.current,
                             patient = patient,
@@ -142,17 +144,31 @@ fun MedicationItem(
     var accepted by remember { mutableStateOf(medication.accepted) }
     Card(
         modifier = Modifier
-            .padding(6.dp)
+            .padding(horizontal = 6.dp, vertical = 3.dp) // Adjust padding here
             .clickable(onClick = onClick), // Apply click listener to the entire item
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
         ),
+        shape = RoundedCornerShape(16.dp), // Adjust shape here
         colors = CardColors(
             containerColor = MaterialTheme.colorScheme.tertiary,
             contentColor = MaterialTheme.colorScheme.primary,
             disabledContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
             disabledContentColor = MaterialTheme.colorScheme.onTertiaryContainer
         )
+//    Card(
+//        modifier = Modifier
+//            .padding(6.dp)
+//            .clickable(onClick = onClick), // Apply click listener to the entire item
+//        elevation = CardDefaults.cardElevation(
+//            defaultElevation = 4.dp
+//        ),
+//        colors = CardColors(
+//            containerColor = MaterialTheme.colorScheme.tertiary,
+//            contentColor = MaterialTheme.colorScheme.primary,
+//            disabledContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
+//            disabledContentColor = MaterialTheme.colorScheme.onTertiaryContainer
+//        )
     ) {
         Row(
             modifier = Modifier

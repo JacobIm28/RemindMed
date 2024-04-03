@@ -140,9 +140,6 @@ fun MyTimePickerDialog(
                                     println("Dialog State: $dialogState")
                                     return@Button
                                 }
-                                println("SELECTED TIMES:")
-                                println(selectedTimes)
-                                println(Time(state.hour, state.minute, 0))
                                 onDismiss()
                             },
                             enabled = true
