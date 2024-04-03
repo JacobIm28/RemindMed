@@ -122,7 +122,9 @@ fun RemindMedApp(context: Context) {
 
     fun onNavigateToMedicationEdit(medication: Medication) {
         navController.navigate(Routes.MEDICATION_EDIT + "?" +
-                "${NavArguments.MEDICATION_EDIT.MEDICATION_ID}=${medication.medicationId}")
+                "${NavArguments.MEDICATION_EDIT.MEDICATION_ID}=${medication.medicationId}" +
+                "&${NavArguments.MEDICATION_LIST.PID}=${medication.pid}"
+        )
     }
 
     fun onNavigateToMedicationInfo(medication: Medication) {
@@ -266,6 +268,7 @@ fun RemindMedApp(context: Context) {
                     ) {backStackEntry ->
                         MedicationEditScreen(
                             medicationId = backStackEntry.arguments?.getString(NavArguments.MEDICATION_EDIT.MEDICATION_ID)?: "",
+                            patientId = backStackEntry.arguments?.getString(NavArguments.MEDICATION_LIST.PID)?: "",
                             onNavigateToPeopleList = { onNavigateToPeopleList() },
                             onNavigateToMedicationList = { pid: String -> onNavigateToMedicationList(pid) },
                         )

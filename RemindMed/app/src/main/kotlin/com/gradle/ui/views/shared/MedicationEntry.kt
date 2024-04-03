@@ -104,6 +104,8 @@ fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit,
 
     val showDuplicateMedicationErrorDialog = remember { mutableStateOf(false) }
 
+    val showDateInvalidRangeErrorDialog = remember { mutableStateOf(false) }
+
     if (showAddMedicationErrorDialog.value) {
         AlertDialog(
             onDismissRequest = { showAddMedicationErrorDialog.value = false },
@@ -137,6 +139,19 @@ fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit,
             text = { Text("This medication already exists as a prescription in your medication list. Please check your inputs.") },
             confirmButton = {
                 Button(onClick = { showDuplicateMedicationErrorDialog.value = false }) {
+                    Text("OK")
+                }
+            }
+        )
+    }
+
+    if (showDateInvalidRangeErrorDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showDateInvalidRangeErrorDialog.value = false },
+            title = { Text("Date Error") },
+            text = { Text("The start date must be before or equal to the end date.") },
+            confirmButton = {
+                Button(onClick = { showDateInvalidRangeErrorDialog.value = false }) {
                     Text("OK")
                 }
             }
@@ -440,20 +455,35 @@ fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit,
                             if (duplicateMedication()) {
                                 showDuplicateMedicationErrorDialog.value = true
                             } else {
-                                controller.invoke(
-                                    MedicationViewEvent.TimeEvent,
-                                    medicationViewModel.getSelectedTimes()
-                                )
-                                controller.invoke(MedicationViewEvent.AddEvent, medicationViewModel)
 
-                                if (medicationViewModel.successfulAdd.value) {
-                                    if(GlobalObjects.type == "patient") {
-                                        scheduleNotifications(context, user!!, medicationViewModel.model)
-                                    }
-                                    onNavigateToMedicationList(GlobalObjects.patient.pid)
-                                    medicationViewModel.clearAll()
+                                val startDate = medicationViewModel.startDate.value
+                                val endDate = medicationViewModel.endDate.value
+
+                                if (startDate != null && endDate != null && startDate > endDate) {
+                                    showDateInvalidRangeErrorDialog.value = true
                                 } else {
-                                    showAddMedicationErrorDialog.value = true
+                                    controller.invoke(
+                                        MedicationViewEvent.TimeEvent,
+                                        medicationViewModel.getSelectedTimes()
+                                    )
+                                    controller.invoke(
+                                        MedicationViewEvent.AddEvent,
+                                        medicationViewModel
+                                    )
+
+                                    if (medicationViewModel.successfulAdd.value) {
+                                        if (GlobalObjects.type == "patient") {
+                                            scheduleNotifications(
+                                                context,
+                                                user!!,
+                                                medicationViewModel.model
+                                            )
+                                        }
+                                        onNavigateToMedicationList(GlobalObjects.patient.pid)
+                                        medicationViewModel.clearAll()
+                                    } else {
+                                        showAddMedicationErrorDialog.value = true
+                                    }
                                 }
                             }
                         } else {
@@ -467,3 +497,4 @@ fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit,
         }
     }
 }
+

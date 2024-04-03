@@ -38,7 +38,7 @@ fun ButtonSecondary(text: String, onClick: () -> Unit, enabled: Boolean) {
             onClick,
             shape = MaterialTheme.shapes.medium,
             colors = ButtonColors(
-                containerColor = MaterialTheme.colorScheme.tertiary,
+                containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = Color.White,
                 disabledContainerColor = MaterialTheme.colorScheme.tertiary,
                 disabledContentColor = MaterialTheme.colorScheme.onTertiary

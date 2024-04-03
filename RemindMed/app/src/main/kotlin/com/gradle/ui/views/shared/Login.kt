@@ -7,6 +7,7 @@ import android.os.Build
 import com.example.remindmed.R
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme as md_theme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -60,6 +61,7 @@ fun LogButton(
     ) {
         Button(
             onClick = { onClick() },
+            elevation = ButtonDefaults.elevation(defaultElevation = 0.dp, pressedElevation = 0.dp),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp)
@@ -115,6 +117,7 @@ fun MainView(
     ) {
         Text(
             text = "RemindMed",
+            // style = androidx.compose.material3.MaterialTheme.typography.titleMedium,
             style = TextStyle(
                 fontFamily = FontFamily.Default,
                 fontWeight = FontWeight.Bold,
@@ -128,7 +131,7 @@ fun MainView(
             var type by rememberSaveable { mutableStateOf(viewModel.user.type) }
 
             if(!validateName(name)) {
-                Text(text = "Please enter a valid name", style = TextStyle(color = MaterialTheme.colors.error))
+                Text(text = "Please enter a valid name", style = TextStyle(color = androidx.compose.material.MaterialTheme.colors.error))
             }
 
            Column (
@@ -224,7 +227,7 @@ fun Login(mainViewModel: LoginViewModel = viewModel(), context: Context) {
             println("Reached here")
             Surface(
                 modifier = Modifier.fillMaxSize(),
-                color = MaterialTheme.colors.background
+                color = androidx.compose.material.MaterialTheme.colors.background
             ) {
                 MainView(mainViewModel)
             }
