@@ -50,4 +50,10 @@ class AddPatient(var _did: String, var _currPatients: MutableList<Patient>) : IP
             field = value
             notifySubscribers()
         }
+
+    var submitEnabled = false
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
 }

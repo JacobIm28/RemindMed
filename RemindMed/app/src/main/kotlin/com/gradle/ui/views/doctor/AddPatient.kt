@@ -42,17 +42,13 @@ enum class AddPatientViewEvent{
 fun AddPatientScreen(onNavigateToMedicationList: (String) -> Unit, onNavigateToPeopleList: () -> Unit) {
     var patients: MutableList<Patient> by remember {mutableStateOf(mutableListOf<Patient>())}
     var addPatientModel : AddPatient by remember{ mutableStateOf(AddPatient("", patients)) }
-    var addPatientViewModel : AddPatientViewModel by remember{mutableStateOf(AddPatientViewModel(addPatientModel))}
-    var addPatientController : AddPatientController by remember{mutableStateOf(AddPatientController(addPatientModel))}
-    var viewModel by remember{ mutableStateOf(addPatientViewModel) }
-    var controller by remember{ mutableStateOf(addPatientController) }
+    var viewModel : AddPatientViewModel by remember{mutableStateOf(AddPatientViewModel(addPatientModel))}
+    var controller : AddPatientController by remember{mutableStateOf(AddPatientController(addPatientModel))}
     LaunchedEffect(Unit) {
         patients = DoctorApi().getPatients(GlobalObjects.doctor.did)
         addPatientModel = AddPatient(GlobalObjects.doctor.did, patients)
-        addPatientViewModel = AddPatientViewModel(addPatientModel)
-        addPatientController = AddPatientController(addPatientModel)
-        viewModel = addPatientViewModel
-        controller = addPatientController
+        viewModel = AddPatientViewModel(addPatientModel)
+        controller = AddPatientController(addPatientModel)
     }
 
     AppTheme {
@@ -81,7 +77,7 @@ fun AddPatientScreen(onNavigateToMedicationList: (String) -> Unit, onNavigateToP
                     }
 
                     Row (modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                        ButtonPrimary("Add Patient", {controller.invoke(AddPatientViewEvent.AddPatientEvent, "")}, viewModel.currPatient.value != null && !viewModel.patientAlreadyUnderDoctor.value)
+                        ButtonPrimary("Add Patient", {controller.invoke(AddPatientViewEvent.AddPatientEvent, "")}, viewModel.currPatient.value != null && !viewModel.patientAlreadyUnderDoctor.value && viewModel.submitEnabled.value)
                     }
 
                     if (viewModel.showDialog.value) {
@@ -89,7 +85,7 @@ fun AddPatientScreen(onNavigateToMedicationList: (String) -> Unit, onNavigateToP
                             onDismissRequest = { controller.invoke(AddPatientViewEvent.DialogClose, "") },
                             text = { Text(viewModel.addPatientDialogMessage.value) },
                             confirmButton = {
-                                Button(onClick = { controller.invoke(AddPatientViewEvent.DialogClose, ""); onNavigateToPeopleList(); }) {
+                                Button(onClick = { controller.invoke(AddPatientViewEvent.DialogClose, "")}) {
                                     Text("OK")
                                 }
                             }
