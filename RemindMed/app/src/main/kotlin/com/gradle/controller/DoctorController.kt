@@ -2,11 +2,12 @@ package com.gradle.controller
 
 import com.gradle.constants.GlobalObjects
 import com.gradle.models.Doctor
+import com.gradle.models.LoginModel
 import com.gradle.ui.views.shared.ProfileViewEvent
 import com.gradle.apiCalls.Doctor as DoctorApi
 import com.gradle.apiCalls.User as UserApi
 
-class DoctorController(val model: Doctor) {
+class DoctorController(val model: Doctor, private val loginViewModel: LoginModel) {
     fun invoke(event: ProfileViewEvent, value: Any?) {
         when(event) {
             ProfileViewEvent.NameEvent -> {
@@ -36,6 +37,14 @@ class DoctorController(val model: Doctor) {
             }
             ProfileViewEvent.DismissEvent -> {
                 model.changesSubmitted = false
+                model.logoutClicked = false
+            }
+            ProfileViewEvent.LogoutClicked -> {
+                model.logoutClicked = true
+            }
+            ProfileViewEvent.LogoutConfirmed -> {
+                model.logoutClicked = false
+                loginViewModel.logout()
             }
         }
     }

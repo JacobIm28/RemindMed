@@ -38,25 +38,35 @@ import com.gradle.ui.viewModels.DoctorViewModel
 import com.gradle.ui.viewModels.PatientViewModel
 import android.os.Handler
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.IconButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.outlined.ExitToApp
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.text.font.FontWeight
+import com.gradle.models.LoginModel
 
 enum class ProfileViewEvent {
     NameEvent,
     EmailEvent,
     UpdateEvent,
-    DismissEvent
+    DismissEvent,
+    LogoutClicked,
+    LogoutConfirmed
 }
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("RememberReturnType", "UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun ProfileScreen(doctorViewModel: DoctorViewModel, doctorController: DoctorController) {
+fun ProfileScreen(doctorViewModel: DoctorViewModel, doctorController: DoctorController, loginModel: LoginModel) {
     var doctorModel : DoctorViewModel by remember{ mutableStateOf(DoctorViewModel(Doctor())) }
-    var doctorController : DoctorController by remember{ mutableStateOf(DoctorController(Doctor())) }
+    var doctorController : DoctorController by remember{ mutableStateOf(DoctorController(Doctor(), loginModel)) }
     var viewModel by remember{ mutableStateOf(doctorModel) }
     var controller by remember{ mutableStateOf(doctorController) }
     LaunchedEffect(Unit) {
         val doctor : Doctor = DoctorApi().getDoctor(GlobalObjects.doctor.did)
         doctorModel = DoctorViewModel(doctor)
-        doctorController = DoctorController(doctor)
+        doctorController = DoctorController(doctor, loginModel)
         viewModel = doctorModel
         controller = doctorController
     }
@@ -64,7 +74,26 @@ fun ProfileScreen(doctorViewModel: DoctorViewModel, doctorController: DoctorCont
     AppTheme {
         Box(modifier = Modifier.verticalScroll(rememberScrollState())){
             Column (modifier = androidx.compose.ui.Modifier.padding()) {
-                TitleLarge("Profile")
+                Row (
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        "Profile",
+                        modifier = Modifier.padding(top = 13.dp, bottom = 5.dp).weight(1f),
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                    IconButton(onClick = {controller.invoke(ProfileViewEvent.LogoutClicked, "")}) {
+                        Icon(
+                            imageVector = Icons.Outlined.ExitToApp,
+                            tint = MaterialTheme.colorScheme.primary,
+                            contentDescription = "Back"
+                        )
+                    }
+                }
                 Spacer(modifier = Modifier.height(16.dp))
 
                 TextInput("Name", "", viewModel.name.value, {controller.invoke(ProfileViewEvent.NameEvent, it)})
@@ -116,6 +145,21 @@ fun ProfileScreen(doctorViewModel: DoctorViewModel, doctorController: DoctorCont
                         }
                     )
                 }
+
+                if (viewModel.logoutClicked.value) {
+                    AlertDialog(
+                        onDismissRequest = {controller.invoke(ProfileViewEvent.DismissEvent, "")},
+                        text = { Text("Are you sure you want to log out?") },
+                        confirmButton = {
+                            Button(onClick = { controller.invoke(ProfileViewEvent.DismissEvent, "") }) {
+                                Text("CANCEL")
+                            }
+                            Button(onClick = { controller.invoke(ProfileViewEvent.LogoutConfirmed, "") }) {
+                                Text("OK")
+                            }
+                        }
+                    )
+                }
             }
         }
     }
@@ -124,15 +168,15 @@ fun ProfileScreen(doctorViewModel: DoctorViewModel, doctorController: DoctorCont
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("RememberReturnType", "UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun ProfileScreen(patientViewModel: PatientViewModel, patientController: PatientController) {
+fun ProfileScreen(patientViewModel: PatientViewModel, patientController: PatientController, loginModel: LoginModel) {
   var patientModel : PatientViewModel by remember{ mutableStateOf(PatientViewModel(Patient())) }
-  var patientController : PatientController by remember{ mutableStateOf(PatientController(Patient())) }
+  var patientController : PatientController by remember{ mutableStateOf(PatientController(Patient(), loginModel)) }
   var viewModel by remember{ mutableStateOf(patientModel) }
   var controller by remember{ mutableStateOf(patientController) }
   LaunchedEffect(Unit) {
       val patient : Patient = PatientApi().getPatientbyId(GlobalObjects.patient.pid)
       patientModel = PatientViewModel(patient)
-      patientController = PatientController(patient)
+      patientController = PatientController(patient, loginModel)
       viewModel = patientModel
       controller = patientController
   }
@@ -140,7 +184,26 @@ fun ProfileScreen(patientViewModel: PatientViewModel, patientController: Patient
     AppTheme {
         Box(modifier = Modifier.verticalScroll(rememberScrollState())){
             Column (modifier = androidx.compose.ui.Modifier.padding().fillMaxWidth()) {
-                TitleLarge("Profile")
+                Row (
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        "Profile",
+                        modifier = Modifier.padding(top = 13.dp, bottom = 5.dp).weight(1f),
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                    IconButton(onClick = {controller.invoke(ProfileViewEvent.LogoutClicked, "")}) {
+                        Icon(
+                            imageVector = Icons.Outlined.ExitToApp,
+                            tint = MaterialTheme.colorScheme.primary,
+                            contentDescription = "Back"
+                        )
+                    }
+                }
                 Spacer(modifier = Modifier.height(16.dp))
 
                 TextInput("Name", "", viewModel.name.value, {controller.invoke(ProfileViewEvent.NameEvent, it)})
@@ -186,6 +249,21 @@ fun ProfileScreen(patientViewModel: PatientViewModel, patientController: Patient
                         text = { Text("Unfortunately, the changes did not go through") },
                         confirmButton = {
                             Button(onClick = { controller.invoke(ProfileViewEvent.DismissEvent, "") }) {
+                                Text("OK")
+                            }
+                        }
+                    )
+                }
+
+                if (viewModel.logoutClicked.value) {
+                    AlertDialog(
+                        onDismissRequest = {controller.invoke(ProfileViewEvent.DismissEvent, "")},
+                        text = { Text("Are you sure you want to log out?") },
+                        confirmButton = {
+                            Button(onClick = { controller.invoke(ProfileViewEvent.DismissEvent, "") }) {
+                                Text("CANCEL")
+                            }
+                            Button(onClick = { controller.invoke(ProfileViewEvent.LogoutConfirmed, "") }) {
                                 Text("OK")
                             }
                         }
