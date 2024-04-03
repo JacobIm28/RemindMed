@@ -66,6 +66,7 @@ import java.util.concurrent.TimeUnit
 @Composable
 fun MedicationEditScreen(
     medicationId: String,
+    patientId: String,
     onNavigateToPeopleList: () -> Unit,
     onNavigateToMedicationList: (String) -> Unit
 ) {
@@ -86,7 +87,7 @@ fun MedicationEditScreen(
     var searchJob: Job? = null
 
     LaunchedEffect(Unit) {
-        val medications = PatientApi().getMedicines(GlobalObjects.patient.pid)
+        val medications = PatientApi().getMedicines(patientId)
         medication = medications.find { it.medicationId == medicationId }
 
         medication?.let { med ->
@@ -436,7 +437,7 @@ fun MedicationEditScreen(
                         if (GlobalObjects.type == "doctor") {
                             onNavigateToPeopleList()
                         } else {
-                            onNavigateToMedicationList(GlobalObjects.patient.pid)
+                            onNavigateToMedicationList(patientId)
                         }
                     },
                     enabled = true
@@ -444,6 +445,7 @@ fun MedicationEditScreen(
 
                 ButtonSecondary(
                     text = "Change",
+
                     onClick = {
                         if (validateInputs()) {
                             if (duplicateMedication()) {
@@ -469,7 +471,7 @@ fun MedicationEditScreen(
                                     )
 
                                     if (medicationViewModel?.successfulChange?.value == true) {
-                                        onNavigateToMedicationList(GlobalObjects.patient.pid)
+                                        onNavigateToMedicationList(patientId)
                                         medicationViewModel?.clearAll()
                                     } else {
                                         showAddMedicationErrorDialog.value = true

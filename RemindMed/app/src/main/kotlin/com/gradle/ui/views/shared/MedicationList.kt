@@ -164,7 +164,7 @@ fun MedicationItem(
                 Text(medication.name, fontWeight = FontWeight.Bold)
                 Text(medication.amount, style = MaterialTheme.typography.bodyMedium)
                 Text("${medication.startDate} - ${medication.endDate}", style = MaterialTheme.typography.bodyMedium)
-                Text("${medication.times}", style = MaterialTheme.typography.bodyMedium)
+                Text("${medication.getFormattedTimes()}", style = MaterialTheme.typography.bodyMedium)
             }
             Spacer(modifier = Modifier.weight(1f))
 

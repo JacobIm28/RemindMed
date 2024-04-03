@@ -71,7 +71,7 @@ import com.gradle.apiCalls.Patient as PatientApi
 class Prescription (
     val name: String,
     val amount: String,
-    val times: String
+    val times: List<String>
 )
 
 @Composable
@@ -171,7 +171,7 @@ fun HomeScreen() {
         }
     }
     notTakenMedications = medicationsToday.map { medication ->
-        Prescription(medication.name, medication.amount, medication.times.toString())
+        Prescription(medication.name, medication.amount, medication.getFormattedTimes())
     }
     takenMedications = emptyList()
 
