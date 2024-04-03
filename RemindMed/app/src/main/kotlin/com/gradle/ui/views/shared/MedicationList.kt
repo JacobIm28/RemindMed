@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.Composable
@@ -180,12 +181,11 @@ fun MedicationItem(
 
             if (accepted) {
                 Column {
+                    IconButton(onClick = { showDialog = true }) { // Set showDialog to true when remove icon clicked
+                        Icon(Icons.Filled.Clear, contentDescription = "Delete")
+                    }
                     IconButton(onClick = { onNavigateToMedicationEdit(medication) }) {
                         Icon(Icons.Filled.Edit, contentDescription = "Edit")
-                    }
-                    // Remove icon
-                    IconButton(onClick = { showDialog = true }) { // Set showDialog to true when remove icon clicked
-                        Icon(Icons.Filled.Delete, contentDescription = "Delete")
                     }
                 }
             } else {

@@ -437,7 +437,7 @@ fun MedicationEditScreen(
                         if (GlobalObjects.type == "doctor") {
                             onNavigateToPeopleList()
                         } else {
-                            onNavigateToMedicationList(patientId)
+                            onNavigateToMedicationList(GlobalObjects.patient.pid)
                         }
                     },
                     enabled = true
@@ -471,7 +471,11 @@ fun MedicationEditScreen(
                                     )
 
                                     if (medicationViewModel?.successfulChange?.value == true) {
-                                        onNavigateToMedicationList(patientId)
+                                        if (GlobalObjects.type == "doctor") {
+                                            onNavigateToPeopleList()
+                                        } else {
+                                            onNavigateToMedicationList(GlobalObjects.patient.pid)
+                                        }
                                         medicationViewModel?.clearAll()
                                     } else {
                                         showAddMedicationErrorDialog.value = true
