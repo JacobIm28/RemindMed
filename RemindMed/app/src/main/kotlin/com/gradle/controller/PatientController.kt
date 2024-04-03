@@ -10,13 +10,13 @@ class PatientController(val model: Patient) {
         when(event) {
             ProfileViewEvent.NameEvent -> {
                 model.name = value as String
-                model.submitEnabled = value != model._name
+                model.submitEnabled = value != model._name && value.isNotEmpty()
             }
             ProfileViewEvent.EmailEvent -> {
                 model.email = value as String
                 val emailRegex = Regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\$")
                 val emailIsValid : Boolean =  emailRegex.matches(value.toString())
-                model.submitEnabled = emailIsValid && value != model._email
+                model.submitEnabled = emailIsValid && value != model._email && value.isNotEmpty()
             }
             ProfileViewEvent.UpdateEvent -> {
                 model.changesSubmitted = true

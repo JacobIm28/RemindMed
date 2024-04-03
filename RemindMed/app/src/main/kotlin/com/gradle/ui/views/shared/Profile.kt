@@ -105,7 +105,7 @@ fun ProfileScreen(doctorViewModel: DoctorViewModel, doctorController: DoctorCont
                             }
                         }
                     )
-                } else if (viewModel.changesSubmitted.value) {
+                } else if (viewModel.changesSubmitted.value && !viewModel.successfulChange.value) {
                     AlertDialog(
                         onDismissRequest = {controller.invoke(ProfileViewEvent.DismissEvent, "")},
                         text = { Text("Unfortunately, the changes did not go through") },
@@ -180,7 +180,7 @@ fun ProfileScreen(patientViewModel: PatientViewModel, patientController: Patient
                             }
                         }
                     )
-                } else if (viewModel.changesSubmitted.value) {
+                } else if (viewModel.changesSubmitted.value && !viewModel.successfulChange.value) {
                     AlertDialog(
                         onDismissRequest = {controller.invoke(ProfileViewEvent.DismissEvent, "")},
                         text = { Text("Unfortunately, the changes did not go through") },
