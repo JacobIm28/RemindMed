@@ -32,6 +32,7 @@ import com.gradle.constants.*
 import com.gradle.controller.DoctorController
 import com.gradle.controller.MedicationController
 import com.gradle.controller.PatientController
+import com.gradle.models.LoginModel
 import com.gradle.models.Medication
 import com.gradle.ui.viewModels.DoctorViewModel
 import com.gradle.ui.viewModels.MedicationViewModel
@@ -57,7 +58,7 @@ data class NavigationItem(
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("RememberReturnType", "UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun RemindMedApp(context: Context) {
+fun RemindMedApp(context: Context, loginModel: LoginModel) {
     val navController = rememberNavController();
     val context = LocalContext.current
     val CHANNEL_ID = "CHANNEL"
@@ -194,12 +195,12 @@ fun RemindMedApp(context: Context) {
 //                    }
                     if (GlobalObjects.type == "patient") {
                         val patientModel = PatientViewModel(GlobalObjects.patient)
-                        val patientController = PatientController(GlobalObjects.patient)
-                        composable(Routes.PROFILE) { ProfileScreen(patientModel, patientController) }
+                        val patientController = PatientController(GlobalObjects.patient, loginModel)
+                        composable(Routes.PROFILE) { ProfileScreen(patientModel, patientController, loginModel) }
                     } else {
                         val doctorModel = DoctorViewModel(GlobalObjects.doctor)
-                        val doctorController = DoctorController(GlobalObjects.doctor)
-                        composable(Routes.PROFILE) { ProfileScreen(doctorModel, doctorController) }
+                        val doctorController = DoctorController(GlobalObjects.doctor, loginModel)
+                        composable(Routes.PROFILE) { ProfileScreen(doctorModel, doctorController, loginModel) }
                     }
 
                     composable(

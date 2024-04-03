@@ -207,12 +207,6 @@ fun MainView(
             text = buttonText,
             onClick = onClickAction,
         )
-
-        println(viewModel.isLoading)
-
-        if(viewModel.isLoading) {
-            LoadingScreen()
-        }
     }
 }
 @RequiresApi(Build.VERSION_CODES.S)
@@ -222,7 +216,7 @@ fun MainView(
 fun Login(mainViewModel: LoginViewModel = viewModel(), context: Context) {
     AppTheme {
         if(mainViewModel.userIsComplete){
-            RemindMedApp(context)
+            RemindMedApp(context, mainViewModel)
         } else {
             println("Reached here")
             Surface(
