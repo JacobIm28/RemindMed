@@ -256,11 +256,12 @@ fun RemindMedApp(context: Context, loginModel: LoginViewModel) {
                         Routes.MEDICATION_EDIT_WITH_ARGS,
                         arguments = listOf(
                             navArgument(NavArguments.MEDICATION_EDIT.MEDICATION_ID) { type = NavType.StringType; defaultValue = "" },
+                            navArgument(NavArguments.MEDICATION_EDIT.PID) { type = NavType.StringType; defaultValue = "" }
                         )
                     ) {backStackEntry ->
                         MedicationEditScreen(
                             medicationId = backStackEntry.arguments?.getString(NavArguments.MEDICATION_EDIT.MEDICATION_ID)?: "",
-                            patientId = backStackEntry.arguments?.getString(NavArguments.MEDICATION_LIST.PID)?: "",
+                            patientId = backStackEntry.arguments?.getString(NavArguments.MEDICATION_ENTRY.PID)?: "",
                             onNavigateToPeopleList = { onNavigateToPeopleList() },
                             onNavigateToMedicationList = { pid: String -> onNavigateToMedicationList(pid) },
                         )

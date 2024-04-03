@@ -4,6 +4,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
@@ -11,8 +14,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,6 +33,7 @@ import com.gradle.ui.components.ButtonSecondary
 import com.gradle.ui.components.HeadLineMedium
 import com.gradle.ui.theme.AppTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextInput(
     label: String,
@@ -38,16 +44,20 @@ fun TextInput(
     errorMessage: String = "Error"
 ) {
     AppTheme {
-        Column(modifier = Modifier.padding(5.dp)) {
+        Column() {
             if (isError) {
                 Text(errorMessage, color = MaterialTheme.colorScheme.error)
             } else {
                 Text(label)
             }
-            Spacer(modifier = Modifier.height(5.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             TextField(
+                colors = TextFieldDefaults.textFieldColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                ),
                 value = value,
                 onValueChange = onValueChange,
+
                 // label = { Text(placeholder) },
                 maxLines = 1,
                 isError = isError,
@@ -56,6 +66,7 @@ fun TextInput(
                 },
                 modifier = Modifier.fillMaxWidth()
             )
+            Spacer(modifier = Modifier.height(12.dp))
         }
     }
 }
@@ -73,9 +84,9 @@ fun MultilineTextInput(
     AppTheme {
         Column(modifier = Modifier.padding(5.dp)) {
             if (isError) {
-                Text(errorMessage, color = MaterialTheme.colorScheme.error)
+                Text(errorMessage, color = MaterialTheme.colorScheme.tertiary)
             } else {
-                Text(label)
+                Text(label, color = MaterialTheme.colorScheme.tertiary)
             }
             Spacer(modifier = Modifier.height(5.dp))
             TextField(
