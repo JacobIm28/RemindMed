@@ -35,12 +35,12 @@ object DateSerializer {
 @OptIn(ExperimentalSerializationApi::class)
 @Serializer(forClass = Time::class)
 object TimeSerializer : KSerializer<Time> {
-    @RequiresApi(Build.VERSION_CODES.O)
+    @RequiresApi(Build.VERSION_CODES.S)
     override fun serialize(encoder: Encoder, value: Time) {
         encoder.encodeString(value.toString())
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    @RequiresApi(Build.VERSION_CODES.S)
     override fun deserialize(decoder: Decoder): Time {
         return Time.valueOf(decoder.decodeString())
     }
@@ -55,7 +55,9 @@ class Medication(
     @Serializable(with = DateSerializer::class) var initialEndDate: Date,
     var initialName: String,
     var initialNotes: String,
-    var initialTimes: MutableList<@Serializable(with = TimeSerializer::class) Time>
+    var initialTimes: MutableList<@Serializable(with = TimeSerializer::class) Time>,
+    var initialAccepted: Boolean,
+    var initialTaken: Boolean
 ) : IPresenter() {
 
     var pid: String = initialPid
@@ -136,11 +138,23 @@ class Medication(
             notifySubscribers()
         }
 
+    var accepted = initialAccepted
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+
+    var taken = initialTaken
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+
 //    override fun notifySubscribers() {
 //        // Notification logic here
 //    }
     override fun toString(): String {
-        return "Medication(pid=$pid, medicationId=$medicationId, amount='$amount', startDate=${startDate}, endDate=${endDate}, name=$name, notes=$notes) times=${times}"
+        return "Medication(pid=$pid, medicationId=$medicationId, amount='$amount', startDate=${startDate}, endDate=${endDate}, name=$name, notes=$notes) times=${times} accepted=$accepted taken=$taken"
     }
 
     fun getFormattedTimes(): List<String> {
@@ -165,6 +179,8 @@ class Medication(
         if (endDate != other.endDate) return false
 //        if (!times.contentEquals(other.times)) return false
         if (name != other.name) return false
+        if (accepted != other.accepted) return false
+        if (taken != other.taken) return false
         return notes == other.notes
     }
 
@@ -177,6 +193,8 @@ class Medication(
 //        result = 31 * result + times.hashCode()
         result = 31 * result + name.hashCode()
         result = 31 * result + notes.hashCode()
+        result = 31 * result + accepted.hashCode()
+        result = 31 * result + taken.hashCode()
         return result
     }
 }

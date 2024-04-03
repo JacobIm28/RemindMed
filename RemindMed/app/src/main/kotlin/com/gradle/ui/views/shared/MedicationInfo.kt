@@ -3,7 +3,6 @@ package com.gradle.ui.views.shared
 import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,23 +27,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.example.remindmed.R
 import com.google.gson.JsonObject
 import com.gradle.constants.medicationInfoBlacklist
 import com.gradle.ui.components.BoldText
-import com.gradle.ui.components.HeadLineMedium
 import com.gradle.ui.components.HeadlineLarge
-import com.gradle.ui.components.MedicationSummaryCard
 import com.gradle.ui.components.LoadingScreen
 import com.gradle.ui.components.TitleLarge
 import com.gradle.ui.components.ToggleList
 import com.gradle.ui.theme.AppTheme
 import com.gradle.utilities.formatJSONKey
 import kotlinx.coroutines.delay
-import com.gradle.apiCalls.Medication as MedicationApi
+import com.gradle.apiCalls.MedicationApi as MedicationApi
 
 @RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")

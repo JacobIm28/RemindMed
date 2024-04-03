@@ -50,7 +50,9 @@ class NotificationUtils {
                             context,
                             "Reminder to take your " + medication.name,
                             "Hey ${patient.name}, remember to take ${medication.amount} of your ${medication.name}.",
-                            medication.endDate.time
+                            medication.endDate.time,
+                            patient.pid,
+                            medication.medicationId
                         )
 
                         alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, alarm.timeInMillis, pendingIntent)
@@ -63,7 +65,9 @@ class NotificationUtils {
             context: Context,
             title: String?,
             content: String?,
-            endTime: Long?
+            endTime: Long?,
+            pid: String?,
+            mid: String?
         ): PendingIntent {
             if (title == null || content == null || endTime == null) {
                 return PendingIntent.getBroadcast(context, 0, Intent(), PendingIntent.FLAG_IMMUTABLE)
@@ -74,6 +78,8 @@ class NotificationUtils {
             intent.putExtra("content", content)
             intent.putExtra("end", endTime)
             intent.putExtra("requestCode", requestCode)
+            intent.putExtra("pid", pid)
+            intent.putExtra("mid", mid)
 
             val pendingIntent = PendingIntent.getBroadcast(
                 context,

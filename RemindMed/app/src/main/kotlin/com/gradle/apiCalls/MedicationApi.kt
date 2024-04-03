@@ -17,11 +17,11 @@ import java.sql.Date
 import java.sql.Time
 
 @OptIn(DelicateCoroutinesApi::class)
-class Medication {
+class MedicationApi {
     //TODO: Change host to server's address once API deployed to some server
 
     private val host: String = "https://remindmed-api-nsjyfltjaa-uk.a.run.app"
-    private val nullMedication = Medication("-1", "", "", Date(0), Date(0), "", "", mutableListOf<Time>())
+    private val nullMedication = Medication("-1", "", "", Date(0), Date(0), "", "", mutableListOf<Time>(), false, false)
     private val client = HttpClient(Android) {
         install(ContentNegotiation) {
             json(Json {

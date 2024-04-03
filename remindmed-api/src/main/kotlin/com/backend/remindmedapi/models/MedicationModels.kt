@@ -34,26 +34,7 @@ object TimeSerializer : KSerializer<Time> {
         return Time.valueOf(decoder.decodeString())
     }
 }
-//@Serializable
-//data class Medication(
-//    @SerialName("pid") val pid: String,  @SerialName("amount") val amount: String,
-//    @SerialName("startDate") @Serializable(with = DateSerializer::class) val startDate: Date,
-//    @SerialName("endDate") @Serializable(with = DateSerializer::class) val endDate: Date,
-//    @SerialName("name") val name: String,
-//    @SerialName("notes") val notes: String,
-//    @SerialName("times") @Serializable(with = TimeSerializer::class) val timesJson: String,
-//    @SerialName("medicationId") val medicationId: String,
-//
-//) {
-//    val times: MutableList<Time>
-//        get() {
-//            val times = mutableListOf<Time>()
-//            val json = Json.parseToJsonElement(timesJson).jsonArray
-//            for (element in json) {
-//                times.add(Time.valueOf(element.jsonPrimitive.content))
-//            }
-//            return times
-//        }
+
 @Serializable
 class Medication(
     var initialPid: String,
@@ -63,7 +44,9 @@ class Medication(
     @Serializable(with = DateSerializer::class) var initialEndDate: Date,
     var initialName: String,
     var initialNotes: String,
-    var initialTimes: MutableList<@Serializable(with = TimeSerializer::class) Time>
+    var initialTimes: MutableList<@Serializable(with = TimeSerializer::class) Time>,
+    var initialAccepted: Boolean,
+    var initialTaken: Boolean,
 ) {
 
     var pid: String = initialPid
@@ -127,6 +110,16 @@ class Medication(
         }
 
     var isError = false
+        set(value) {
+            field = value
+        }
+
+    var accepted = initialAccepted
+        set(value) {
+            field = value
+        }
+
+    var taken = initialTaken
         set(value) {
             field = value
         }

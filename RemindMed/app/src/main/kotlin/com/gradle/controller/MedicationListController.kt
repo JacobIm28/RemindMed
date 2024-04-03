@@ -5,7 +5,7 @@ import androidx.annotation.RequiresApi
 import com.gradle.constants.GlobalObjects
 import com.gradle.models.MedicationList
 import com.gradle.ui.views.shared.MedicationListViewEvent
-import com.gradle.apiCalls.Patient as PatientApi
+import com.gradle.apiCalls.PatientApi as PatientApi
 
 class MedicationListController(val model: MedicationList) {
     @RequiresApi(Build.VERSION_CODES.O)

@@ -1,6 +1,7 @@
 package com.gradle.ui.views.shared
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
@@ -24,10 +25,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 
 import com.gradle.constants.GlobalObjects
 import com.gradle.controller.MedicationListController
-import com.gradle.apiCalls.Patient as PatientApi
+import com.gradle.apiCalls.PatientApi as PatientApi
 import com.gradle.models.Medication
 import com.gradle.models.MedicationList
 import com.gradle.models.Patient
@@ -38,7 +40,11 @@ import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
 import androidx.compose.ui.res.painterResource
 import com.example.remindmed.R
+import com.gradle.controller.MedicationController
+import com.gradle.ui.components.ButtonPrimary
 import com.gradle.ui.viewModels.MedicationListViewModel
+import com.gradle.ui.viewModels.MedicationViewModel
+import com.gradle.utilities.notifications.NotificationUtils.Companion.scheduleNotifications
 
 enum class MedicationListViewEvent {
     MedicationRemove
@@ -102,6 +108,8 @@ fun MedicationListScreen(
                 LazyColumn {
                     items(viewModel.medicationList.value) { medication ->
                         MedicationItem(
+                            context = LocalContext.current,
+                            patient = patient,
                             medication = medication,
                             onRemove = {
                                 coroutineScope.launch {
@@ -118,16 +126,18 @@ fun MedicationListScreen(
         }
     }
 
-@RequiresApi(Build.VERSION_CODES.O)
+@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun MedicationItem(
+    context: Context,
+    patient: Patient,
     medication: Medication,
     onRemove: () -> Unit,
     onClick: () -> Unit, // Click listener for the entire item
     onNavigateToMedicationEdit: (Medication) -> Unit
 ) {
     var showDialog by remember { mutableStateOf(false) }
-
+    var accepted by remember { mutableStateOf(medication.accepted) }
     Card(
         modifier = Modifier
             .padding(6.dp)
@@ -168,14 +178,33 @@ fun MedicationItem(
             }
             Spacer(modifier = Modifier.weight(1f))
 
-            Column {
-                IconButton(onClick = { onNavigateToMedicationEdit(medication) }) {
-                    Icon(Icons.Filled.Edit, contentDescription = "Edit")
+            if (accepted) {
+                Column {
+                    IconButton(onClick = { onNavigateToMedicationEdit(medication) }) {
+                        Icon(Icons.Filled.Edit, contentDescription = "Edit")
+                    }
+                    // Remove icon
+                    IconButton(onClick = { showDialog = true }) { // Set showDialog to true when remove icon clicked
+                        Icon(Icons.Filled.Delete, contentDescription = "Delete")
+                    }
                 }
-                // Remove icon
-                IconButton(onClick = { showDialog = true }) { // Set showDialog to true when remove icon clicked
-                    Icon(Icons.Filled.Delete, contentDescription = "Delete")
-                }
+            } else {
+                ButtonPrimary(
+                    text = "Accept",
+                    onClick = {
+                        scheduleNotifications(context, patient, medication)
+                        accepted = true
+                        medication.accepted = true
+                        var medicationViewModel = MedicationViewModel(medication)
+                        var medicationController = MedicationController(medication)
+
+                        medicationController.invoke(
+                            MedicationViewEvent.UpdateEvent,
+                            medicationViewModel
+                        )
+                    },
+                    enabled = true
+                )
             }
         }
     }

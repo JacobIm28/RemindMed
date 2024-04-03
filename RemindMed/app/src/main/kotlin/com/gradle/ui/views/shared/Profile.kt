@@ -22,9 +22,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.gradle.apiCalls.Patient as PatientApi
-import com.gradle.apiCalls.Doctor as DoctorApi
+import com.gradle.apiCalls.PatientApi as PatientApi
+import com.gradle.apiCalls.DoctorApi as DoctorApi
 import com.gradle.ui.components.ButtonPrimary
 import com.gradle.ui.components.TitleLarge
 import com.gradle.ui.theme.AppTheme

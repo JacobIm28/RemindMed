@@ -20,7 +20,8 @@ class MedicationViewModel(val model: Medication) : ISubscriber {
     var _timeStates = mutableStateListOf<TimePickerState>()
     var timeStates: List<TimePickerState> = _timeStates
     var times = mutableStateOf(model.times)
-
+    var accepted = mutableStateOf(model.accepted)
+    var taken = mutableStateOf(model.taken)
 
     var successfulAdd = mutableStateOf(model.successfulAdd)
     var successfulChange = mutableStateOf(model.successfulChange)
@@ -46,6 +47,8 @@ class MedicationViewModel(val model: Medication) : ISubscriber {
         successfulChange.value = false
         errorMessage.value = ""
         isError.value = false
+        accepted.value = false
+        taken.value = false
     }
 
 
@@ -79,25 +82,7 @@ class MedicationViewModel(val model: Medication) : ISubscriber {
             "$formattedHour:$paddedMinute $period"
         }
     }
-//    private val medicationApi = MedicationApi()
-//
-//    private val _medicationName = MutableStateFlow("")
-//    val medicationName: StateFlow<String> = _medicationName
 
-//    fun getMedicationByName(name: String) {
-//        viewModelScope.launch {
-//            val result = medicationApi.getMedicationbyName(name)
-//            // Process result
-//        }
-//    }
-//
-//    // Function to add medication
-//    fun addMedication(medication: Medication) {
-//        viewModelScope.launch {
-//            val success = medicationApi.addMedication(medication)
-//            // Handle success or error
-//        }
-//    }
     override fun update() {
         pid.value = model.pid
         medicationId.value = model.medicationId
@@ -111,5 +96,7 @@ class MedicationViewModel(val model: Medication) : ISubscriber {
         successfulChange.value = model.successfulChange
         errorMessage.value = model.errorMessage
         isError.value = model.isError
+        accepted.value = model.accepted
+        taken.value = model.taken
     }
 }

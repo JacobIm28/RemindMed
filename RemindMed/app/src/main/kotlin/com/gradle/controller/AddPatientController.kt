@@ -3,8 +3,8 @@ package com.gradle.controller
 import com.gradle.models.AddPatient
 import com.gradle.models.Patient
 import com.gradle.ui.views.doctor.AddPatientViewEvent
-import com.gradle.apiCalls.Patient as PatientApi
-import com.gradle.apiCalls.Doctor as DoctorApi
+import com.gradle.apiCalls.PatientApi as PatientApi
+import com.gradle.apiCalls.DoctorApi as DoctorApi
 
 class AddPatientController(val model: AddPatient) {
     fun invoke(event: AddPatientViewEvent, value: Any?) {

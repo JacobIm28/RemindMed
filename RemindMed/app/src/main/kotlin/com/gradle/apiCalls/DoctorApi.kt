@@ -10,15 +10,12 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.http.*
-import io.ktor.serialization.kotlinx.*
 import io.ktor.serialization.kotlinx.json.*
-import io.ktor.util.InternalAPI
 import kotlinx.serialization.json.Json
 
 @OptIn(DelicateCoroutinesApi::class)
-class Doctor {
+class DoctorApi {
     //TODO: Change host to server's address once API deployed to some server
 
     private val host: String = "https://remindmed-api-nsjyfltjaa-uk.a.run.app"

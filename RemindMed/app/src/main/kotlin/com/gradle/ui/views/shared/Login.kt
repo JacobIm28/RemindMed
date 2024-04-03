@@ -41,8 +41,8 @@ import com.gradle.ui.viewModels.LoginViewModel
 import com.gradle.models.Patient
 import com.gradle.ui.components.*
 import com.gradle.ui.views.RemindMedApp
-import com.gradle.apiCalls.Patient as PatientApi
-import com.gradle.apiCalls.Doctor as DoctorApi
+import com.gradle.apiCalls.PatientApi as PatientApi
+import com.gradle.apiCalls.DoctorApi as DoctorApi
 import com.gradle.ui.components.LoadingScreen
 fun validateName(name: String): Boolean {
     return name.isNotEmpty() && name.length > 2 && name.matches(Regex(".*[a-zA-Z0-9].*"))

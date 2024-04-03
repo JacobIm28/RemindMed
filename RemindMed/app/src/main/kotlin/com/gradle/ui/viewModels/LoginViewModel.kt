@@ -14,8 +14,8 @@ import android.util.Log
 import com.auth0.android.jwt.JWT
 import com.example.remindmed.R
 import com.gradle.constants.GlobalObjects
-import com.gradle.apiCalls.Patient as PatientApi
-import com.gradle.apiCalls.Doctor as DoctorApi
+import com.gradle.apiCalls.PatientApi as PatientApi
+import com.gradle.apiCalls.DoctorApi as DoctorApi
 import com.gradle.models.Doctor
 import com.gradle.models.Patient
 import com.gradle.models.User

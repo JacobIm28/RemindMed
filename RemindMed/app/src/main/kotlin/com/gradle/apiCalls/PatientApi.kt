@@ -13,21 +13,14 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.util.InternalAPI
 import kotlinx.serialization.json.Json
-import com.google.gson.JsonParser
-import java.sql.Date
-import java.sql.Time
-import java.text.SimpleDateFormat
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 import com.gradle.models.Doctor
 
 @OptIn(DelicateCoroutinesApi::class)
-class Patient {
+class PatientApi {
 
     private val host: String = "https://remindmed-api-nsjyfltjaa-uk.a.run.app"
     private val nullPatient = Patient("-1", "", "")

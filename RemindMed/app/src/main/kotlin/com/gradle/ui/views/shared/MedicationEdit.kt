@@ -23,7 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.gradle.apiCalls.Patient as PatientApi
+import com.gradle.apiCalls.PatientApi as PatientApi
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -47,7 +47,7 @@ import com.gradle.ui.theme.AppTheme
 import java.sql.Date
 import java.sql.Time
 
-import com.gradle.apiCalls.Medication as MedicationApi
+import com.gradle.apiCalls.MedicationApi as MedicationApi
 import com.gradle.models.Medication as Medication
 
 import com.gradle.controller.MedicationController
@@ -60,7 +60,7 @@ import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 
-@RequiresApi(Build.VERSION_CODES.O)
+@RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @SuppressLint("RememberReturnType", "UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -403,7 +403,7 @@ fun MedicationEditScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             println(medicationViewModel != null)
-            TimeInput(medicationViewModel?: MedicationViewModel(medication?: Medication("", "", "", Date(0L), Date(0L), "", "", mutableListOf())))
+            TimeInput(medicationViewModel?: MedicationViewModel(medication?: Medication("", "", "", Date(0L), Date(0L), "", "", mutableListOf(), false, false)))
 
             Spacer(modifier = Modifier.height(16.dp))
 
