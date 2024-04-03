@@ -114,8 +114,8 @@ class PatientController {
     fun addMedicine(@RequestBody medication: Medication): String {
         println(medication)
         val timeString = "[" + medication.times.joinToString(",") { "to_timestamp(\'${it}\', 'hh24:mi:ss')"} + "]"
-        val queryString = "INSERT INTO Medication (pid, medication_id, amount, startDate, endDate, name, notes, times) VALUES ('${medication.pid.toString().replace("\"", "")}', '${medication.medicationId.toString().replace("\"", "")}', '${medication.amount.toString().replace("\"", "")}', " +
-                "'${medication.startDate.toString().replace("\"", "")}', '${medication.endDate.toString().replace("\"", "")}', '${medication.name.replace("\"", "")}', '${medication.notes.replace("\"", "")}', ARRAY $timeString) RETURNING pid;"
+        val queryString = "INSERT INTO Medication (pid, medication_id, amount, startDate, endDate, name, notes, times, accepted, taken) VALUES ('${medication.pid.toString().replace("\"", "")}', '${medication.medicationId.toString().replace("\"", "")}', '${medication.amount.toString().replace("\"", "")}', " +
+                "'${medication.startDate.toString().replace("\"", "")}', '${medication.endDate.toString().replace("\"", "")}', '${medication.name.replace("\"", "")}', '${medication.notes.replace("\"", "")}', ARRAY $timeString, ${medication.accepted}, ${medication.taken}) RETURNING pid;"
         databaseService.query(queryString)
         return "Inserted Medicine with id: ${medication.medicationId} Patient with id: ${medication.pid}"
     }
@@ -150,6 +150,12 @@ class PatientController {
             val timeString = "[" + medication.times.joinToString(",") { "to_timestamp(\'${it}\', 'hh24:mi:ss')"} + "]"
             queryStr += "times = ARRAY ${timeString}, "
         }
+        if (medication.accepted.toString() != "") {
+            queryStr += "accepted = ${medication.accepted}, "
+        }
+        if (medication.taken.toString() != "") {
+            queryStr += "taken = ${medication.taken}, "
+        }
         queryStr = queryStr.dropLast(2)
         queryStr += " WHERE pid = '${medication.pid}' AND medication_id = '${medication.medicationId}' RETURNING pid;"
         databaseService.query(queryStr)
@@ -162,12 +168,12 @@ class PatientController {
         val result = databaseService.query("SELECT m.* FROM Medication m WHERE m.pid = '$pid';")
         val response = mutableListOf<Medication>()
         for (medicine in result!!) {
-            if(medicine[0] is String && medicine[1] is String && medicine[2] is String && medicine[3] is Date && medicine[4] is Date && medicine[5] is String && medicine[6] is String && medicine[7] is Array<*> && (medicine[7] as Array<*>).isArrayOf<Time>()) {
+            if(medicine[0] is String && medicine[1] is String && medicine[2] is String && medicine[3] is Date && medicine[4] is Date && medicine[5] is String && medicine[6] is String && medicine[7] is Array<*> && (medicine[7] as Array<*>).isArrayOf<Time>() && medicine[8] is Boolean && medicine[9] is Boolean) {
                 val times = mutableListOf<Time>()
                 for (time in medicine[7] as Array<*>) {
                     times.add(time as Time)
                 }
-                response.add((Medication(medicine[0] as String, medicine[1] as String, medicine[2] as String, medicine[3] as Date, medicine[4] as Date, medicine[5] as String, medicine[6] as String, times)))
+                response.add((Medication(medicine[0] as String, medicine[1] as String, medicine[2] as String, medicine[3] as Date, medicine[4] as Date, medicine[5] as String, medicine[6] as String, times, medicine[8] as Boolean, medicine[9] as Boolean)))
             }
         }
         return response

@@ -25,7 +25,7 @@ import com.gradle.ui.components.HeadlineLarge
 import com.gradle.ui.components.TitleLarge
 import com.gradle.ui.theme.AppTheme
 import com.gradle.constants.GlobalObjects as GlobalObjects
-import com.gradle.apiCalls.Doctor
+import com.gradle.apiCalls.DoctorApi
 import com.gradle.controller.AddPatientController
 import com.gradle.models.AddPatient
 import com.gradle.ui.components.PatientItem
@@ -47,7 +47,7 @@ fun AddPatientScreen(onNavigateToMedicationList: (String) -> Unit, onNavigateToP
     var viewModel by remember{ mutableStateOf(addPatientViewModel) }
     var controller by remember{ mutableStateOf(addPatientController) }
     LaunchedEffect(Unit) {
-        patients = Doctor().getPatients(GlobalObjects.doctor.did)
+        patients = DoctorApi().getPatients(GlobalObjects.doctor.did)
         addPatientModel = AddPatient(GlobalObjects.doctor.did, patients)
         addPatientViewModel = AddPatientViewModel(addPatientModel)
         addPatientController = AddPatientController(addPatientModel)

@@ -4,7 +4,7 @@ import com.gradle.constants.GlobalObjects
 import com.gradle.models.Doctor
 import com.gradle.models.LoginModel
 import com.gradle.ui.views.shared.ProfileViewEvent
-import com.gradle.apiCalls.Doctor as DoctorApi
+import com.gradle.apiCalls.DoctorApi as DoctorApi
 import com.gradle.apiCalls.User as UserApi
 
 class DoctorController(val model: Doctor, private val loginViewModel: LoginModel) {

@@ -23,7 +23,7 @@ class PatientController(val model: Patient, private val loginViewModel: LoginMod
                 model.changesSubmitted = true
                 val newPat: Patient = Patient(GlobalObjects.patient.pid, model.name, model.email)
                 try {
-                    model.successfulChange = com.gradle.apiCalls.Patient().updatePatient(newPat) && UserApi().changeEmail(newPat.pid, model.email)
+                    model.successfulChange = com.gradle.apiCalls.PatientApi().updatePatient(newPat) && UserApi().changeEmail(newPat.pid, model.email)
                     if (model.successfulChange) {
                         model._name = model.name
                         model._email = model.email

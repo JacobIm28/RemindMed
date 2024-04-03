@@ -1,27 +1,18 @@
 package com.gradle.controller
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.TimePickerState
-import androidx.compose.runtime.mutableStateListOf
-import com.gradle.constants.GlobalObjects
 import com.gradle.models.Medication
 import com.gradle.ui.views.shared.MedicationViewEvent
 import java.sql.Date
 import java.sql.Time
 
-import com.gradle.apiCalls.Patient as PatientApi
-import com.gradle.apiCalls.Medication as MedicationApi
+import com.gradle.apiCalls.PatientApi as PatientApi
+import com.gradle.apiCalls.MedicationApi as MedicationApi
 
 class MedicationController(val model: Medication) {
-//    @OptIn(ExperimentalMaterial3Api::class)
-//    fun getSelectedTimes(timeStates: MutableList<TimePickerState>): MutableList<Time> {
-//        val selectedTimes = mutableListOf<Time>()
-//        for (timeState in timeStates) {
-//            selectedTimes.add(Time(timeState.hour, timeState.minute, 0))
-//        }
-//        print("SELECTED TIMES: $selectedTimes")
-//        return selectedTimes
-//    }
+    @RequiresApi(Build.VERSION_CODES.S)
     @OptIn(ExperimentalMaterial3Api::class)
     fun invoke(event: MedicationViewEvent, value: Any?) {
         when(event) {
@@ -47,9 +38,11 @@ class MedicationController(val model: Medication) {
             MedicationViewEvent.NotesEvent -> model.notes = value as String
 
             MedicationViewEvent.TimeEvent -> model.times = value as MutableList<Time>
+            MedicationViewEvent.AcceptedEvent -> model.accepted = value as Boolean
+            MedicationViewEvent.TakenEvent -> model.taken = value as Boolean
 
             MedicationViewEvent.AddEvent -> {
-                val med = Medication(model.pid, model.medicationId, model.amount, model.startDate, model.endDate, model.name, model.notes, model.times)
+                val med = Medication(model.pid, model.medicationId, model.amount, model.startDate, model.endDate, model.name, model.notes, model.times, model.accepted, model.taken)
                 try {
                     model.successfulAdd = PatientApi().addMedication(med)
 
@@ -60,7 +53,7 @@ class MedicationController(val model: Medication) {
             }
 
             MedicationViewEvent.UpdateEvent -> {
-                val med = Medication(model.pid, model.medicationId, model.amount, model.startDate, model.endDate, model.name, model.notes, model.times)
+                val med = Medication(model.pid, model.medicationId, model.amount, model.startDate, model.endDate, model.name, model.notes, model.times, model.accepted, model.taken)
                 try {
                     model.successfulChange = PatientApi().updateMedication(med)
                 } catch (e: Exception) {

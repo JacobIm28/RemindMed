@@ -24,7 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.gradle.apiCalls.Patient as PatientApi
+import com.gradle.apiCalls.PatientApi as PatientApi
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -48,7 +48,7 @@ import com.gradle.ui.components.TitleLarge
 import com.gradle.ui.theme.AppTheme
 import java.sql.Date
 
-import com.gradle.apiCalls.Medication as MedicationApi
+import com.gradle.apiCalls.MedicationApi as MedicationApi
 import com.gradle.models.Medication as Medication
 
 import com.gradle.controller.MedicationController
@@ -72,7 +72,9 @@ enum class MedicationViewEvent {
     NotesEvent,
     AddEvent,
     UpdateEvent,
-    RemoveEvent
+    RemoveEvent,
+    AcceptedEvent,
+    TakenEvent
 }
 
 @RequiresApi(Build.VERSION_CODES.S)
@@ -229,24 +231,11 @@ fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit,
                             Box(
                                 modifier = Modifier
                                     .size(50.dp)
-                                    .background(MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(5.dp))
+                                    .background(
+                                        MaterialTheme.colorScheme.primary,
+                                        shape = RoundedCornerShape(5.dp)
+                                    )
                             )
-                            // button without container
-//                            IconButton(
-////                                label = "Add Time",
-//                                onClick = { viewModel.addTimePickerState() },
-////                                shape = RoundedCornerShape(5.dp),
-////                                containerColor = MaterialTheme.colorScheme.primary
-////                                colors = ButtonDefaults.buttonColors(
-////                                    containerColor = MaterialTheme.colorScheme.primary,
-////                                    contentColor = Color.White,
-////                                    disabledContainerColor = MaterialTheme.colorScheme.primary,
-////                                    disabledContentColor = MaterialTheme.colorScheme.onTertiary
-////                                ),
-//                                modifier = Modifier.padding(horizontal = 20.dp, vertical = 2.dp)
-//                            ) {
-//                                Icon(Icons.Default.Add, contentDescription = "Add Time")
-//                            }
                             IconButton(
                                 onClick = {
                                     medicationViewModel.addTimePickerState()
@@ -267,7 +256,7 @@ fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit,
     }
 
     @SuppressLint("SuspiciousIndentation")
-    @RequiresApi(Build.VERSION_CODES.O)
+    @RequiresApi(Build.VERSION_CODES.S)
     @Composable
     fun MedicationSearchBar(
         onSearch: () -> Unit,
@@ -466,6 +455,11 @@ fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit,
                                         MedicationViewEvent.TimeEvent,
                                         medicationViewModel.getSelectedTimes()
                                     )
+                                    if (GlobalObjects.type == "patient") {
+                                        medicationViewModel.model.accepted = true
+                                    } else {
+                                        medicationViewModel.model.accepted = false
+                                    }
                                     controller.invoke(
                                         MedicationViewEvent.AddEvent,
                                         medicationViewModel

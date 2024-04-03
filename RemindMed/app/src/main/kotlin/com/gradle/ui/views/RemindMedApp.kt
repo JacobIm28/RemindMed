@@ -166,6 +166,15 @@ fun RemindMedApp(context: Context, loginModel: LoginModel) {
                     .padding(innerPadding)
                     .padding(25.dp)
             ) {
+                var nullMedication = Medication("-1", "", "", Date(0), Date(0), "", "", mutableListOf<Time>(), false, false) // null medication for entry
+
+                if (GlobalObjects.type == "patient") {
+                    nullMedication = Medication(GlobalObjects.patient.pid, "", "", Date(0), Date(0), "", "", mutableListOf<Time>(), false, false)
+                }
+
+                val medicationModel = MedicationViewModel(nullMedication) // null medication for entry
+                val medicationController = MedicationController(nullMedication)
+
                 NavHost(navController, startDestination = if (GlobalObjects.type == "doctor") Routes.PEOPLE_LIST else Routes.HOME ) {
                     composable(Routes.PEOPLE_LIST) {
                         PeopleListScreen(onNavigateToMedicationList = { pid: String -> onNavigateToMedicationList(pid)})
@@ -184,15 +193,6 @@ fun RemindMedApp(context: Context, loginModel: LoginModel) {
 
                     }
 
-//                    if (GlobalObjects.type == "patient") {
-//                        val patientModel = PatientViewModel(GlobalObjects.patient)
-//                        val patientController = PatientController(GlobalObjects.patient)
-//                        composable(Routes.PROFILE) { ProfileScreen(navController, patientModel, patientController) }
-//                    } else {
-//                        val doctorModel = DoctorViewModel(GlobalObjects.doctor)
-//                        val doctorController = DoctorController(GlobalObjects.doctor)
-//                        composable(Routes.PROFILE) { ProfileScreen(navController, doctorModel, doctorController) }
-//                    }
                     if (GlobalObjects.type == "patient") {
                         val patientModel = PatientViewModel(GlobalObjects.patient)
                         val patientController = PatientController(GlobalObjects.patient, loginModel)
@@ -219,15 +219,6 @@ fun RemindMedApp(context: Context, loginModel: LoginModel) {
                             dosage = backStackEntry.arguments?.getString(NavArguments.MEDICATION_INFO.DOSAGE)?: ""
                         )
                     }
-
-                    var nullMedication = Medication("-1", "", "", Date(0), Date(0), "", "", mutableListOf<Time>()) // null medication for entry
-
-                    if (GlobalObjects.type == "patient") {
-                        nullMedication = Medication(GlobalObjects.patient.pid, "", "", Date(0), Date(0), "", "", mutableListOf<Time>())
-                    }
-
-                    val medicationModel = MedicationViewModel(nullMedication) // null medication for entry
-                    val medicationController = MedicationController(nullMedication)
 
                     composable(
                         Routes.MEDICATION_ENTRY_WITH_ARGS,
