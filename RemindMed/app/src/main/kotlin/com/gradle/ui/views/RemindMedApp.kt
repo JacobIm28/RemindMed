@@ -32,7 +32,7 @@ import com.gradle.constants.*
 import com.gradle.controller.DoctorController
 import com.gradle.controller.MedicationController
 import com.gradle.controller.PatientController
-import com.gradle.models.LoginModel
+import com.gradle.ui.viewModels.LoginViewModel
 import com.gradle.models.Medication
 import com.gradle.ui.viewModels.DoctorViewModel
 import com.gradle.ui.viewModels.MedicationViewModel
@@ -58,7 +58,7 @@ data class NavigationItem(
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("RememberReturnType", "UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun RemindMedApp(context: Context, loginModel: LoginModel) {
+fun RemindMedApp(context: Context, loginModel: LoginViewModel) {
     val navController = rememberNavController();
     val context = LocalContext.current
     val CHANNEL_ID = "CHANNEL"
@@ -177,7 +177,7 @@ fun RemindMedApp(context: Context, loginModel: LoginModel) {
 
                 NavHost(navController, startDestination = if (GlobalObjects.type == "doctor") Routes.PEOPLE_LIST else Routes.HOME ) {
                     composable(Routes.PEOPLE_LIST) {
-                        PeopleListScreen(onNavigateToMedicationList = { pid: String -> onNavigateToMedicationList(pid)})
+                        PeopleListScreen(onNavigateToMedicationList = { pid: String -> onNavigateToMedicationList(pid)}, loginModel)
                     }
 
                     composable(

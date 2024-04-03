@@ -44,7 +44,7 @@ import androidx.compose.material.icons.outlined.ExitToApp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.text.font.FontWeight
-import com.gradle.models.LoginModel
+import com.gradle.ui.viewModels.LoginViewModel
 
 enum class ProfileViewEvent {
     NameEvent,
@@ -57,7 +57,7 @@ enum class ProfileViewEvent {
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("RememberReturnType", "UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun ProfileScreen(doctorViewModel: DoctorViewModel, doctorController: DoctorController, loginModel: LoginModel) {
+fun ProfileScreen(doctorViewModel: DoctorViewModel, doctorController: DoctorController, loginModel: LoginViewModel) {
     var doctorModel : DoctorViewModel by remember{ mutableStateOf(DoctorViewModel(Doctor())) }
     var doctorController : DoctorController by remember{ mutableStateOf(DoctorController(Doctor(), loginModel)) }
     var viewModel by remember{ mutableStateOf(doctorModel) }
@@ -167,7 +167,7 @@ fun ProfileScreen(doctorViewModel: DoctorViewModel, doctorController: DoctorCont
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("RememberReturnType", "UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun ProfileScreen(patientViewModel: PatientViewModel, patientController: PatientController, loginModel: LoginModel) {
+fun ProfileScreen(patientViewModel: PatientViewModel, patientController: PatientController, loginModel: LoginViewModel) {
   var patientModel : PatientViewModel by remember{ mutableStateOf(PatientViewModel(Patient())) }
   var patientController : PatientController by remember{ mutableStateOf(PatientController(Patient(), loginModel)) }
   var viewModel by remember{ mutableStateOf(patientModel) }
