@@ -13,45 +13,39 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-
-import com.gradle.models.Patient
-
-import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.gradle.apiCalls.PatientApi as PatientApi
-
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.gradle.apiCalls.MedicationApi
+import com.gradle.apiCalls.PatientApi
 import com.gradle.constants.GlobalObjects
+import com.gradle.controller.MedicationController
+import com.gradle.models.Medication
+import com.gradle.models.Patient
 import com.gradle.ui.components.ButtonSecondary
 import com.gradle.ui.components.CustomDatePicker
 import com.gradle.ui.components.CustomTimePicker
 import com.gradle.ui.components.MedicationSummaryCard
 import com.gradle.ui.components.TitleLarge
 import com.gradle.ui.theme.AppTheme
-import java.sql.Date
-
-import com.gradle.apiCalls.MedicationApi as MedicationApi
-import com.gradle.models.Medication as Medication
-
-import com.gradle.controller.MedicationController
 import com.gradle.ui.viewModels.MedicationViewModel
 import com.gradle.utilities.notifications.NotificationUtils.Companion.scheduleNotifications
 import kotlinx.coroutines.CoroutineScope
@@ -59,8 +53,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.sql.Date
 import java.util.concurrent.TimeUnit
-
 
 enum class MedicationViewEvent {
     MedicationIdEvent,
@@ -81,12 +75,13 @@ enum class MedicationViewEvent {
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @SuppressLint("RememberReturnType", "UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit,
-                          onNavigateToMedicationList: (String) -> Unit,
-                          medicationViewModel: MedicationViewModel,
-                          medicationController: MedicationController,
-                          pid: String) {
-
+fun MedicationEntryScreen(
+    onNavigateToPeopleList: () -> Unit,
+    onNavigateToMedicationList: (String) -> Unit,
+    medicationViewModel: MedicationViewModel,
+    medicationController: MedicationController,
+    pid: String
+) {
     val context = LocalContext.current
 
     var medications by remember { mutableStateOf(emptyList<Medication>()) }
@@ -98,7 +93,7 @@ fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit,
         medicationController.model.pid = pid
     }
 
-    val controller by remember{mutableStateOf(medicationController)}
+    val controller by remember { mutableStateOf(medicationController) }
 
     val showAddMedicationErrorDialog = remember { mutableStateOf(false) }
 
@@ -181,7 +176,6 @@ fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit,
         }
         return false
     }
-
 
     var searchResults by remember { mutableStateOf<List<String>>(emptyList()) }
     var searchTerm by remember { mutableStateOf(TextFieldValue("")) }
@@ -273,7 +267,7 @@ fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit,
                 onSearch()
             }
         }
-    
+
         Column {
             OutlinedTextField(
                 value = searchTerm,
@@ -284,7 +278,8 @@ fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit,
                     } else {
                         searchResults = emptyList()
                     }
-                    expanded = (term.text.isNotBlank() && !suggestionClicked) // Expand dropdown only when there's text
+                    expanded =
+                        (term.text.isNotBlank() && !suggestionClicked) // Expand dropdown only when there's text
                 },
                 label = { Text("Search Medication") },
                 placeholder = { Text("Enter Medication Name") },
@@ -365,7 +360,7 @@ fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit,
                 value = medicationViewModel.amount.value,
                 onValueChange = {
                     controller.invoke(MedicationViewEvent.AmountEvent, it)
-                                },
+                },
                 label = { Text("Dosage") },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -387,14 +382,19 @@ fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit,
                 }
 
                 CustomDatePicker(startDateState, "Start Date") {
-                    controller.invoke(MedicationViewEvent.StartDateEvent, Date(startDateState.selectedDateMillis?.let { it + TimeUnit.DAYS.toMillis(1) } ?: System.currentTimeMillis()))
+                    controller.invoke(
+                        MedicationViewEvent.StartDateEvent,
+                        Date(startDateState.selectedDateMillis?.let { it + TimeUnit.DAYS.toMillis(1) }
+                            ?: System.currentTimeMillis()))
 
                 }
                 CustomDatePicker(endDateState, "End Date") {
-                    controller.invoke(MedicationViewEvent.EndDateEvent, Date(endDateState.selectedDateMillis?.let { it + TimeUnit.DAYS.toMillis(1) } ?: System.currentTimeMillis()))
+                    controller.invoke(
+                        MedicationViewEvent.EndDateEvent,
+                        Date(endDateState.selectedDateMillis?.let { it + TimeUnit.DAYS.toMillis(1) }
+                            ?: System.currentTimeMillis()))
                 }
             }
-
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -406,7 +406,7 @@ fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit,
                 value = medicationViewModel.notes.value,
                 onValueChange = {
                     controller.invoke(MedicationViewEvent.NotesEvent, it)
-                                },
+                },
                 label = { Text("Notes") },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -448,18 +448,15 @@ fun MedicationEntryScreen(onNavigateToPeopleList: () -> Unit,
                                 val startDate = medicationViewModel.startDate.value
                                 val endDate = medicationViewModel.endDate.value
 
-                                if (startDate != null && endDate != null && startDate > endDate) {
+                                if (startDate > endDate) {
                                     showDateInvalidRangeErrorDialog.value = true
                                 } else {
                                     controller.invoke(
                                         MedicationViewEvent.TimeEvent,
                                         medicationViewModel.getSelectedTimes()
                                     )
-                                    if (GlobalObjects.type == "patient") {
-                                        medicationViewModel.model.accepted = true
-                                    } else {
-                                        medicationViewModel.model.accepted = false
-                                    }
+                                    medicationViewModel.model.accepted =
+                                        GlobalObjects.type == "patient"
                                     controller.invoke(
                                         MedicationViewEvent.AddEvent,
                                         medicationViewModel

@@ -3,21 +3,21 @@ package com.gradle.apiCalls
 import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
+import com.gradle.models.Doctor
 import com.gradle.models.Medication
 import com.gradle.models.Patient
 import io.ktor.client.*
 import io.ktor.client.call.body
 import io.ktor.client.engine.android.*
-import io.ktor.client.request.*
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.util.InternalAPI
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
-import com.gradle.models.Doctor
 
 @OptIn(DelicateCoroutinesApi::class)
 class PatientApi {
@@ -91,8 +91,6 @@ class PatientApi {
         }
     }
 
-
-    // TODO: Kind of useless, remove if not needed. Good for testing, though
     fun getAllPatients(): MutableList<Patient> {
         return try {
             var patients: MutableList<Patient>? = null
@@ -146,8 +144,6 @@ class PatientApi {
         }
     }
 
-    // TESTED all endpoints above, will not test anymore from here.
-    // Please contact Samir Ali if any issues arise
     fun updatePatient(patient: Patient): Boolean {
         return try {
             var success = false
@@ -182,17 +178,6 @@ class PatientApi {
             throw e
         }
     }
-
-//    suspend fun removeMedication(pid: String, mid: String): Boolean {
-//        return try {
-//            println("Removing medication with id: $mid from patient with id: $pid")
-//            val response = client.delete("$host/patient/medicine?pid=$pid&mid=$mid").status.isSuccess()
-//            response
-//        } catch (e: Exception) {
-//            false
-//        }
-//    }
-
 
      fun removeMedication(pid: String, mid: String): Boolean {
          return try {

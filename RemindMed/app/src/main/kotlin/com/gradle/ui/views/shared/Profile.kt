@@ -2,50 +2,46 @@ package com.gradle.ui.views.shared
 
 import TextInput
 import android.annotation.SuppressLint
+import android.os.Handler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
+import androidx.compose.material.IconButton
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.gradle.apiCalls.PatientApi as PatientApi
-import com.gradle.apiCalls.DoctorApi as DoctorApi
-import com.gradle.ui.components.ButtonPrimary
-import com.gradle.ui.components.TitleLarge
-import com.gradle.ui.theme.AppTheme
-import androidx.compose.runtime.LaunchedEffect
+import com.gradle.apiCalls.DoctorApi
+import com.gradle.apiCalls.PatientApi
 import com.gradle.constants.GlobalObjects
 import com.gradle.controller.DoctorController
 import com.gradle.controller.PatientController
 import com.gradle.models.Doctor
 import com.gradle.models.Patient
-import com.gradle.ui.viewModels.DoctorViewModel
-import com.gradle.ui.viewModels.PatientViewModel
-import android.os.Handler
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.IconButton
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.outlined.ExitToApp
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.ui.text.font.FontWeight
-import com.gradle.ui.viewModels.LoginViewModel
+import com.gradle.ui.components.ButtonPrimary
 import com.gradle.ui.components.ButtonSecondary
+import com.gradle.ui.theme.AppTheme
+import com.gradle.ui.viewModels.DoctorViewModel
+import com.gradle.ui.viewModels.LoginViewModel
+import com.gradle.ui.viewModels.PatientViewModel
 
 enum class ProfileViewEvent {
     NameEvent,
@@ -55,16 +51,29 @@ enum class ProfileViewEvent {
     LogoutClicked,
     LogoutConfirmed
 }
-@OptIn(ExperimentalMaterial3Api::class)
+
+
 @SuppressLint("RememberReturnType", "UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun ProfileScreen(doctorViewModel: DoctorViewModel, doctorController: DoctorController, loginModel: LoginViewModel) {
-    var doctorModel : DoctorViewModel by remember{ mutableStateOf(DoctorViewModel(Doctor())) }
-    var doctorController : DoctorController by remember{ mutableStateOf(DoctorController(Doctor(), loginModel)) }
-    var viewModel by remember{ mutableStateOf(doctorModel) }
-    var controller by remember{ mutableStateOf(doctorController) }
+fun ProfileScreen(
+    doctorViewModel: DoctorViewModel,
+    doctorController: DoctorController,
+    loginModel: LoginViewModel
+) {
+    var doctorModel: DoctorViewModel by remember { mutableStateOf(DoctorViewModel(Doctor())) }
+    var doctorController: DoctorController by remember {
+        mutableStateOf(
+            DoctorController(
+                Doctor(),
+                loginModel
+            )
+        )
+    }
+    var viewModel by remember { mutableStateOf(doctorModel) }
+    var controller by remember { mutableStateOf(doctorController) }
+
     LaunchedEffect(Unit) {
-        val doctor : Doctor = DoctorApi().getDoctor(GlobalObjects.doctor.did)
+        val doctor: Doctor = DoctorApi().getDoctor(GlobalObjects.doctor.did)
         doctorModel = DoctorViewModel(doctor)
         doctorController = DoctorController(doctor, loginModel)
         viewModel = doctorModel
@@ -72,23 +81,30 @@ fun ProfileScreen(doctorViewModel: DoctorViewModel, doctorController: DoctorCont
     }
 
     AppTheme {
-        Box(modifier = Modifier.verticalScroll(rememberScrollState())){
-            Column (modifier = androidx.compose.ui.Modifier.padding()) {
-                Row (
+        Box(modifier = Modifier.verticalScroll(rememberScrollState())) {
+            Column(modifier = Modifier.padding()) {
+                Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         "Profile",
-                        modifier = Modifier.padding(top = 13.dp, bottom = 5.dp).weight(1f),
+                        modifier = Modifier
+                            .padding(top = 13.dp, bottom = 5.dp)
+                            .weight(1f),
                         style = MaterialTheme.typography.titleLarge.copy(
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold
                         )
                     )
-                    IconButton(onClick = {controller.invoke(ProfileViewEvent.LogoutClicked, "")}) {
+                    IconButton(onClick = {
+                        controller.invoke(
+                            ProfileViewEvent.LogoutClicked,
+                            ""
+                        )
+                    }) {
                         Icon(
-                            imageVector = Icons.Outlined.ExitToApp,
+                            imageVector = Icons.AutoMirrored.Outlined.ExitToApp,
                             tint = MaterialTheme.colorScheme.primary,
                             contentDescription = "Back"
                         )
@@ -96,26 +112,42 @@ fun ProfileScreen(doctorViewModel: DoctorViewModel, doctorController: DoctorCont
                 }
                 Spacer(modifier = Modifier.height(16.dp))
 
-                TextInput("Name", "", viewModel.name.value, {controller.invoke(ProfileViewEvent.NameEvent, it)})
+                TextInput(
+                    "Name",
+                    "",
+                    viewModel.name.value,
+                    { controller.invoke(ProfileViewEvent.NameEvent, it) })
                 Spacer(modifier = Modifier.height(24.dp))
 
-                TextInput("Email", "", viewModel.email.value, {controller.invoke(ProfileViewEvent.EmailEvent, it)})
+                TextInput(
+                    "Email",
+                    "",
+                    viewModel.email.value,
+                    { controller.invoke(ProfileViewEvent.EmailEvent, it) })
                 Spacer(modifier = Modifier.height(24.dp))
 
-                Row (modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                    ButtonPrimary("Submit", {
-//                        viewModel.changesSubmitted.value = true
-                        controller.invoke(ProfileViewEvent.UpdateEvent, "")
-                                            }, viewModel.submitEnabled.value)
+                Row(modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                    ButtonPrimary(
+                        "Submit",
+                        {
+                            controller.invoke(ProfileViewEvent.UpdateEvent, "")
+                        },
+                        viewModel.submitEnabled.value
+                    )
                 }
+
                 Spacer(modifier = Modifier.height(16.dp))
 
                 if (viewModel.changesSubmitted.value && viewModel.successfulChange.value) {
                     AlertDialog(
-                        onDismissRequest = { controller.invoke(ProfileViewEvent.DismissEvent, "")},
-                        text = { Text("Success!")},
+                        onDismissRequest = { controller.invoke(ProfileViewEvent.DismissEvent, "") },
+                        text = { Text("Success!") },
                         confirmButton = {
-                            Button(onClick = { controller.invoke(ProfileViewEvent.DismissEvent, "") }) {
+                            Button(
+                                onClick = {
+                                    controller.invoke(ProfileViewEvent.DismissEvent, "")
+                                }
+                            ) {
                                 Text("OK")
                             }
                         }
@@ -126,20 +158,30 @@ fun ProfileScreen(doctorViewModel: DoctorViewModel, doctorController: DoctorCont
                     }, 5000)
                 } else if (viewModel.changesSubmitted.value && viewModel.errorMessage.value.isNotBlank()) {
                     AlertDialog(
-                        onDismissRequest = {controller.invoke(ProfileViewEvent.DismissEvent, "")},
-                        text = { Text("Unfortunately, the changes did not go through\n" + viewModel.errorMessage.value)},
+                        onDismissRequest = { controller.invoke(ProfileViewEvent.DismissEvent, "") },
+                        text = { Text("Unfortunately, the changes did not go through\n" + viewModel.errorMessage.value) },
                         confirmButton = {
-                            Button(onClick = { controller.invoke(ProfileViewEvent.DismissEvent, "") }) {
+                            Button(onClick = {
+                                controller.invoke(
+                                    ProfileViewEvent.DismissEvent,
+                                    ""
+                                )
+                            }) {
                                 Text("OK")
                             }
                         }
                     )
                 } else if (viewModel.changesSubmitted.value && !viewModel.successfulChange.value) {
                     AlertDialog(
-                        onDismissRequest = {controller.invoke(ProfileViewEvent.DismissEvent, "")},
+                        onDismissRequest = { controller.invoke(ProfileViewEvent.DismissEvent, "") },
                         text = { Text("Unfortunately, the changes did not go through") },
                         confirmButton = {
-                            Button(onClick = { controller.invoke(ProfileViewEvent.DismissEvent, "") }) {
+                            Button(onClick = {
+                                controller.invoke(
+                                    ProfileViewEvent.DismissEvent,
+                                    ""
+                                )
+                            }) {
                                 Text("OK")
                             }
                         }
@@ -148,13 +190,23 @@ fun ProfileScreen(doctorViewModel: DoctorViewModel, doctorController: DoctorCont
 
                 if (viewModel.logoutClicked.value) {
                     AlertDialog(
-                        onDismissRequest = {controller.invoke(ProfileViewEvent.DismissEvent, "")},
+                        onDismissRequest = { controller.invoke(ProfileViewEvent.DismissEvent, "") },
                         text = { Text("Are you sure you want to log out?") },
                         confirmButton = {
-                            Button(onClick = { controller.invoke(ProfileViewEvent.DismissEvent, "") }) {
+                            Button(onClick = {
+                                controller.invoke(
+                                    ProfileViewEvent.DismissEvent,
+                                    ""
+                                )
+                            }) {
                                 Text("CANCEL")
                             }
-                            Button(onClick = { controller.invoke(ProfileViewEvent.LogoutConfirmed, "") }) {
+                            Button(onClick = {
+                                controller.invoke(
+                                    ProfileViewEvent.LogoutConfirmed,
+                                    ""
+                                )
+                            }) {
                                 Text("OK")
                             }
                         }
@@ -165,40 +217,59 @@ fun ProfileScreen(doctorViewModel: DoctorViewModel, doctorController: DoctorCont
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("RememberReturnType", "UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun ProfileScreen(patientViewModel: PatientViewModel, patientController: PatientController, loginModel: LoginViewModel) {
-  var patientModel : PatientViewModel by remember{ mutableStateOf(PatientViewModel(Patient())) }
-  var patientController : PatientController by remember{ mutableStateOf(PatientController(Patient(), loginModel)) }
-  var viewModel by remember{ mutableStateOf(patientModel) }
-  var controller by remember{ mutableStateOf(patientController) }
-  LaunchedEffect(Unit) {
-      val patient : Patient = PatientApi().getPatientbyId(GlobalObjects.patient.pid)
-      patientModel = PatientViewModel(patient)
-      patientController = PatientController(patient, loginModel)
-      viewModel = patientModel
-      controller = patientController
-  }
+fun ProfileScreen(
+    patientViewModel: PatientViewModel,
+    patientController: PatientController,
+    loginModel: LoginViewModel
+) {
+    var patientModel: PatientViewModel by remember { mutableStateOf(PatientViewModel(Patient())) }
+    var patientController: PatientController by remember {
+        mutableStateOf(
+            PatientController(
+                Patient(),
+                loginModel
+            )
+        )
+    }
+    var viewModel by remember { mutableStateOf(patientModel) }
+    var controller by remember { mutableStateOf(patientController) }
+    LaunchedEffect(Unit) {
+        val patient: Patient = PatientApi().getPatientbyId(GlobalObjects.patient.pid)
+        patientModel = PatientViewModel(patient)
+        patientController = PatientController(patient, loginModel)
+        viewModel = patientModel
+        controller = patientController
+    }
 
     AppTheme {
-        Box(modifier = Modifier.verticalScroll(rememberScrollState())){
-            Column (modifier = androidx.compose.ui.Modifier.padding().fillMaxWidth()) {
-                Row (
+        Box(modifier = Modifier.verticalScroll(rememberScrollState())) {
+            Column(modifier = Modifier
+                .padding()
+                .fillMaxWidth()) {
+                Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         "Profile",
-                        modifier = Modifier.padding(top = 13.dp, bottom = 5.dp).weight(1f),
+                        modifier = Modifier
+                            .padding(top = 13.dp, bottom = 5.dp)
+                            .weight(1f),
                         style = MaterialTheme.typography.titleLarge.copy(
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold
                         )
                     )
-                    IconButton(onClick = {controller.invoke(ProfileViewEvent.LogoutClicked, "")}) {
+                    IconButton(onClick = {
+                        controller.invoke(
+                            ProfileViewEvent.LogoutClicked,
+                            ""
+                        )
+                    }) {
                         Icon(
-                            imageVector = Icons.Outlined.ExitToApp,
+                            imageVector = Icons.AutoMirrored.Outlined.ExitToApp,
                             tint = MaterialTheme.colorScheme.primary,
                             contentDescription = "Back"
                         )
@@ -206,13 +277,21 @@ fun ProfileScreen(patientViewModel: PatientViewModel, patientController: Patient
                 }
                 Spacer(modifier = Modifier.height(16.dp))
 
-                TextInput("Name", "", viewModel.name.value, {controller.invoke(ProfileViewEvent.NameEvent, it)})
+                TextInput(
+                    "Name",
+                    "",
+                    viewModel.name.value,
+                    { controller.invoke(ProfileViewEvent.NameEvent, it) })
                 Spacer(modifier = Modifier.height(12.dp))
 
-                TextInput("Email", "", viewModel.email.value, {controller.invoke(ProfileViewEvent.EmailEvent, it)})
+                TextInput(
+                    "Email",
+                    "",
+                    viewModel.email.value,
+                    { controller.invoke(ProfileViewEvent.EmailEvent, it) })
                 Spacer(modifier = Modifier.height(12.dp))
 
-                Row (modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                Row(modifier = Modifier.align(Alignment.CenterHorizontally)) {
                     ButtonSecondary("Submit", {
                         viewModel.changesSubmitted.value = true
                         controller.invoke(ProfileViewEvent.UpdateEvent, "")
@@ -222,10 +301,15 @@ fun ProfileScreen(patientViewModel: PatientViewModel, patientController: Patient
 
                 if (viewModel.changesSubmitted.value && viewModel.successfulChange.value) {
                     AlertDialog(
-                        onDismissRequest = { controller.invoke(ProfileViewEvent.DismissEvent, "")},
-                        text = { Text("Success!")},
+                        onDismissRequest = { controller.invoke(ProfileViewEvent.DismissEvent, "") },
+                        text = { Text("Success!") },
                         confirmButton = {
-                            Button(onClick = { controller.invoke(ProfileViewEvent.DismissEvent, "") }) {
+                            Button(onClick = {
+                                controller.invoke(
+                                    ProfileViewEvent.DismissEvent,
+                                    ""
+                                )
+                            }) {
                                 Text("OK")
                             }
                         }
@@ -235,20 +319,30 @@ fun ProfileScreen(patientViewModel: PatientViewModel, patientController: Patient
                     }, 5000)
                 } else if (viewModel.changesSubmitted.value && viewModel.errorMessage.value.isNotBlank()) {
                     AlertDialog(
-                        onDismissRequest = {controller.invoke(ProfileViewEvent.DismissEvent, "")},
-                        text = { Text("Unfortunately, the changes did not go through\n" + viewModel.errorMessage.value)},
+                        onDismissRequest = { controller.invoke(ProfileViewEvent.DismissEvent, "") },
+                        text = { Text("Unfortunately, the changes did not go through\n" + viewModel.errorMessage.value) },
                         confirmButton = {
-                            Button(onClick = { controller.invoke(ProfileViewEvent.DismissEvent, "")}) {
+                            Button(onClick = {
+                                controller.invoke(
+                                    ProfileViewEvent.DismissEvent,
+                                    ""
+                                )
+                            }) {
                                 Text("OK")
                             }
                         }
                     )
                 } else if (viewModel.changesSubmitted.value && !viewModel.successfulChange.value) {
                     AlertDialog(
-                        onDismissRequest = {controller.invoke(ProfileViewEvent.DismissEvent, "")},
+                        onDismissRequest = { controller.invoke(ProfileViewEvent.DismissEvent, "") },
                         text = { Text("Unfortunately, the changes did not go through") },
                         confirmButton = {
-                            Button(onClick = { controller.invoke(ProfileViewEvent.DismissEvent, "") }) {
+                            Button(onClick = {
+                                controller.invoke(
+                                    ProfileViewEvent.DismissEvent,
+                                    ""
+                                )
+                            }) {
                                 Text("OK")
                             }
                         }
@@ -257,13 +351,23 @@ fun ProfileScreen(patientViewModel: PatientViewModel, patientController: Patient
 
                 if (viewModel.logoutClicked.value) {
                     AlertDialog(
-                        onDismissRequest = {controller.invoke(ProfileViewEvent.DismissEvent, "")},
+                        onDismissRequest = { controller.invoke(ProfileViewEvent.DismissEvent, "") },
                         text = { Text("Are you sure you want to log out?") },
                         confirmButton = {
-                            Button(onClick = { controller.invoke(ProfileViewEvent.DismissEvent, "") }) {
+                            Button(onClick = {
+                                controller.invoke(
+                                    ProfileViewEvent.DismissEvent,
+                                    ""
+                                )
+                            }) {
                                 Text("CANCEL")
                             }
-                            Button(onClick = { controller.invoke(ProfileViewEvent.LogoutConfirmed, "") }) {
+                            Button(onClick = {
+                                controller.invoke(
+                                    ProfileViewEvent.LogoutConfirmed,
+                                    ""
+                                )
+                            }) {
                                 Text("OK")
                             }
                         }

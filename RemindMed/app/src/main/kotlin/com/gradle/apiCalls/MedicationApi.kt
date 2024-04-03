@@ -18,8 +18,6 @@ import java.sql.Time
 
 @OptIn(DelicateCoroutinesApi::class)
 class MedicationApi {
-    //TODO: Change host to server's address once API deployed to some server
-
     private val host: String = "https://remindmed-api-nsjyfltjaa-uk.a.run.app"
     private val nullMedication = Medication("-1", "", "", Date(0), Date(0), "", "", mutableListOf<Time>(), false, false)
     private val client = HttpClient(Android) {
@@ -39,7 +37,6 @@ class MedicationApi {
                 launch {
                     println("Getting medication with name: $name")
                     val response = client.get("$host/medicine?name=$name").bodyAsText()
-                    //TODO: check for malformed json
                     medication = JsonParser.parseString(response).asJsonObject
                 }
             }

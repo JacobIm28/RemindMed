@@ -5,39 +5,33 @@ import android.os.Handler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.material.Text
-import com.gradle.ui.components.TitleLarge
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.AlertDialog
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import com.gradle.constants.GlobalObjects
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.gradle.apiCalls.DoctorApi
+import com.gradle.apiCalls.PatientApi
+import com.gradle.constants.GlobalObjects
 import com.gradle.controller.PeopleListController
-import com.gradle.models.Doctor
-import com.gradle.ui.theme.*
-import com.gradle.models.Patient
 import com.gradle.models.PeopleList
 import com.gradle.ui.components.DoctorItem
 import com.gradle.ui.components.LoadingScreen
-import com.gradle.ui.components.PatientItem
-import com.gradle.ui.components.TitleLarge
 import com.gradle.ui.components.PeopleListPatientItem
+import com.gradle.ui.components.TitleLarge
+import com.gradle.ui.theme.AppTheme
 import com.gradle.ui.viewModels.LoginViewModel
 import com.gradle.ui.viewModels.PeopleListViewModel
-import com.gradle.apiCalls.PatientApi as PatientApi
-import com.gradle.apiCalls.DoctorApi as DoctorApi
 
 enum class PeopleListEvent {
     DeleteEvent
@@ -59,10 +53,8 @@ fun PeopleListScreen(onNavigateToMedicationList: (String) -> Unit, LoginModel: L
         if (GlobalObjects.type == "doctor") {
             viewModel.patientList.value = DoctorApi().getPatients(GlobalObjects.doctor.did)
             doctorName = DoctorApi().getDoctor(GlobalObjects.doctor.did).name
-//            patientList = DoctorApi().getPatients(GlobalObjects.doctor.did)
         } else {
             patientName = PatientApi().getPatientbyId(GlobalObjects.patient.pid).name
-//            doctorList = PatientApi().getDoctors(GlobalObjects.patient.pid)
         }
         isLoading = false
     }

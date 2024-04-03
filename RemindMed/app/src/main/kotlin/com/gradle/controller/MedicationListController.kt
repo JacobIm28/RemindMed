@@ -16,8 +16,6 @@ class MedicationListController(val model: MedicationList) {
                 val success = PatientApi().removeMedication(GlobalObjects.patient.pid, medicationId)
                 if (success) {
                     model.medicationList = PatientApi().getMedicines(GlobalObjects.patient.pid).toList()
-                } else {
-                    println("Medication Not Removed")
                 }
             }
         }

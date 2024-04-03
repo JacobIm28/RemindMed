@@ -2,23 +2,14 @@ package com.gradle.models
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import com.google.gson.JsonElement
-import com.gradle.utilities.toFormattedDateString
-import com.gradle.utilities.toFormattedTimeString
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Serializer
-
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.jsonArray
-import kotlinx.serialization.json.jsonPrimitive
-import java.sql.Time
 import java.sql.Date
+import java.sql.Time
 
 @OptIn(ExperimentalSerializationApi::class)
 @Serializer(forClass = Date::class)
@@ -150,9 +141,6 @@ class Medication(
             notifySubscribers()
         }
 
-//    override fun notifySubscribers() {
-//        // Notification logic here
-//    }
     override fun toString(): String {
         return "Medication(pid=$pid, medicationId=$medicationId, amount='$amount', startDate=${startDate}, endDate=${endDate}, name=$name, notes=$notes) times=${times} accepted=$accepted taken=$taken"
     }
@@ -177,7 +165,6 @@ class Medication(
         if (amount != other.amount) return false
         if (startDate != other.startDate) return false
         if (endDate != other.endDate) return false
-//        if (!times.contentEquals(other.times)) return false
         if (name != other.name) return false
         if (accepted != other.accepted) return false
         if (taken != other.taken) return false
@@ -190,7 +177,6 @@ class Medication(
         result = 31 * result + amount.hashCode()
         result = 31 * result + startDate.hashCode()
         result = 31 * result + endDate.hashCode()
-//        result = 31 * result + times.hashCode()
         result = 31 * result + name.hashCode()
         result = 31 * result + notes.hashCode()
         result = 31 * result + accepted.hashCode()
