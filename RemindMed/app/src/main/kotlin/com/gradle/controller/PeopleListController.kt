@@ -3,7 +3,7 @@ package com.gradle.controller
 import com.gradle.constants.GlobalObjects
 import com.gradle.models.PeopleList
 import com.gradle.ui.views.shared.PeopleListEvent
-import com.gradle.apiCalls.Doctor as DoctorApi
+import com.gradle.apiCalls.DoctorApi
 
 class PeopleListController(val model : PeopleList) {
     fun invoke(event: PeopleListEvent, value: Any?) {

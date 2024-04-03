@@ -1,12 +1,12 @@
 package com.gradle.controller
 
 import com.gradle.constants.GlobalObjects
-import com.gradle.models.LoginModel
 import com.gradle.models.Patient
+import com.gradle.ui.viewModels.LoginViewModel
 import com.gradle.ui.views.shared.ProfileViewEvent
 import com.gradle.apiCalls.User as UserApi
 
-class PatientController(val model: Patient, private val loginViewModel: LoginModel) {
+class PatientController(val model: Patient, private val loginViewModel: LoginViewModel) {
     fun invoke(event: ProfileViewEvent, value: Any?) {
         when(event) {
             ProfileViewEvent.NameEvent -> {

@@ -29,6 +29,9 @@ import com.gradle.models.PeopleList
 import com.gradle.ui.components.DoctorItem
 import com.gradle.ui.components.LoadingScreen
 import com.gradle.ui.components.PatientItem
+import com.gradle.ui.components.PeopleListPatientItem
+import com.gradle.ui.viewModels.LoginViewModel
+import com.gradle.ui.viewModels.PeopleListViewModel
 import com.gradle.apiCalls.PatientApi as PatientApi
 import com.gradle.apiCalls.DoctorApi as DoctorApi
 
@@ -39,7 +42,7 @@ enum class PeopleListEvent {
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("RememberReturnType", "UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun PeopleListScreen(onNavigateToMedicationList: (String) -> Unit) {
+fun PeopleListScreen(onNavigateToMedicationList: (String) -> Unit, LoginModel: LoginViewModel) {
     val model : PeopleList = PeopleList()
     val viewModel : PeopleListViewModel by remember{ mutableStateOf(PeopleListViewModel(model)) }
     val controller : PeopleListController by remember{ mutableStateOf(PeopleListController(model)) }
@@ -75,12 +78,12 @@ fun PeopleListScreen(onNavigateToMedicationList: (String) -> Unit) {
                         }
                     }
                     items(viewModel.patientList.value) { patient ->
-                        PeopleListPatientItem(patient, onNavigateToMedicationList, true, false) { str ->
+                        PeopleListPatientItem(patient, onNavigateToMedicationList, true, false, { str ->
                             controller.invoke(
                                 PeopleListEvent.DeleteEvent,
                                 str
                             )
-                        }
+                        }, LoginModel)
                     }
                 } else {
                     if (viewModel.doctorList.value.isEmpty()) {

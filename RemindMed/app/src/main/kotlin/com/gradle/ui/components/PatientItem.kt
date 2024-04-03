@@ -41,7 +41,8 @@ import com.gradle.models.Patient
 import com.gradle.ui.theme.AppTheme
 import com.gradle.ui.viewModels.PatientViewModel
 import com.gradle.ui.views.doctor.AddPatientViewEvent
-import com.gradle.apiCalls.Doctor as DoctorApi
+import com.gradle.apiCalls.DoctorApi
+import com.gradle.ui.viewModels.LoginViewModel
 
 @Composable
 fun PatientItem(patient: Patient, onNavigateMedicationList: (String) -> Unit, isValid: Boolean, isAddPatient: Boolean) {
@@ -87,8 +88,8 @@ fun PatientItem(patient: Patient, onNavigateMedicationList: (String) -> Unit, is
 }
 
 @Composable
-fun PeopleListPatientItem(patient: Patient, onNavigateMedicationList: (String) -> Unit, isValid: Boolean, isAddPatient: Boolean, controllerFunc : (String) -> Unit) {
-    val controller : PatientController by remember{ mutableStateOf(PatientController(patient)) }
+fun PeopleListPatientItem(patient: Patient, onNavigateMedicationList: (String) -> Unit, isValid: Boolean, isAddPatient: Boolean, controllerFunc : (String) -> Unit, loginModel: LoginViewModel) {
+    val controller : PatientController by remember{ mutableStateOf(PatientController(patient, loginModel) ) }
     var showDialog by remember { mutableStateOf(false) }
 
     AppTheme {
