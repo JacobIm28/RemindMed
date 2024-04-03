@@ -25,7 +25,8 @@
             android:name="remindmed.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.RemindMed">
+            android:theme="@style/Theme.RemindMed"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
