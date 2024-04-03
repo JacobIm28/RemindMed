@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -189,22 +190,45 @@ fun MedicationItem(
                     }
                 }
             } else {
-                ButtonPrimary(
-                    text = "Accept",
-                    onClick = {
-                        scheduleNotifications(context, patient, medication)
-                        accepted = true
-                        medication.accepted = true
-                        var medicationViewModel = MedicationViewModel(medication)
-                        var medicationController = MedicationController(medication)
+//                ButtonPrimary(
+//                    text = "Accept",
+//                    onClick = {
+//                        scheduleNotifications(context, patient, medication)
+//                        accepted = true
+//                        medication.accepted = true
+//                        var medicationViewModel = MedicationViewModel(medication)
+//                        var medicationController = MedicationController(medication)
+//
+//                        medicationController.invoke(
+//                            MedicationViewEvent.UpdateEvent,
+//                            medicationViewModel
+//                        )
+//                    },
+//                    enabled = true
+//                )
+                Column {
+                    IconButton(
+                        onClick = { showDialog = true }
+                    ) {
+                        Icon(Icons.Filled.Clear, contentDescription = "Decline")
+                    }
+                    IconButton(
+                        onClick = {
+                            scheduleNotifications(context, patient, medication)
+                            accepted = true
+                            medication.accepted = true
+                            var medicationViewModel = MedicationViewModel(medication)
+                            var medicationController = MedicationController(medication)
 
-                        medicationController.invoke(
-                            MedicationViewEvent.UpdateEvent,
-                            medicationViewModel
-                        )
-                    },
-                    enabled = true
-                )
+                            medicationController.invoke(
+                                MedicationViewEvent.UpdateEvent,
+                                medicationViewModel
+                            )
+                        }) {
+                        Icon(Icons.Filled.Check, contentDescription = "Accept")
+                    }
+                }
+
             }
         }
     }
