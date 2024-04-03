@@ -2,7 +2,6 @@ package com.gradle.ui.viewModels
 
 import androidx.compose.runtime.mutableStateOf
 import com.gradle.models.AddPatient
-import com.gradle.ui.viewModels.ISubscriber
 
 class AddPatientViewModel(val model: AddPatient) : ISubscriber {
     val did = model.did

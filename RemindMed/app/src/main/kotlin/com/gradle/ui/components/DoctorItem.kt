@@ -32,7 +32,6 @@ fun DoctorItem(doctor: Doctor) {
             elevation = CardDefaults.cardElevation(
                 defaultElevation = 4.dp
             ),
-
             colors = CardColors(
                 containerColor = MaterialTheme.colorScheme.tertiary,
                 contentColor = MaterialTheme.colorScheme.onSecondaryContainer,

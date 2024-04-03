@@ -27,7 +27,6 @@ fun MedicationSummaryCard(name: String, dosage: String, time: String, dates: Str
         modifier = Modifier
             .fillMaxWidth()
             .border(1.dp, Color.LightGray, RoundedCornerShape(15.dp)),
-
         colors = CardColors(
             containerColor = MaterialTheme.colorScheme.tertiary,
             contentColor = MaterialTheme.colorScheme.primary,
@@ -39,11 +38,6 @@ fun MedicationSummaryCard(name: String, dosage: String, time: String, dates: Str
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Replace with your actual image resource
-//            Image(
-//                painter = painterResource(id = R.drawable.ic_medication_placeholder),
-//                contentDescription = "Medication Image"
-//            )
             Spacer(modifier = Modifier.width(16.dp))
             Column {
                 Text("Medication: $name", fontWeight = FontWeight.Bold)

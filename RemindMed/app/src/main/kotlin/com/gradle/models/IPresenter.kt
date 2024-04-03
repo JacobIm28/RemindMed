@@ -5,7 +5,7 @@ import com.gradle.ui.viewModels.ISubscriber
 abstract class IPresenter {
     private val subscribers = mutableListOf<ISubscriber>()
     fun notifySubscribers() {
-        subscribers.forEach() {
+        subscribers.forEach {
             it.update()
         }
     }

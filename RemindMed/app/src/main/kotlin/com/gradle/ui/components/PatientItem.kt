@@ -10,12 +10,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
@@ -32,16 +30,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.gradle.constants.GlobalObjects
-import com.gradle.constants.NavArguments
-import com.gradle.constants.Routes
 import com.gradle.controller.PatientController
 import com.gradle.models.Patient
 import com.gradle.ui.theme.AppTheme
-import com.gradle.ui.viewModels.PatientViewModel
-import com.gradle.ui.views.doctor.AddPatientViewEvent
-import com.gradle.apiCalls.DoctorApi
 import com.gradle.ui.viewModels.LoginViewModel
 
 @Composable
@@ -52,7 +43,6 @@ fun PatientItem(patient: Patient, onNavigateMedicationList: (String) -> Unit, is
             elevation = CardDefaults.cardElevation(
                 defaultElevation = 4.dp
             ),
-
             colors = CardColors(
                 containerColor = if (isValid) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.tertiaryContainer,
                 contentColor = MaterialTheme.colorScheme.onSecondaryContainer,

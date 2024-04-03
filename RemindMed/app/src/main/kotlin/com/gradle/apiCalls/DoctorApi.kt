@@ -6,7 +6,6 @@ import io.ktor.client.*
 import io.ktor.client.call.body
 import io.ktor.client.engine.android.*
 import io.ktor.client.request.*
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -16,8 +15,6 @@ import kotlinx.serialization.json.Json
 
 @OptIn(DelicateCoroutinesApi::class)
 class DoctorApi {
-    //TODO: Change host to server's address once API deployed to some server
-
     private val host: String = "https://remindmed-api-nsjyfltjaa-uk.a.run.app"
     private val nullDoctor = Doctor("-1", "", "")
     private val client = HttpClient(Android) {
@@ -68,7 +65,6 @@ class DoctorApi {
         }
     }
 
-    //TODO: Kind of useless, remove if not needed. Good for testing, though
     fun getAllDoctors(): ArrayList<Doctor> {
         return try {
             var doctors: ArrayList<Doctor>? = null

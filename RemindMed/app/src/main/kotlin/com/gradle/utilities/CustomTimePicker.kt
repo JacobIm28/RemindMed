@@ -137,7 +137,6 @@ fun MyTimePickerDialog(
 
                                 if (selectedTimes.any { it == Time(state.hour, state.minute, 0) }) {
                                     dialogState = true
-                                    println("Dialog State: $dialogState")
                                     return@Button
                                 }
                                 onDismiss()
@@ -149,6 +148,7 @@ fun MyTimePickerDialog(
                     }
                 }
             }
+
             if (dialogState) {
                 AlertDialog(
                     onDismissRequest = { dialogState = false },

@@ -1,24 +1,28 @@
 package com.gradle.apiCalls
 
-import io.ktor.client.*
-import io.ktor.client.engine.android.*
-import io.ktor.client.request.*
+import com.google.gson.JsonParser
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.android.Android
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.headers
+import io.ktor.client.request.patch
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.append
+import io.ktor.http.isSuccess
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
-import kotlinx.serialization.json.Json
-import com.google.gson.JsonParser
 import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
-@OptIn(DelicateCoroutinesApi::class)
 class User {
 
     private val host: String = "https://dev-cog1thu33l6uz3pp.us.auth0.com"
-    //TODO: Hide if possible.
     private val client = HttpClient(Android) {
         install(ContentNegotiation) {
             json(Json {
@@ -41,7 +45,6 @@ class User {
                             append(HttpHeaders.ContentType, ContentType.Application.Json)
                         }
                         setBody(
-                            //TODO: Figure out why R.string.com_auth0_api_client_id displays a different value.
                             Json.encodeToString(mapOf(
                                 "client_id" to "ZWR8P2MkE3FUeUqYahfIkVzSpyoEPXzE",
                                 "client_secret" to "pV_iHLgnnoHEyD0PLoSDn7wlBzWKDevjIpVufXy1eIS_ICUlQ9uVvOWnGoi2m3TK",

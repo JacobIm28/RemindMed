@@ -2,7 +2,6 @@ package com.gradle.ui.viewModels
 
 import androidx.compose.runtime.mutableStateOf
 import com.gradle.models.MedicationList
-import com.gradle.ui.viewModels.ISubscriber
 
 class MedicationListViewModel(val model: MedicationList) : ISubscriber {
     val medicationList = mutableStateOf(model.medicationList)

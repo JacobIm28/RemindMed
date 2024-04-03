@@ -1,10 +1,7 @@
 package com.gradle.ui.views.patient
+
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.ui.graphics.Color
-//import com.gradle.models.Medication
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -23,11 +20,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,45 +39,34 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-//import androidx.hilt.navigation.compose.hiltViewModel
-import com.gradle.models.CalendarModel
-import com.gradle.utilities.CalendarDataSource
-import com.gradle.utilities.toFormattedDateShortString
-import com.gradle.utilities.toFormattedDateString
-import com.gradle.utilities.toFormattedMonthDateString
 import com.example.remindmed.R
+import com.gradle.apiCalls.PatientApi
 import com.gradle.constants.GlobalObjects
 import com.gradle.controller.MedicationController
+import com.gradle.models.CalendarModel
 import com.gradle.models.DateModel
 import com.gradle.models.Medication
 import com.gradle.models.Patient
 import com.gradle.ui.theme.AppTheme
 import com.gradle.ui.viewModels.MedicationViewModel
 import com.gradle.ui.views.shared.MedicationViewEvent
+import com.gradle.utilities.CalendarDataSource
+import com.gradle.utilities.toFormattedDateShortString
+import com.gradle.utilities.toFormattedDateString
+import com.gradle.utilities.toFormattedMonthDateString
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
-//import com.google.accompanist.permissions.ExperimentalPermissionsApi
-//import com.google.accompanist.permissions.isGranted
-//import com.google.accompanist.permissions.rememberPermissionState
 import java.util.Calendar
 import java.util.Date
 import java.util.concurrent.TimeUnit
 
-import com.gradle.apiCalls.PatientApi as PatientApi
-
-
-//class Prescription (
-//    val name: String,
-//    val amount: String,
-//    val times: List<String>
-//)
-
 @Composable
-fun MedicationItem(
+fun HomeMedicationItem(
     medication: Medication,
     taken: Boolean = false,
     enabled: Boolean = true,
@@ -112,7 +97,10 @@ fun MedicationItem(
                 Text(medication.name, fontWeight = FontWeight.Bold)
                 Text("Dosage: ${medication.amount}", style = MaterialTheme.typography.bodyMedium)
 
-                Text("Time: ${medication.getFormattedTimes()}", style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    "Time: ${medication.getFormattedTimes()}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
             Checkbox(
                 checked = taken,
@@ -134,8 +122,8 @@ fun MedicationListHomeScreen(
     notTakenMedications: List<Medication>,
     onCheckedChange: (Medication, Boolean) -> Unit
 ) {
-    val isToday = selectedDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate() == LocalDate.now()
-
+    val isToday =
+        selectedDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate() == LocalDate.now()
 
     val updatedTakenMedications = if (!isToday) {
         emptyList()
@@ -148,33 +136,48 @@ fun MedicationListHomeScreen(
         notTakenMedications
     }
     Column {
-        Text("Taken:", modifier = Modifier.padding(8.dp),style = MaterialTheme.typography.titleMedium)
+        Text(
+            "Taken:",
+            modifier = Modifier.padding(8.dp),
+            style = MaterialTheme.typography.titleMedium
+        )
         HorizontalDivider(modifier = Modifier.padding(8.dp))
 
         updatedTakenMedications.forEach { medication ->
-            MedicationItem(medication = medication, taken = true, enabled = isToday, onCheckedChange = { isChecked ->
-                onCheckedChange(medication, isChecked)
-            })
+            HomeMedicationItem(
+                medication = medication,
+                taken = true,
+                enabled = isToday,
+                onCheckedChange = { isChecked ->
+                    onCheckedChange(medication, isChecked)
+                })
         }
         Spacer(modifier = Modifier.height(16.dp))
-        Text("Not Finished:", modifier = Modifier.padding(8.dp), style = MaterialTheme.typography.titleMedium)
+        Text(
+            "Not Finished:",
+            modifier = Modifier.padding(8.dp),
+            style = MaterialTheme.typography.titleMedium
+        )
         HorizontalDivider(modifier = Modifier.padding(8.dp))
 
         updatedNotTakenMedications.forEach { medication ->
-            MedicationItem(medication = medication, taken = false, enabled = isToday, onCheckedChange = { isChecked ->
-                if (!isToday) {
-                    onCheckedChange(medication, false)
-                } else {
-                    onCheckedChange(medication, isChecked)
-                }
-            })
+            HomeMedicationItem(
+                medication = medication,
+                taken = false,
+                enabled = isToday,
+                onCheckedChange = { isChecked ->
+                    if (!isToday) {
+                        onCheckedChange(medication, false)
+                    } else {
+                        onCheckedChange(medication, isChecked)
+                    }
+                })
         }
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
-//fun HomeScreen(viewModel: HomepageViewModel, controller: HomepageController) {
 fun HomeScreen() {
     var takenMedications by remember { mutableStateOf(listOf<Medication>()) }
     var notTakenMedications by remember { mutableStateOf(listOf<Medication>()) }
@@ -196,7 +199,11 @@ fun HomeScreen() {
         patient = PatientApi().getPatientbyId(GlobalObjects.patient.pid)
         medications = PatientApi().getMedicines(GlobalObjects.patient.pid)
         medicationsToday = medications.filter { medication ->
-            (selectedDate >= medication.startDate && selectedDate < Date(medication.endDate.time + TimeUnit.DAYS.toMillis(1)))
+            (selectedDate >= medication.startDate && selectedDate < Date(
+                medication.endDate.time + TimeUnit.DAYS.toMillis(
+                    1
+                )
+            ))
         }
 
 //        medicationsToday.map { medication ->
@@ -224,16 +231,13 @@ fun HomeScreen() {
     }
 
     AppTheme {
-        Scaffold(
-        ) { innerPadding ->
+        Scaffold { innerPadding ->
             Box(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 Column(modifier = Modifier.padding(innerPadding)) {
 
                     DatesHeader(
                         onDateSelected = { newSelectedDate ->
-                            selectedDate =
-                                newSelectedDate // LOW PRIORITY: need to restrict it so that medications for days other than today cannot be marked taken,
-                            // user can only "take" medications for the current date, selecting a new date just allows for user to see what medications they have for that day
+                            selectedDate = newSelectedDate
                         }
                     )
                     DailyOverviewCard(medicationsToday, greeting, patient)
@@ -242,7 +246,7 @@ fun HomeScreen() {
                     MedicationListHomeScreen(
                         takenMedications = takenMedications,
                         notTakenMedications = notTakenMedications,
-                                selectedDate = selectedDate
+                        selectedDate = selectedDate
                     ) { medication, isChecked ->
                         val medicationViewModel = MedicationViewModel(medication)
                         val medicationController = MedicationController(medication)
@@ -257,7 +261,10 @@ fun HomeScreen() {
 //                            medication.taken = false
                             medicationController.invoke(MedicationViewEvent.TakenEvent, false)
                         }
-                        medicationController.invoke(MedicationViewEvent.UpdateEvent, medicationViewModel)
+                        medicationController.invoke(
+                            MedicationViewEvent.UpdateEvent,
+                            medicationViewModel
+                        )
                     }
                 }
             }
@@ -265,7 +272,6 @@ fun HomeScreen() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DailyOverviewCard(
     medicationsToday: List<Medication>,
@@ -331,7 +337,7 @@ fun DailyOverviewCard(
 fun DatesHeader(
     onDateSelected: (Date) -> Unit
 ) {
-    var dataSource by remember { mutableStateOf(CalendarDataSource())}
+    var dataSource by remember { mutableStateOf(CalendarDataSource()) }
     var calendarModel by remember { mutableStateOf(dataSource.getData(lastSelectedDate = dataSource.today)) }
 
     LaunchedEffect(Unit) {
@@ -351,7 +357,10 @@ fun DatesHeader(
                     add(Calendar.DAY_OF_YEAR, -2)
                 }
                 val finalStartDate = calendar.time
-                calendarModel = dataSource.getData(startDate = finalStartDate, lastSelectedDate = calendarModel.selectedDate.date)
+                calendarModel = dataSource.getData(
+                    startDate = finalStartDate,
+                    lastSelectedDate = calendarModel.selectedDate.date
+                )
             },
             onNextClickListener = { endDate ->
                 val calendar = Calendar.getInstance().apply {
@@ -359,7 +368,10 @@ fun DatesHeader(
                     add(Calendar.DAY_OF_YEAR, 2)
                 }
                 val finalStartDate = calendar.time
-                calendarModel = dataSource.getData(startDate = finalStartDate, lastSelectedDate = calendarModel.selectedDate.date)
+                calendarModel = dataSource.getData(
+                    startDate = finalStartDate,
+                    lastSelectedDate = calendarModel.selectedDate.date
+                )
             }
         )
         DateList(
@@ -405,7 +417,7 @@ fun DateHeader(
             onPrevClickListener(data.startDate.date)
         }) {
             Icon(
-                imageVector = Icons.Filled.KeyboardArrowLeft,
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                 tint = MaterialTheme.colorScheme.primary,
                 contentDescription = "Back"
             )
@@ -414,7 +426,7 @@ fun DateHeader(
             onNextClickListener(data.endDate.date)
         }) {
             Icon(
-                imageVector = Icons.Filled.KeyboardArrowRight,
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 tint = MaterialTheme.colorScheme.primary,
                 contentDescription = "Next"
             )

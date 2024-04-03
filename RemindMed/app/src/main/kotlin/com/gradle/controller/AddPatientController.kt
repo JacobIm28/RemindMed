@@ -36,7 +36,6 @@ class AddPatientController(val model: AddPatient) {
                     model.showDialog = true
                     model.addPatientDialogMessage = "Unfortunately, this patient is already under your care"
                 } else {
-                    // it is a valid patient to add
                     model.patientAlreadyUnderDoctor = false
                     model.currPatient = potentialPatient
                     model.submitEnabled = true

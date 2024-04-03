@@ -18,17 +18,11 @@ class MedicationController(val model: Medication) {
         when(event) {
             MedicationViewEvent.MedicationIdEvent -> {
                 val medicationResult = MedicationApi().getMedicationbyName(value as String)
-                println("MEDICATION ID $medicationResult")
                 if (medicationResult != null && medicationResult.has("results")) {
                     val resultsArray = medicationResult.getAsJsonArray("results")
                     if (resultsArray.size() > 0) {
                         model.medicationId = resultsArray[0].asJsonObject["id"].asString
-                        println("MEDICATION ID $model.medicationId")
-                    } else {
-                        println("Results array is empty")
                     }
-                } else {
-                    println("Medication result is null or does not contain 'results' field")
                 }
             }
             MedicationViewEvent.NameEvent -> model.name = value as String
@@ -36,7 +30,6 @@ class MedicationController(val model: Medication) {
             MedicationViewEvent.StartDateEvent -> model.startDate = value as Date
             MedicationViewEvent.EndDateEvent -> model.endDate = value as Date
             MedicationViewEvent.NotesEvent -> model.notes = value as String
-
             MedicationViewEvent.TimeEvent -> model.times = value as MutableList<Time>
             MedicationViewEvent.AcceptedEvent -> model.accepted = value as Boolean
             MedicationViewEvent.TakenEvent -> model.taken = value as Boolean

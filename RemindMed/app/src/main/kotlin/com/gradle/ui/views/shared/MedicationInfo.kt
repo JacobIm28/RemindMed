@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.google.gson.JsonObject
+import com.gradle.apiCalls.MedicationApi
 import com.gradle.constants.medicationInfoBlacklist
 import com.gradle.ui.components.BoldText
 import com.gradle.ui.components.HeadlineLarge
@@ -38,19 +39,20 @@ import com.gradle.ui.components.ToggleList
 import com.gradle.ui.theme.AppTheme
 import com.gradle.utilities.formatJSONKey
 import kotlinx.coroutines.delay
-import com.gradle.apiCalls.MedicationApi as MedicationApi
 
 @RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun MedicationInfoScreen(medicationName: String, startDate: String, endDate: String, dosage: String) {
-    // TODO: Get medication as a prop passed in from medication card
+fun MedicationInfoScreen(
+    medicationName: String,
+    startDate: String,
+    endDate: String,
+    dosage: String
+) {
     var medicationInfo by remember { mutableStateOf<JsonObject?>(null) }
-
     var isLoading by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
-        println("Fetching Medication Info for " + medicationName)
         delay(1)
         val result: JsonObject = MedicationApi().getMedicationbyName(medicationName)
         if (result.size() > 0) {
@@ -59,24 +61,20 @@ fun MedicationInfoScreen(medicationName: String, startDate: String, endDate: Str
         isLoading = false
     }
 
-    AppTheme (
-
-    ) {
+    AppTheme {
         Scaffold { padding ->
-            Column (modifier = Modifier
-                .padding(padding)
-                .verticalScroll(rememberScrollState())) {
+            Column(
+                modifier = Modifier
+                    .padding(padding)
+                    .verticalScroll(rememberScrollState())
+            ) {
                 if (isLoading || medicationInfo == null) {
                     LoadingScreen()
                 } else {
-//                IconButton(onClick = { navController.navigate(Routes.MEDICATION_EDIT) }) {
-//                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-//                }
-
                     TitleLarge(text = medicationName)
-                    Column() {
+                    Column {
                         HeadlineLarge(text = "Your prescription")
-                        Card (
+                        Card(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .border(1.dp, Color.LightGray, RoundedCornerShape(15.dp)),
@@ -89,31 +87,41 @@ fun MedicationInfoScreen(medicationName: String, startDate: String, endDate: Str
                         ) {
                             Row(
                                 modifier = Modifier
-                                    .fillMaxWidth().padding(20.dp)
+                                    .fillMaxWidth()
+                                    .padding(20.dp)
                             ) {
                                 Column(verticalArrangement = Arrangement.SpaceBetween) {
-                                    Row (horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+                                    Row(
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
                                         BoldText(text = "Dosage: ")
                                         Text(text = dosage)
                                     }
-                                    Row (horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+                                    Row(
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
                                         BoldText(text = "Start date: ")
                                         Text(text = startDate)
                                     }
-                                    Row (horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+                                    Row(
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
                                         BoldText(text = "End date: ")
                                         Text(text = endDate)
                                     }
                                 }
                             }
                         }
-
                     }
                     Spacer(modifier = Modifier.size(10.dp))
 
                     HeadlineLarge(text = "Information")
+
                     medicationInfo?.let { info ->
-                        info.keySet()?.forEach() {
+                        info.keySet()?.forEach {
                             if (!medicationInfoBlacklist.contains(it) && info[it].isJsonArray && info[it].asJsonArray.size() == 1) {
                                 ToggleList(
                                     header = formatJSONKey(it),

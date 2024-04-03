@@ -6,7 +6,6 @@ import java.util.Calendar
 import java.util.Date
 
 class CalendarDataSource {
-
     val today: Date
         get() {
             return Date()

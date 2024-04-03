@@ -5,8 +5,8 @@ import androidx.compose.material3.TimePickerState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import com.gradle.models.Medication
-import java.sql.Time
 import java.sql.Date
+import java.sql.Time
 
 @OptIn(ExperimentalMaterial3Api::class)
 class MedicationViewModel(val model: Medication) : ISubscriber {
@@ -50,7 +50,6 @@ class MedicationViewModel(val model: Medication) : ISubscriber {
         accepted.value = false
         taken.value = false
     }
-
 
     fun clearTimePickerState() {
         _timeStates.clear()

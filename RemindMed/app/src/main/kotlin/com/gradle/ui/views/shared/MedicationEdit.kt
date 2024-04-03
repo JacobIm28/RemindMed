@@ -1,5 +1,6 @@
 package com.gradle.ui.views.shared
 
+
 import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -13,52 +14,46 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-
-
-import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.gradle.apiCalls.PatientApi as PatientApi
-
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.gradle.apiCalls.MedicationApi
+import com.gradle.apiCalls.PatientApi
 import com.gradle.constants.GlobalObjects
+import com.gradle.controller.MedicationController
+import com.gradle.models.Medication
 import com.gradle.ui.components.ButtonSecondary
 import com.gradle.ui.components.CustomDatePicker
 import com.gradle.ui.components.CustomTimePicker
 import com.gradle.ui.components.MedicationSummaryCard
 import com.gradle.ui.components.TitleLarge
 import com.gradle.ui.theme.AppTheme
-import java.sql.Date
-import java.sql.Time
-
-import com.gradle.apiCalls.MedicationApi as MedicationApi
-import com.gradle.models.Medication as Medication
-
-import com.gradle.controller.MedicationController
 import com.gradle.ui.viewModels.MedicationViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.sql.Date
+import java.sql.Time
 import java.util.concurrent.TimeUnit
-
 
 @RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -108,17 +103,11 @@ fun MedicationEditScreen(
         medicationViewModel?.timeStates = medicationViewModel?._timeStates?: emptyList()
 
         times = medicationViewModel?.times?.value?: emptyList()
-
     }
 
-
     val showAddMedicationErrorDialog = remember { mutableStateOf(false) }
-
     val showValidationErrorDialog = remember { mutableStateOf(false) }
-
     val showDuplicateMedicationErrorDialog = remember { mutableStateOf(false) }
-
-
     val showDateInvalidRangeErrorDialog = remember { mutableStateOf(false) }
 
     if (showAddMedicationErrorDialog.value) {
@@ -159,6 +148,7 @@ fun MedicationEditScreen(
             }
         )
     }
+
     if (showDateInvalidRangeErrorDialog.value) {
         AlertDialog(
             onDismissRequest = { showDateInvalidRangeErrorDialog.value = false },
@@ -210,7 +200,6 @@ fun MedicationEditScreen(
                 Column {
                     medicationViewModel.timeStates.forEachIndexed { index, timeState ->
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            println("TIME STATE" + timeState.hour)
                             CustomTimePicker(medicationViewModel, timeState)
                             Spacer(modifier = Modifier.width(8.dp))
                             if (medicationViewModel.timeStates.size > 1) {
@@ -258,6 +247,7 @@ fun MedicationEditScreen(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.S)
     @SuppressLint("SuspiciousIndentation")
     @Composable
     fun MedicationSearchBar(
@@ -265,7 +255,6 @@ fun MedicationEditScreen(
         suggestions: List<String>
     ) {
         var expanded by remember { mutableStateOf(false) }
-
         var suggestionClicked by remember { mutableStateOf(false) }
 
         DisposableEffect(Unit) {
@@ -323,7 +312,6 @@ fun MedicationEditScreen(
                                             MedicationViewEvent.NameEvent,
                                             suggestion
                                         )
-                                        println(medicationViewModel?.name?.value)
 
                                         medicationController?.invoke(
                                             MedicationViewEvent.MedicationIdEvent,
@@ -340,7 +328,6 @@ fun MedicationEditScreen(
                                 style = MaterialTheme.typography.bodySmall,
                                 color = Color.Black,
                                 textAlign = TextAlign.Start
-
                             )
                             HorizontalDivider(color = Color.Gray)
                         }
@@ -399,10 +386,8 @@ fun MedicationEditScreen(
                 }
             }
 
-
             Spacer(modifier = Modifier.height(16.dp))
 
-            println(medicationViewModel != null)
             TimeInput(medicationViewModel?: MedicationViewModel(medication?: Medication("", "", "", Date(0L), Date(0L), "", "", mutableListOf(), false, false)))
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -457,9 +442,6 @@ fun MedicationEditScreen(
                                 if (startDate != null && endDate != null && startDate > endDate) {
                                     showDateInvalidRangeErrorDialog.value = true
                                 } else {
-                                    // if pass error checks proceed with adding the medication
-                                    println("MEDICATION HERE")
-
                                     medicationController?.invoke(
                                         MedicationViewEvent.TimeEvent,
                                         medicationViewModel?.getSelectedTimes()

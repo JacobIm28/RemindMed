@@ -12,14 +12,8 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationManagerCompat
 import com.gradle.models.Medication
 import com.gradle.models.Patient
-import com.gradle.utilities.toFormattedDateString
-import io.ktor.util.date.getTimeMillis
 import java.sql.Date
 import java.sql.Time
-import java.time.LocalDate
-import kotlin.time.Duration.Companion.days
-
-//import java.util.Calendar.kt
 
 class NotificationUtils {
 
@@ -31,7 +25,7 @@ class NotificationUtils {
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
             if (notificationServicePermission(context)) {
-                if (alarmManager.canScheduleExactAlarms() == false) {
+                if (!alarmManager.canScheduleExactAlarms()) {
                     Intent().also { intent ->
                         intent.action = Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
                         context.startActivity(intent)
@@ -119,18 +113,11 @@ class NotificationUtils {
             return true
         }
 
-        fun dayOfYear(epochMilliseconds: Long): Int {
-            // Convert epoch milliseconds to java.sql.Time
-            val time = Time(epochMilliseconds)
-
-            // Convert java.sql.Time to java.util.Date
+        fun dayOfYear(millis: Long): Int {
+            val time = Time(millis)
             val date = Date(time.time)
-
-            // Convert java.util.Date to Calendar
             val calendar = Calendar.getInstance()
             calendar.time = date
-
-            // Extract day of the year
             return calendar.get(Calendar.DAY_OF_YEAR)
         }
     }

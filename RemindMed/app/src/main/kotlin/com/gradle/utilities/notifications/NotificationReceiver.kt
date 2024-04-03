@@ -10,22 +10,19 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.example.remindmed.R
+import com.gradle.apiCalls.PatientApi
 import com.gradle.constants.CHANNEL_ID
-import com.gradle.models.Medication
-import java.util.Date
 import com.gradle.utilities.notifications.NotificationUtils.Companion.createPendingIntent
-import com.gradle.apiCalls.PatientApi as PatientApi
+import java.util.Date
 
 class NotificationReceiver: BroadcastReceiver() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onReceive(context: Context, intent: Intent) {
-        println("Sending notification")
+        println("Received notification broadcast")
 
         var pid = intent.getStringExtra("pid")
         var mid = intent.getStringExtra("mid")
-        Medication
-
 
         if (pid == null || mid == null) {
             return
