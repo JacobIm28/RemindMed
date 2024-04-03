@@ -39,6 +39,7 @@ class AddPatientController(val model: AddPatient) {
                     // it is a valid patient to add
                     model.patientAlreadyUnderDoctor = false
                     model.currPatient = potentialPatient
+                    model.submitEnabled = true
                 }
             }
             AddPatientViewEvent.AddPatientEvent -> {
@@ -52,6 +53,7 @@ class AddPatientController(val model: AddPatient) {
                     model.addPatientDialogMessage = "Unfortunately could not add patient"
                     model.showDialog = true
                 }
+                model.submitEnabled = false
             }
             AddPatientViewEvent.DialogClose -> {
                 model.showDialog = false

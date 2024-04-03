@@ -14,6 +14,7 @@ class AddPatientViewModel(val model: AddPatient) : ISubscriber {
     var patientAlreadyUnderDoctor = mutableStateOf(model.patientAlreadyUnderDoctor)
     var showDialog = mutableStateOf(model.showDialog)
     var addPatientDialogMessage = mutableStateOf(model.addPatientDialogMessage)
+    var submitEnabled = mutableStateOf(model.submitEnabled)
 
     init {
         model.subscribe(this)
@@ -28,5 +29,6 @@ class AddPatientViewModel(val model: AddPatient) : ISubscriber {
         patientAlreadyUnderDoctor.value = model.patientAlreadyUnderDoctor
         showDialog.value = model.showDialog
         addPatientDialogMessage.value = model.addPatientDialogMessage
+        submitEnabled.value = model.submitEnabled
     }
 }
