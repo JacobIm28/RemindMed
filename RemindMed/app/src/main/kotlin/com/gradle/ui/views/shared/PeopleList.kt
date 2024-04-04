@@ -61,6 +61,7 @@ fun PeopleListScreen(onNavigateToMedicationList: (String) -> Unit, LoginModel: L
             viewModel.patientList.value = DoctorApi().getPatients(GlobalObjects.doctor.did)
             doctorName = DoctorApi().getDoctor(GlobalObjects.doctor.did).name
         } else {
+            viewModel.doctorList.value = PatientApi().getDoctors(GlobalObjects.patient.pid)
             patientName = PatientApi().getPatientbyId(GlobalObjects.patient.pid).name
         }
         isLoading = false
