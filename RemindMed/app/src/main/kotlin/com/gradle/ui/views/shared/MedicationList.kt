@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
@@ -84,11 +83,13 @@ fun MedicationListScreen(
     AppTheme {
         Scaffold(
             floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { onNavigateToMedicationEntry(pid) },
-                    containerColor = MaterialTheme.colorScheme.primary
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = "Add Medication")
+                if (GlobalObjects.type == "doctor") {
+                    FloatingActionButton(
+                        onClick = { onNavigateToMedicationEntry(pid) },
+                        containerColor = MaterialTheme.colorScheme.primary
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = "Add Medication")
+                    }
                 }
             },
         ) { padding ->
@@ -164,28 +165,32 @@ fun MedicationItem(
             )
             Spacer(modifier = Modifier.width(12.dp))
             Column(
-                modifier = Modifier.weight(1f) // Ensure the column occupies remaining space
+                modifier = Modifier.weight(1f)
             ) {
                 Text("Medication: ${medication.name}", fontWeight = FontWeight.Bold)
                 Text("Dosage: ${medication.amount}", style = MaterialTheme.typography.bodyMedium)
-                Text("Dates: ${medication.startDate} - ${medication.endDate}", style = MaterialTheme.typography.bodyMedium)
-                Text("Times: ${medication.getFormattedTimes()}", style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    "Dates: ${medication.startDate} - ${medication.endDate}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    "Times: ${medication.getFormattedTimes().joinToString(", ")}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
                 Text("Notes: ${medication.notes}", style = MaterialTheme.typography.bodyMedium)
-                // may just remove field from showing up if value is empty
             }
 
-            // Buttons column
             Column {
                 if (accepted) {
                     IconButton(onClick = {
                         showDialog = true
-                    }) { // Set showDialog to true when remove icon clicked
+                    }) {
                         Icon(Icons.Filled.Clear, contentDescription = "Delete")
                     }
                     IconButton(onClick = { onNavigateToMedicationEdit(medication) }) {
                         Icon(Icons.Filled.Edit, contentDescription = "Edit")
                     }
-                } else {
+                } else if (GlobalObjects.type == "patient") {
                     IconButton(
                         onClick = { showDialog = true }
                     ) {
