@@ -200,7 +200,7 @@ fun MedicationEditScreen(
                 Column {
                     medicationViewModel.timeStates.forEachIndexed { index, timeState ->
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            CustomTimePicker(medicationViewModel, timeState)
+                            CustomTimePicker(medicationViewModel, timeState, true)
                             Spacer(modifier = Modifier.width(8.dp))
                             if (medicationViewModel.timeStates.size > 1) {
                                 IconButton(

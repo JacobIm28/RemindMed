@@ -11,6 +11,7 @@ import kotlinx.coroutines.runBlocking
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.serialization.json.Json
 
 @OptIn(DelicateCoroutinesApi::class)

@@ -15,7 +15,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ExitToApp
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -52,7 +54,7 @@ enum class ProfileViewEvent {
     LogoutConfirmed
 }
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("RememberReturnType", "UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun ProfileScreen(
@@ -71,7 +73,6 @@ fun ProfileScreen(
     }
     var viewModel by remember { mutableStateOf(doctorModel) }
     var controller by remember { mutableStateOf(doctorController) }
-
     LaunchedEffect(Unit) {
         val doctor: Doctor = DoctorApi().getDoctor(GlobalObjects.doctor.did)
         doctorModel = DoctorViewModel(doctor)
@@ -97,18 +98,21 @@ fun ProfileScreen(
                             fontWeight = FontWeight.Bold
                         )
                     )
-                    IconButton(onClick = {
-                        controller.invoke(
-                            ProfileViewEvent.LogoutClicked,
-                            ""
-                        )
-                    }) {
+                    Text(
+                        text = "Logout",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                    IconButton(
+                        onClick = { controller.invoke(ProfileViewEvent.LogoutClicked, "") }
+                    ) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Outlined.ExitToApp,
+                            imageVector = Icons.Outlined.ExitToApp,
                             tint = MaterialTheme.colorScheme.primary,
                             contentDescription = "Back"
                         )
                     }
+
                 }
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -127,15 +131,10 @@ fun ProfileScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Row(modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                    ButtonPrimary(
-                        "Submit",
-                        {
-                            controller.invoke(ProfileViewEvent.UpdateEvent, "")
-                        },
-                        viewModel.submitEnabled.value
-                    )
+                    ButtonPrimary("Submit", {
+                        controller.invoke(ProfileViewEvent.UpdateEvent, "")
+                    }, viewModel.submitEnabled.value)
                 }
-
                 Spacer(modifier = Modifier.height(16.dp))
 
                 if (viewModel.changesSubmitted.value && viewModel.successfulChange.value) {
@@ -143,11 +142,12 @@ fun ProfileScreen(
                         onDismissRequest = { controller.invoke(ProfileViewEvent.DismissEvent, "") },
                         text = { Text("Success!") },
                         confirmButton = {
-                            Button(
-                                onClick = {
-                                    controller.invoke(ProfileViewEvent.DismissEvent, "")
-                                }
-                            ) {
+                            Button(onClick = {
+                                controller.invoke(
+                                    ProfileViewEvent.DismissEvent,
+                                    ""
+                                )
+                            }) {
                                 Text("OK")
                             }
                         }
@@ -217,6 +217,7 @@ fun ProfileScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("RememberReturnType", "UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun ProfileScreen(
@@ -245,9 +246,11 @@ fun ProfileScreen(
 
     AppTheme {
         Box(modifier = Modifier.verticalScroll(rememberScrollState())) {
-            Column(modifier = Modifier
-                .padding()
-                .fillMaxWidth()) {
+            Column(
+                modifier = Modifier
+                    .padding()
+                    .fillMaxWidth()
+            ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
@@ -262,6 +265,12 @@ fun ProfileScreen(
                             fontWeight = FontWeight.Bold
                         )
                     )
+                    Text(
+                        text = "Logout",
+                        style = MaterialTheme.typography.titleSmall,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+
                     IconButton(onClick = {
                         controller.invoke(
                             ProfileViewEvent.LogoutClicked,
@@ -269,7 +278,7 @@ fun ProfileScreen(
                         )
                     }) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Outlined.ExitToApp,
+                            imageVector = Icons.Outlined.ExitToApp,
                             tint = MaterialTheme.colorScheme.primary,
                             contentDescription = "Back"
                         )

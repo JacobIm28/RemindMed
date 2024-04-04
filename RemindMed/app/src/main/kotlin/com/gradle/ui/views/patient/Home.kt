@@ -20,10 +20,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -125,6 +128,7 @@ fun MedicationListHomeScreen(
     val isToday =
         selectedDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate() == LocalDate.now()
 
+
     val updatedTakenMedications = if (!isToday) {
         emptyList()
     } else {
@@ -135,6 +139,7 @@ fun MedicationListHomeScreen(
     } else {
         notTakenMedications
     }
+
     Column {
         Text(
             "Taken:",
@@ -191,9 +196,6 @@ fun HomeScreen() {
     var patient by remember { mutableStateOf(Patient("")) }
     var greeting by remember { mutableStateOf("") }
 
-    var medicationViewModel by remember { mutableStateOf<MedicationViewModel?>(null) }
-    var medicationController by remember { mutableStateOf<MedicationController?>(null) }
-
     LaunchedEffect(Unit) {
         selectedDate = Calendar.getInstance().time
         patient = PatientApi().getPatientbyId(GlobalObjects.patient.pid)
@@ -206,13 +208,6 @@ fun HomeScreen() {
             ))
         }
 
-//        medicationsToday.map { medication ->
-//            MedicationViewModel(medication)
-//        }.also { medicationViewModelList ->
-//            medicationViewModelList.forEach { medicationViewModel ->
-//                 medicationViewModelList.add(medicationViewModel)
-//            }
-//        }
         medicationsToday.forEach { medication ->
             medicationViewModelList.add(MedicationViewModel(medication))
         }
@@ -230,14 +225,40 @@ fun HomeScreen() {
         }
     }
 
+    LaunchedEffect(selectedDate) {
+        medicationsToday = medications.filter { medication ->
+            (selectedDate >= medication.startDate && selectedDate < Date(
+                medication.endDate.time + TimeUnit.DAYS.toMillis(
+                    1
+                )
+            ))
+        }
+        var isToday =
+            selectedDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate() == LocalDate.now()
+        takenMedications = if (!isToday) {
+            emptyList()
+        } else {
+            medicationsToday.filter { medication ->
+                medication.taken == true
+            }
+        }
+        notTakenMedications = if (!isToday) {
+            medicationsToday
+        } else {
+            medicationsToday.filter { medication ->
+                medication.taken == false
+            }
+        }
+    }
+
     AppTheme {
         Scaffold { innerPadding ->
             Box(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 Column(modifier = Modifier.padding(innerPadding)) {
-
                     DatesHeader(
                         onDateSelected = { newSelectedDate ->
-                            selectedDate = newSelectedDate
+                            selectedDate =
+                                newSelectedDate
                         }
                     )
                     DailyOverviewCard(medicationsToday, greeting, patient)
@@ -272,6 +293,7 @@ fun HomeScreen() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DailyOverviewCard(
     medicationsToday: List<Medication>,
@@ -417,7 +439,7 @@ fun DateHeader(
             onPrevClickListener(data.startDate.date)
         }) {
             Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                imageVector = Icons.Filled.KeyboardArrowLeft,
                 tint = MaterialTheme.colorScheme.primary,
                 contentDescription = "Back"
             )
@@ -426,7 +448,7 @@ fun DateHeader(
             onNextClickListener(data.endDate.date)
         }) {
             Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                imageVector = Icons.Filled.KeyboardArrowRight,
                 tint = MaterialTheme.colorScheme.primary,
                 contentDescription = "Next"
             )
@@ -479,7 +501,6 @@ fun DateList(
                             fontWeight = FontWeight.Bold
                         )
                     }
-
                 }
                 Text(
                     text = data.monthNames[date.date.month.plus(1)] ?: "",

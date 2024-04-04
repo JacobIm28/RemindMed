@@ -8,9 +8,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.material.Text
+import com.gradle.ui.components.TitleLarge
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.AlertDialog
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,10 +26,14 @@ import androidx.compose.ui.unit.dp
 import com.gradle.apiCalls.DoctorApi
 import com.gradle.apiCalls.PatientApi
 import com.gradle.constants.GlobalObjects
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.unit.dp
 import com.gradle.controller.PeopleListController
 import com.gradle.models.PeopleList
 import com.gradle.ui.components.DoctorItem
 import com.gradle.ui.components.LoadingScreen
+import com.gradle.ui.components.PatientItem
+import com.gradle.ui.components.TitleLarge
 import com.gradle.ui.components.PeopleListPatientItem
 import com.gradle.ui.components.TitleLarge
 import com.gradle.ui.theme.AppTheme
@@ -65,6 +72,10 @@ fun PeopleListScreen(onNavigateToMedicationList: (String) -> Unit, LoginModel: L
         } else {
             LazyColumn(modifier = Modifier.padding()) {
                 if (GlobalObjects.type == "doctor") {
+                    item {
+                        TitleLarge("${doctorName.substringBefore(" ")}'s Patients")
+                        HorizontalDivider()
+                    }
                     if (viewModel.patientList.value.isEmpty()) {
                         item {
                             Spacer(modifier = Modifier.height(20.dp))

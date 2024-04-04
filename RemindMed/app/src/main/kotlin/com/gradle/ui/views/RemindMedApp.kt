@@ -8,7 +8,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.automirrored.rounded.List
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Person
@@ -21,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -75,6 +77,11 @@ fun RemindMedApp(loginModel: LoginViewModel) {
             route = Routes.MEDICATION_LIST + "?${NavArguments.MEDICATION_LIST.PID}=${GlobalObjects.patient.pid}"
         ),
         NavigationItem(
+            icon = Icons.Default.AddCircle,
+            label = "Add Med",
+            route = Routes.MEDICATION_ENTRY + "?${NavArguments.MEDICATION_ENTRY.PID}=${GlobalObjects.patient.pid}"
+        ),
+        NavigationItem(
             icon = Icons.Rounded.Person,
             label = "Doctors",
             route = Routes.PEOPLE_LIST
@@ -93,7 +100,7 @@ fun RemindMedApp(loginModel: LoginViewModel) {
             route = Routes.PEOPLE_LIST,
         ),
         NavigationItem(
-            icon = Icons.Default.Add,
+            icon = Icons.Default.AddCircle,
             label = "Add Patients",
             route = Routes.ADD_PATIENT
         ),
@@ -146,7 +153,8 @@ fun RemindMedApp(loginModel: LoginViewModel) {
         Scaffold(
             bottomBar = {
                 BottomNavigation(
-                    backgroundColor = MaterialTheme.colorScheme.tertiary
+                    backgroundColor = MaterialTheme.colorScheme.tertiary,
+                    modifier = Modifier.padding(horizontal = 0.dp, vertical = 0.dp)
                 ) {
 
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -154,17 +162,18 @@ fun RemindMedApp(loginModel: LoginViewModel) {
 
                     navBarItems.forEach { navItem ->
                         BottomNavigationItem(
+                            modifier = Modifier.padding(horizontal = 0.dp, vertical = 0.dp),
                             icon = {
                                 Icon(
                                     navItem.icon,
                                     contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary
+                                    tint = MaterialTheme.colorScheme.primary,
                                 )
                             },
                             label = {
                                 Text(
                                     navItem.label,
-                                    style = MaterialTheme.typography.bodySmall,
+                                    style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
                                     maxLines = 1
                                 )
                             },
@@ -369,7 +378,7 @@ fun RemindMedApp(loginModel: LoginViewModel) {
                         MedicationEditScreen(
                             medicationId = backStackEntry.arguments?.getString(NavArguments.MEDICATION_EDIT.MEDICATION_ID)
                                 ?: "",
-                            patientId = backStackEntry.arguments?.getString(NavArguments.MEDICATION_ENTRY.PID)
+                            patientId = backStackEntry.arguments?.getString(NavArguments.MEDICATION_LIST.PID)
                                 ?: "",
                             onNavigateToPeopleList = { onNavigateToPeopleList() },
                             onNavigateToMedicationList = { pid: String ->
