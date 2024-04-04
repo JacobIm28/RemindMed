@@ -56,7 +56,7 @@ fun MedicationInfoScreen(
 
     LaunchedEffect(Unit) {
         delay(500)
-        val result: JsonObject = MedicationApi().getMedicationbyName(mid)
+        val result: JsonObject = MedicationApi().getMedicationbyId(mid)
         if (result.size() > 0) {
             medicationInfo = result["results"].asJsonArray[0].asJsonObject
         }
