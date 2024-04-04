@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.remindmed.R
 import com.gradle.apiCalls.PatientApi
@@ -99,6 +100,16 @@ fun MedicationListScreen(
                     .fillMaxWidth()
             ) {
                 TitleLarge("${patient.name.substringBefore(" ")}'s Medication")
+                if(viewModel.medicationList.value.isEmpty()) {
+                    Text(
+                        "No Medications found",
+                        modifier = Modifier.fillMaxSize().wrapContentHeight(),
+                        style = androidx.compose.material.MaterialTheme.typography.h6,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
                 HorizontalDivider()
                 LazyColumn {
                     items(viewModel.medicationList.value) { medication ->

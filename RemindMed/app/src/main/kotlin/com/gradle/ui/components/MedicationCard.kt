@@ -44,7 +44,6 @@ fun MedicationSummaryCard(name: String, dosage: String, time: String, dates: Str
                 Text("Dosage: $dosage", style = MaterialTheme.typography.bodyMedium)
                 Text("Dates: $dates", style = MaterialTheme.typography.bodyMedium)
                 Text("Times: $time", style = MaterialTheme.typography.bodyMedium)
-                Text("Notes: $specifications", style = MaterialTheme.typography.bodyMedium)
             }
         }
     }
