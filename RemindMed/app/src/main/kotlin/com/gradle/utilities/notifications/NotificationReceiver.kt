@@ -14,8 +14,9 @@ import com.gradle.apiCalls.PatientApi
 import com.gradle.constants.CHANNEL_ID
 import com.gradle.utilities.notifications.NotificationUtils.Companion.createPendingIntent
 import java.util.Date
+import kotlin.math.abs
 
-class NotificationReceiver: BroadcastReceiver() {
+class NotificationReceiver : BroadcastReceiver() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onReceive(context: Context, intent: Intent) {
@@ -27,17 +28,31 @@ class NotificationReceiver: BroadcastReceiver() {
         if (pid == null || mid == null) {
             return
         } else {
-            var result = PatientApi().getMedicines(pid)
-            var foundMedication = false
+            val medications = PatientApi().getMedicines(pid)
+            var sendNotification = false
 
-            for (med in result) {
+            for (med in medications) {
                 if (med.medicationId == intent.getStringExtra("mid")) {
-                    foundMedication = true
+                    val currentTime = Date(System.currentTimeMillis())
+                    sendNotification = true
+
+                    var foundTime = false
+                    for (time in med.times) {
+                        val timeDate = Date(time.time)
+                        if (abs(timeDate.minutes - currentTime.minutes) <= 5) {
+                            foundTime = true
+                            break
+                        }
+                    }
+                    if (!foundTime) {
+                        sendNotification = false
+                    }
+
                     break
                 }
             }
 
-            if (!foundMedication) {
+            if (!sendNotification) {
                 return
             }
         }
@@ -52,8 +67,10 @@ class NotificationReceiver: BroadcastReceiver() {
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         if (intent.getLongExtra("end", 0) < System.currentTimeMillis()) {
-            val pendingIntent = PendingIntent.getService(context, intent.getIntExtra("requestCode", 0), intent,
-                PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE)
+            val pendingIntent = PendingIntent.getService(
+                context, intent.getIntExtra("requestCode", 0), intent,
+                PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
+            )
             if (pendingIntent != null) {
                 NotificationUtils.cancelNotification(context, pendingIntent)
             }
@@ -67,7 +84,11 @@ class NotificationReceiver: BroadcastReceiver() {
                 intent.getStringExtra("pid"),
                 intent.getStringExtra("mid"),
             )
-            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 86400000, pendingIntent)
+            alarmManager.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                System.currentTimeMillis() + 86400000,
+                pendingIntent
+            )
         }
     }
 }

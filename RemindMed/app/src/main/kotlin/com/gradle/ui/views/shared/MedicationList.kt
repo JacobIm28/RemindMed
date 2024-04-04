@@ -44,6 +44,7 @@ import com.gradle.ui.viewModels.MedicationListViewModel
 import com.gradle.ui.viewModels.MedicationViewModel
 import com.gradle.utilities.notifications.NotificationUtils.Companion.scheduleNotifications
 import kotlinx.coroutines.launch
+import java.sql.Time
 
 enum class MedicationListViewEvent {
     MedicationRemove
@@ -178,7 +179,7 @@ fun MedicationItem(
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                Text("Medication: ${medication.name}", fontWeight = FontWeight.Bold)
+                Text("${medication.name}", fontWeight = FontWeight.Bold)
                 Text("Dosage: ${medication.amount}", style = MaterialTheme.typography.bodyMedium)
                 Text(
                     "Dates: ${medication.startDate} - ${medication.endDate}",
@@ -209,7 +210,12 @@ fun MedicationItem(
                     }
                     IconButton(
                         onClick = {
-                            scheduleNotifications(context, patient, medication)
+                            scheduleNotifications(
+                                context,
+                                patient,
+                                medication,
+                                mutableListOf<Time>()
+                            )
                             accepted = true
                             medication.accepted = true
                             var medicationViewModel = MedicationViewModel(medication)

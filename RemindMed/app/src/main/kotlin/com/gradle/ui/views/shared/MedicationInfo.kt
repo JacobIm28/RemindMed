@@ -47,14 +47,16 @@ fun MedicationInfoScreen(
     medicationName: String,
     startDate: String,
     endDate: String,
-    dosage: String
+    dosage: String,
+    mid: String,
+    notes: String
 ) {
     var medicationInfo by remember { mutableStateOf<JsonObject?>(null) }
     var isLoading by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
         delay(500)
-        val result: JsonObject = MedicationApi().getMedicationbyName(medicationName)
+        val result: JsonObject = MedicationApi().getMedicationbyName(mid)
         if (result.size() > 0) {
             medicationInfo = result["results"].asJsonArray[0].asJsonObject
         }
@@ -68,10 +70,13 @@ fun MedicationInfoScreen(
                     .padding(padding)
                     .verticalScroll(rememberScrollState())
             ) {
-                if (isLoading || medicationInfo == null) {
+                TitleLarge(text = medicationName)
+
+                if (isLoading) {
                     LoadingScreen()
+                } else if (medicationInfo == null) {
+                    Text("Medication not found")
                 } else {
-                    TitleLarge(text = medicationName)
                     Column {
                         HeadlineLarge(text = "Your prescription")
                         Card(
@@ -119,6 +124,15 @@ fun MedicationInfoScreen(
                     Spacer(modifier = Modifier.size(10.dp))
 
                     HeadlineLarge(text = "Information")
+
+                    if (notes.isNotEmpty()) {
+                        ToggleList(
+                            header = "Notes",
+                            content = notes,
+                            open = true
+                        )
+                    }
+
 
                     medicationInfo?.let { info ->
                         info.keySet()?.forEach {

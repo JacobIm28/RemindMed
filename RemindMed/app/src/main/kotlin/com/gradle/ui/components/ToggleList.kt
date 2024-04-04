@@ -11,8 +11,8 @@ import androidx.compose.ui.Modifier
 import com.gradle.ui.theme.AppTheme
 
 @Composable
-fun ToggleList(header: String, content: String) {
-    val isExpanded = remember { mutableStateOf(false) }
+fun ToggleList(header: String, content: String, open: Boolean = false) {
+    val isExpanded = remember { mutableStateOf(open) }
 
     AppTheme {
         Column {

@@ -145,7 +145,9 @@ fun RemindMedApp(loginModel: LoginViewModel) {
                     "${NavArguments.MEDICATION_INFO.MEDICATION_NAME}=${medication.name}&" +
                     "${NavArguments.MEDICATION_INFO.START_DATE}=${medication.startDate}&" +
                     "${NavArguments.MEDICATION_INFO.END_DATE}=${medication.endDate}&" +
-                    "${NavArguments.MEDICATION_INFO.DOSAGE}=${medication.amount}"
+                    "${NavArguments.MEDICATION_INFO.DOSAGE}=${medication.amount}" +
+                    "${NavArguments.MEDICATION_INFO.MID}=${medication.medicationId}" +
+                    "${NavArguments.MEDICATION_INFO.NOTES}=${medication.notes}"
         )
     }
 
@@ -310,6 +312,10 @@ fun RemindMedApp(loginModel: LoginViewModel) {
                             endDate = backStackEntry.arguments?.getString(NavArguments.MEDICATION_INFO.END_DATE)
                                 ?: "",
                             dosage = backStackEntry.arguments?.getString(NavArguments.MEDICATION_INFO.DOSAGE)
+                                ?: "",
+                            mid = backStackEntry.arguments?.getString(NavArguments.MEDICATION_INFO.MID)
+                                ?: "",
+                            notes = backStackEntry.arguments?.getString(NavArguments.MEDICATION_INFO.NOTES)
                                 ?: ""
                         )
                     }
@@ -349,6 +355,12 @@ fun RemindMedApp(loginModel: LoginViewModel) {
                             },
                             navArgument(NavArguments.MEDICATION_INFO.DOSAGE) {
                                 type = NavType.StringType; defaultValue = ""
+                            },
+                            navArgument(NavArguments.MEDICATION_INFO.MID) {
+                                type = NavType.StringType; defaultValue = ""
+                            },
+                            navArgument(NavArguments.MEDICATION_INFO.NOTES) {
+                                type = NavType.StringType; defaultValue = ""
                             }
                         )
                     ) { backStackEntry ->
@@ -360,6 +372,10 @@ fun RemindMedApp(loginModel: LoginViewModel) {
                             endDate = backStackEntry.arguments?.getString(NavArguments.MEDICATION_INFO.END_DATE)
                                 ?: "",
                             dosage = backStackEntry.arguments?.getString(NavArguments.MEDICATION_INFO.DOSAGE)
+                                ?: "",
+                            mid = backStackEntry.arguments?.getString(NavArguments.MEDICATION_INFO.MID)
+                                ?: "",
+                            notes = backStackEntry.arguments?.getString(NavArguments.MEDICATION_INFO.NOTES)
                                 ?: ""
                         )
                     }
