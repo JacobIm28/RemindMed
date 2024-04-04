@@ -102,14 +102,14 @@ fun MedicationInfoScreen(
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                         modifier = Modifier.fillMaxWidth()
                                     ) {
-                                        BoldText(text = "Start date: ")
+                                        BoldText(text = "Start Date: ")
                                         Text(text = startDate)
                                     }
                                     Row(
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                         modifier = Modifier.fillMaxWidth()
                                     ) {
-                                        BoldText(text = "End date: ")
+                                        BoldText(text = "End Date: ")
                                         Text(text = endDate)
                                     }
                                 }

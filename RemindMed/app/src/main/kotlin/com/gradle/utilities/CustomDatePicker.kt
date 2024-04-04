@@ -98,6 +98,6 @@ private fun convertMillisToDate(millis: Long): String {
     calendar.timeInMillis = millis
     calendar.add(Calendar.DAY_OF_MONTH, 1)
 
-    val formatter = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
+    val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     return formatter.format(calendar.time)
 }

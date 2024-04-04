@@ -91,6 +91,7 @@ fun MedicationEntryScreen(
         user = PatientApi().getPatientbyId(pid)
         medications = PatientApi().getMedicines(pid)
         medicationController.model.pid = pid
+        medicationViewModel.clearTimePickerState()
     }
 
     val controller by remember { mutableStateOf(medicationController) }
@@ -199,7 +200,8 @@ fun MedicationEntryScreen(
                 Column {
                     medicationViewModel.timeStates.forEachIndexed { index, timeState ->
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            CustomTimePicker(medicationViewModel, timeState)
+                            CustomTimePicker(medicationViewModel, timeState, false)
+
                             Spacer(modifier = Modifier.width(8.dp))
                             if (medicationViewModel.timeStates.size > 1) {
                                 IconButton(
@@ -278,8 +280,8 @@ fun MedicationEntryScreen(
                     } else {
                         searchResults = emptyList()
                     }
-                    expanded =
-                        (term.text.isNotBlank() && !suggestionClicked) // Expand dropdown only when there's text
+                    suggestionClicked = false
+                    expanded = (term.text.isNotBlank() && !suggestionClicked) // Expand dropdown only when there's text
                 },
                 label = { Text("Search Medication") },
                 placeholder = { Text("Enter Medication Name") },
@@ -397,7 +399,6 @@ fun MedicationEntryScreen(
             }
 
             Spacer(modifier = Modifier.height(16.dp))
-
             TimeInput(medicationViewModel)
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -415,8 +416,16 @@ fun MedicationEntryScreen(
             MedicationSummaryCard(
                 name = medicationViewModel.name.value,
                 dosage = medicationViewModel.amount.value,
-                time = "${medicationViewModel.getSelectedFormattedTimes()}",
-                dates = "${medicationViewModel.startDate.value} - ${medicationViewModel.endDate.value}",
+                time = if (medicationViewModel.getSelectedFormattedTimes().isEmpty()) {
+                    ""
+                } else {
+                    "${medicationViewModel.getSelectedFormattedTimes()}"
+                },
+                dates = if (medicationViewModel.startDate.value == Date(0) && medicationViewModel.endDate.value == Date(0)) {
+                    ""
+                } else {
+                    "${medicationViewModel.startDate.value} - ${medicationViewModel.endDate.value}"
+                },
                 specifications = medicationViewModel.notes.value,
             )
             Spacer(modifier = Modifier.height(30.dp))

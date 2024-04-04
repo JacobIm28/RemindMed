@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
@@ -96,7 +97,7 @@ fun MedicationListScreen(
                     .padding(padding)
                     .fillMaxWidth()
             ) {
-                TitleLarge("${patient.name?.substringBefore(" ")}'s Medication")
+                TitleLarge("${patient.name.substringBefore(" ")}'s Medication")
                 HorizontalDivider()
                 LazyColumn {
                     items(viewModel.medicationList.value) { medication ->
@@ -137,12 +138,12 @@ fun MedicationItem(
     var accepted by remember { mutableStateOf(medication.accepted) }
     Card(
         modifier = Modifier
-            .padding(horizontal = 6.dp, vertical = 3.dp)
-            .clickable(onClick = onClick),
+            .padding(horizontal = 6.dp, vertical = 3.dp) // Adjust padding here
+            .clickable(onClick = onClick), // Apply click listener to the entire item
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
         ),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(16.dp), // Adjust shape here
         colors = CardColors(
             containerColor = MaterialTheme.colorScheme.tertiary,
             contentColor = MaterialTheme.colorScheme.primary,
@@ -161,23 +162,21 @@ fun MedicationItem(
                 contentDescription = null,
                 Modifier.size(50.dp)
             )
-            Spacer(modifier = Modifier.width(8.dp))
-            Column {
-                Text(medication.name, fontWeight = FontWeight.Bold)
-                Text(medication.amount, style = MaterialTheme.typography.bodyMedium)
-                Text(
-                    "${medication.startDate} - ${medication.endDate}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Text(
-                    "${medication.getFormattedTimes()}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
+            Spacer(modifier = Modifier.width(12.dp))
+            Column(
+                modifier = Modifier.weight(1f) // Ensure the column occupies remaining space
+            ) {
+                Text("Medication: ${medication.name}", fontWeight = FontWeight.Bold)
+                Text("Dosage: ${medication.amount}", style = MaterialTheme.typography.bodyMedium)
+                Text("Dates: ${medication.startDate} - ${medication.endDate}", style = MaterialTheme.typography.bodyMedium)
+                Text("Times: ${medication.getFormattedTimes()}", style = MaterialTheme.typography.bodyMedium)
+                Text("Notes: ${medication.notes}", style = MaterialTheme.typography.bodyMedium)
+                // may just remove field from showing up if value is empty
             }
-            Spacer(modifier = Modifier.weight(1f))
 
-            if (accepted) {
-                Column {
+            // Buttons column
+            Column {
+                if (accepted) {
                     IconButton(onClick = {
                         showDialog = true
                     }) { // Set showDialog to true when remove icon clicked
@@ -186,9 +185,7 @@ fun MedicationItem(
                     IconButton(onClick = { onNavigateToMedicationEdit(medication) }) {
                         Icon(Icons.Filled.Edit, contentDescription = "Edit")
                     }
-                }
-            } else {
-                Column {
+                } else {
                     IconButton(
                         onClick = { showDialog = true }
                     ) {
@@ -210,7 +207,6 @@ fun MedicationItem(
                         Icon(Icons.Filled.Check, contentDescription = "Accept")
                     }
                 }
-
             }
         }
     }

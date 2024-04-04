@@ -31,21 +31,32 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.gradle.ui.theme.AppTheme
-import com.gradle.ui.viewModels.MedicationViewModel
 import java.sql.Time
+import android.app.TimePickerDialog
+import androidx.compose.material3.TimeInput
+import com.gradle.ui.viewModels.MedicationViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CustomTimePicker(medicationViewModel: MedicationViewModel, state: TimePickerState) {
+fun CustomTimePicker(
+    medicationViewModel: MedicationViewModel,
+    state: TimePickerState,
+    isEdit: Boolean = false
+) {
     var time by remember {
         mutableStateOf("Select Time")
     }
 
     LaunchedEffect(state.hour, state.minute) {
-        val formattedHour = if (state.hour == 0 || state.hour == 12) "12" else String.format("%02d", state.hour % 12)
-        val paddedMinute = String.format("%02d", state.minute)
-        val period = if (state.hour < 12) "AM" else "PM"
-        time = "$formattedHour:$paddedMinute $period"
+        if (isEdit) {
+            val formattedHour = if (state.hour == 0 || state.hour == 12) "12" else String.format(
+                "%02d",
+                state.hour % 12
+            )
+            val paddedMinute = String.format("%02d", state.minute)
+            val period = if (state.hour < 12) "AM" else "PM"
+            time = "$formattedHour:$paddedMinute $period"
+        }
     }
 
     var openDialog by remember {
@@ -123,22 +134,17 @@ fun MyTimePickerDialog(
                         Spacer(modifier = Modifier.width(8.dp))
                         Button(
                             onClick = {
-                                val formattedHour = if (state.hour == 0 || state.hour == 12) "12" else String.format(
-                                    "%02d",
-                                    state.hour % 12
-                                )
+                                println("state.hour: ${state.hour}")
+                                val formattedHour =
+                                    if (state.hour == 0 || state.hour == 12) "12" else String.format(
+                                        "%02d",
+                                        state.hour % 12
+                                    )
                                 val paddedMinute = String.format("%02d", state.minute)
                                 val period = if (state.hour < 12) "AM" else "PM"
+
                                 onConfirm("$formattedHour:$paddedMinute $period")
 
-                                val selectedTimes = medicationViewModel.timeStates.map { timeState ->
-                                    Time(timeState.hour, timeState.minute, 0)
-                                }.toMutableList().dropLast(1)
-
-                                if (selectedTimes.any { it == Time(state.hour, state.minute, 0) }) {
-                                    dialogState = true
-                                    return@Button
-                                }
                                 onDismiss()
                             },
                             enabled = true
