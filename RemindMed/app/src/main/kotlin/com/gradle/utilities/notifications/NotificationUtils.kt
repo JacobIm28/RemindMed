@@ -21,7 +21,12 @@ class NotificationUtils {
         private var requestCode = 0
 
         @RequiresApi(Build.VERSION_CODES.S)
-        fun scheduleNotifications(context: Context, patient: Patient, medication: Medication) {
+        fun scheduleNotifications(
+            context: Context,
+            patient: Patient,
+            medication: Medication,
+            duplicateTimes: MutableList<Time>
+        ) {
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
             if (notificationServicePermission(context)) {
@@ -34,22 +39,28 @@ class NotificationUtils {
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && alarmManager.canScheduleExactAlarms()) {
                     for (time in medication.times) {
-                        val alarm = Calendar.getInstance()
-                        alarm.set(Calendar.HOUR_OF_DAY, time.hours)
-                        alarm.set(Calendar.MINUTE, time.minutes)
-                        alarm.set(Calendar.SECOND, time.seconds)
-                        alarm.set(Calendar.DAY_OF_YEAR, dayOfYear(medication.startDate.time))
+                        if (!duplicateTimes.contains(time)) {
+                            val alarm = Calendar.getInstance()
+                            alarm.set(Calendar.HOUR_OF_DAY, time.hours)
+                            alarm.set(Calendar.MINUTE, time.minutes)
+                            alarm.set(Calendar.SECOND, time.seconds)
+                            alarm.set(Calendar.DAY_OF_YEAR, dayOfYear(medication.startDate.time))
 
-                        val pendingIntent = createPendingIntent(
-                            context,
-                            "Reminder to take your " + medication.name,
-                            "Hey ${patient.name}, remember to take ${medication.amount} of your ${medication.name}.",
-                            medication.endDate.time,
-                            patient.pid,
-                            medication.medicationId
-                        )
+                            val pendingIntent = createPendingIntent(
+                                context,
+                                "Reminder to take your " + medication.name,
+                                "Hey ${patient.name}, remember to take ${medication.amount} of your ${medication.name}.",
+                                medication.endDate.time,
+                                patient.pid,
+                                medication.medicationId
+                            )
 
-                        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, alarm.timeInMillis, pendingIntent)
+                            alarmManager.setExactAndAllowWhileIdle(
+                                AlarmManager.RTC_WAKEUP,
+                                alarm.timeInMillis,
+                                pendingIntent
+                            )
+                        }
                     }
                 }
             }
@@ -64,7 +75,12 @@ class NotificationUtils {
             mid: String?
         ): PendingIntent {
             if (title == null || content == null || endTime == null) {
-                return PendingIntent.getBroadcast(context, 0, Intent(), PendingIntent.FLAG_IMMUTABLE)
+                return PendingIntent.getBroadcast(
+                    context,
+                    0,
+                    Intent(),
+                    PendingIntent.FLAG_IMMUTABLE
+                )
             }
 
             val intent = Intent(context, NotificationReceiver::class.java)
@@ -93,7 +109,8 @@ class NotificationUtils {
 
         private fun notificationServicePermission(context: Context): Boolean {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                val notificationManager =
+                    context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                 if (!notificationManager.areNotificationsEnabled()) {
                     val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
                     intent.putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)

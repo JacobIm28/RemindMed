@@ -29,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -81,6 +82,8 @@ fun MedicationEditScreen(
     val scope = CoroutineScope(Dispatchers.Main)
     var searchJob: Job? = null
 
+    val context = LocalContext.current
+
     LaunchedEffect(Unit) {
         val medications = PatientApi().getMedicines(patientId)
         medication = medications.find { it.medicationId == medicationId }
@@ -89,20 +92,21 @@ fun MedicationEditScreen(
             medicationViewModel = MedicationViewModel(med)
             medicationController = MedicationController(med)
         }
-        searchTerm = medicationViewModel?.name?.value?.let { TextFieldValue(it) } ?: TextFieldValue("")
-        dosageValue = medicationViewModel?.amount?.value?: ""
-        notesValue = medicationViewModel?.notes?.value?: ""
+        searchTerm =
+            medicationViewModel?.name?.value?.let { TextFieldValue(it) } ?: TextFieldValue("")
+        dosageValue = medicationViewModel?.amount?.value ?: ""
+        notesValue = medicationViewModel?.notes?.value ?: ""
 
         timeStatesValue = medicationViewModel?.times?.value?.map { time ->
             val (hour, minute) = time.hours to time.minutes
             TimePickerState(hour, minute, false)
-        }?: emptyList()
+        } ?: emptyList()
 
         medicationViewModel?.clearTimePickerState()
         medicationViewModel?._timeStates?.addAll(timeStatesValue)
-        medicationViewModel?.timeStates = medicationViewModel?._timeStates?: emptyList()
+        medicationViewModel?.timeStates = medicationViewModel?._timeStates ?: emptyList()
 
-        times = medicationViewModel?.times?.value?: emptyList()
+        times = medicationViewModel?.times?.value ?: emptyList()
     }
 
     val showAddMedicationErrorDialog = remember { mutableStateOf(false) }
@@ -171,7 +175,7 @@ fun MedicationEditScreen(
                 medicationViewModel?.startDate?.value != null &&
                 medicationViewModel?.endDate?.value != null &&
                 !medicationViewModel?.getSelectedTimes().isNullOrEmpty()
-        }
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun duplicateMedication(): Boolean {
@@ -226,7 +230,10 @@ fun MedicationEditScreen(
                             Box(
                                 modifier = Modifier
                                     .size(50.dp)
-                                    .background(MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(5.dp))
+                                    .background(
+                                        MaterialTheme.colorScheme.primary,
+                                        shape = RoundedCornerShape(5.dp)
+                                    )
                             )
                             IconButton(
                                 onClick = {
@@ -280,7 +287,8 @@ fun MedicationEditScreen(
                     } else {
                         searchResults = emptyList()
                     }
-                    expanded = (term.text.isNotBlank() && !suggestionClicked) // Expand dropdown only when there's text
+                    expanded =
+                        (term.text.isNotBlank() && !suggestionClicked) // Expand dropdown only when there's text
                 },
                 label = { Text("Search Medication") },
                 modifier = Modifier.fillMaxWidth(),
@@ -378,17 +386,38 @@ fun MedicationEditScreen(
                     )
                 }
                 CustomDatePicker(startDateState, medicationViewModel?.startDate?.value.toString()) {
-                    medicationController?.invoke(MedicationViewEvent.StartDateEvent, Date(startDateState.selectedDateMillis?.let { it + TimeUnit.DAYS.toMillis(1) } ?: System.currentTimeMillis()))
+                    medicationController?.invoke(
+                        MedicationViewEvent.StartDateEvent,
+                        Date(startDateState.selectedDateMillis?.let { it + TimeUnit.DAYS.toMillis(1) }
+                            ?: System.currentTimeMillis()))
 
                 }
                 CustomDatePicker(endDateState, medicationViewModel?.endDate?.value.toString()) {
-                    medicationController?.invoke(MedicationViewEvent.EndDateEvent, Date(endDateState.selectedDateMillis?.let { it + TimeUnit.DAYS.toMillis(1) } ?: System.currentTimeMillis()))
+                    medicationController?.invoke(
+                        MedicationViewEvent.EndDateEvent,
+                        Date(endDateState.selectedDateMillis?.let { it + TimeUnit.DAYS.toMillis(1) }
+                            ?: System.currentTimeMillis()))
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            TimeInput(medicationViewModel?: MedicationViewModel(medication?: Medication("", "", "", Date(0L), Date(0L), "", "", mutableListOf(), false, false)))
+            TimeInput(
+                medicationViewModel ?: MedicationViewModel(
+                    medication ?: Medication(
+                        "",
+                        "",
+                        "",
+                        Date(0L),
+                        Date(0L),
+                        "",
+                        "",
+                        mutableListOf(),
+                        false,
+                        false
+                    )
+                )
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -446,6 +475,17 @@ fun MedicationEditScreen(
                                         MedicationViewEvent.TimeEvent,
                                         medicationViewModel?.getSelectedTimes()
                                     )
+
+//                                    var duplicateTimes = MutableList<Time>()
+//
+//                                    if (GlobalObjects.type == "patient" && medicationViewModel?.model != null) {
+//                                        scheduleNotifications(
+//                                            context,
+//                                            GlobalObjects.patient,
+//                                            medicationViewModel!!.model,
+//                                            duplicateTimes
+//                                        )
+//                                    }
 
                                     medicationController?.invoke(
                                         MedicationViewEvent.UpdateEvent,

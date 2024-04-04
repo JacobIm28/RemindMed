@@ -54,6 +54,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.sql.Date
+import java.sql.Time
 import java.util.concurrent.TimeUnit
 
 enum class MedicationViewEvent {
@@ -281,7 +282,8 @@ fun MedicationEntryScreen(
                         searchResults = emptyList()
                     }
                     suggestionClicked = false
-                    expanded = (term.text.isNotBlank() && !suggestionClicked) // Expand dropdown only when there's text
+                    expanded =
+                        (term.text.isNotBlank() && !suggestionClicked) // Expand dropdown only when there's text
                 },
                 label = { Text("Search Medication") },
                 placeholder = { Text("Enter Medication Name") },
@@ -421,7 +423,10 @@ fun MedicationEntryScreen(
                 } else {
                     "${medicationViewModel.getSelectedFormattedTimes()}"
                 },
-                dates = if (medicationViewModel.startDate.value == Date(0) && medicationViewModel.endDate.value == Date(0)) {
+                dates = if (medicationViewModel.startDate.value == Date(0) && medicationViewModel.endDate.value == Date(
+                        0
+                    )
+                ) {
                     ""
                 } else {
                     "${medicationViewModel.startDate.value} - ${medicationViewModel.endDate.value}"
@@ -476,7 +481,8 @@ fun MedicationEntryScreen(
                                             scheduleNotifications(
                                                 context,
                                                 user!!,
-                                                medicationViewModel.model
+                                                medicationViewModel.model,
+                                                mutableListOf<Time>()
                                             )
                                             onNavigateToMedicationList(GlobalObjects.patient.pid)
                                         } else {
