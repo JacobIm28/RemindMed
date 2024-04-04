@@ -131,7 +131,8 @@ fun ProfileScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Row(modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                    ButtonPrimary("Submit", {
+                    ButtonSecondary("Submit", {
+                        viewModel.changesSubmitted.value = true
                         controller.invoke(ProfileViewEvent.UpdateEvent, "")
                     }, viewModel.submitEnabled.value)
                 }
