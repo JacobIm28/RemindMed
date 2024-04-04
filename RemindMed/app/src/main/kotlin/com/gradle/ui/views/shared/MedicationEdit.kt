@@ -76,7 +76,7 @@ fun MedicationEditScreen(
     var timeStatesValue: List<TimePickerState> by remember { mutableStateOf(emptyList()) }
     var times by remember { mutableStateOf<List<Time>?>(emptyList()) }
 
-    var searchResults by remember { mutableStateOf<List<String>>(emptyList()) }
+    var searchResults by remember { mutableStateOf<List<Pair<String, String>>>(emptyList()) }
     var searchTerm by remember { mutableStateOf(TextFieldValue("")) }
 
     val scope = CoroutineScope(Dispatchers.Main)
@@ -259,7 +259,7 @@ fun MedicationEditScreen(
     @Composable
     fun MedicationSearchBar(
         onSearch: () -> Unit,
-        suggestions: List<String>
+        suggestions: List<Pair<String, String>>
     ) {
         var expanded by remember { mutableStateOf(false) }
         var suggestionClicked by remember { mutableStateOf(false) }
@@ -311,7 +311,7 @@ fun MedicationEditScreen(
                     LazyColumn {
                         items(suggestions) { suggestion ->
                             Text(
-                                text = suggestion,
+                                text = suggestion.first,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
@@ -327,8 +327,8 @@ fun MedicationEditScreen(
                                         )
                                         searchTerm =
                                             TextFieldValue(
-                                                suggestion,
-                                                TextRange(suggestion.length)
+                                                suggestion.first,
+                                                TextRange(suggestion.first.length)
                                             )
                                         expanded = false
                                     }

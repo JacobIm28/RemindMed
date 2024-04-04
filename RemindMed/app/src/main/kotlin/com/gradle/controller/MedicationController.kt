@@ -17,13 +17,8 @@ class MedicationController(val model: Medication) {
     fun invoke(event: MedicationViewEvent, value: Any?) {
         when(event) {
             MedicationViewEvent.MedicationIdEvent -> {
-                val medicationResult = MedicationApi().getMedicationbyName(value as String)
-                if (medicationResult != null && medicationResult.has("results")) {
-                    val resultsArray = medicationResult.getAsJsonArray("results")
-                    if (resultsArray.size() > 0) {
-                        model.medicationId = resultsArray[0].asJsonObject["id"].asString
-                    }
-                }
+                val res = value as Pair<String, String>
+                model.medicationId = res.second
             }
             MedicationViewEvent.NameEvent -> model.name = value as String
             MedicationViewEvent.AmountEvent -> model.amount = value as String

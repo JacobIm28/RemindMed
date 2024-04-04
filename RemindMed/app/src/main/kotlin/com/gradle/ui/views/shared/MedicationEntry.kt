@@ -179,7 +179,7 @@ fun MedicationEntryScreen(
         return false
     }
 
-    var searchResults by remember { mutableStateOf<List<String>>(emptyList()) }
+    var searchResults by remember { mutableStateOf<List<Pair<String, String>>>(emptyList()) }
     var searchTerm by remember { mutableStateOf(TextFieldValue("")) }
 
     val scope = CoroutineScope(Dispatchers.Main)
@@ -257,7 +257,7 @@ fun MedicationEntryScreen(
     @Composable
     fun MedicationSearchBar(
         onSearch: () -> Unit,
-        suggestions: List<String>
+        suggestions: List<Pair<String, String>>
     ) {
         var expanded by remember { mutableStateOf(false) }
 
@@ -307,14 +307,14 @@ fun MedicationEntryScreen(
                     LazyColumn {
                         items(suggestions) { suggestion ->
                             Text(
-                                text = suggestion,
+                                text = suggestion.first,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
                                         suggestionClicked = true
                                         controller.invoke(
                                             MedicationViewEvent.NameEvent,
-                                            suggestion
+                                            suggestion.first
                                         )
 
                                         controller.invoke(
@@ -323,8 +323,8 @@ fun MedicationEntryScreen(
                                         )
                                         searchTerm =
                                             TextFieldValue(
-                                                suggestion,
-                                                TextRange(suggestion.length)
+                                                suggestion.first,
+                                                TextRange(suggestion.first.length)
                                             )
                                         expanded = false
                                     }

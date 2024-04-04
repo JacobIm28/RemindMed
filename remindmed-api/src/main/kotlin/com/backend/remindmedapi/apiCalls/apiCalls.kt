@@ -12,23 +12,18 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.*
-
-fun MutableList<String>.contains(s: String, ignoreCase: Boolean = false): Boolean {
-
-    return any { it.equals(s, ignoreCase) }
-}
-
+import org.postgresql.core.Tuple
 
 // loads in information related to a single drug
 @OptIn(DelicateCoroutinesApi::class)
-fun callOpenFdaSingleDrug(drug: String): JsonObject {
+fun callOpenFdaSingleDrug(drugId: String): JsonObject {
     val client = HttpClient(Android)
     try {
         var data: JsonObject = JsonObject()
         var res: String? = null
         runBlocking{
             launch{
-                val response: String = client.get("https://api.fda.gov/drug/label.json?search=$drug&limit=1").bodyAsText()
+                val response: String = client.get("https://api.fda.gov/drug/label.json?search=id:$drugId&limit=1").bodyAsText()
                 // cast the response to a JsonObject of type SingleDrugRes
                 data = JsonParser.parseString(response).asJsonObject
 
@@ -41,19 +36,20 @@ fun callOpenFdaSingleDrug(drug: String): JsonObject {
     }
 }
 
-fun callListOfMedication(strSoFar: String): MutableList<String> {
+fun callListOfMedication(strSoFar: String): MutableList<Pair<String, String>> {
     val client = HttpClient(Android)
     try {
-        val res = mutableListOf<String>()
+        val res = mutableListOf<Pair<String, String>>()
         runBlocking{
             launch{
-                val response: String = client.get("https://api.fda.gov/drug/ndc.json?search=brand_name:$strSoFar*&limit=20").body()
+                val response: String = client.get("https://api.fda.gov/drug/label.json?search=openfda.brand_name:$strSoFar*&limit=20").body()
                 val parsedJson = JsonParser.parseString(response).asJsonObject
                 val results = parsedJson["results"].asJsonArray
                 for (result in results) {
-                    val drug = result.asJsonObject["brand_name"].asString
-                    if (!res.contains(drug, true)) {
-                        res.add(drug)
+                    val drug = result.asJsonObject["openfda"].asJsonObject["brand_name"].asJsonArray[0].asString
+                    val id = result.asJsonObject["id"].asString
+                    if(!res.contains(Pair(drug, id))) {
+                        res.add(Pair(drug, id))
                     }
                 }
             }

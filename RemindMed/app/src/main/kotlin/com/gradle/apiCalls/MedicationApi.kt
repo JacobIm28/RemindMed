@@ -30,13 +30,13 @@ class MedicationApi {
 
         }
     }
-    fun getMedicationbyName(name: String): JsonObject {
+    fun getMedicationbyId(id: String): JsonObject {
         return try {
             var medication: JsonObject? = null
             runBlocking {
                 launch {
-                    println("Getting medication with name: $name")
-                    val response = client.get("$host/medicine?name=$name").bodyAsText()
+                    println("Getting medication with id: $id")
+                    val response = client.get("$host/medicine?id=$id").bodyAsText()
                     medication = JsonParser.parseString(response).asJsonObject
                 }
             }
@@ -51,9 +51,10 @@ class MedicationApi {
     }
 
     // Use for searching medicines by name, only returns name of medications
-    fun getAllMedicationsbyName(name: String): MutableList<String> {
+    // First is name, second is med id
+    fun getAllMedicationsbyName(name: String): MutableList<Pair<String, String>> {
         return try {
-            var medications: MutableList<String>? = null
+            var medications: MutableList<Pair<String, String>>? = null
             runBlocking {
                 launch {
                     println("Getting all medications with name: $name")
@@ -61,7 +62,7 @@ class MedicationApi {
                 }
             }
             if (medications != null) {
-                medications as MutableList<String>
+                medications as MutableList<Pair<String, String>>
             } else {
                 mutableListOf()
             }
