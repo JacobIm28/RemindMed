@@ -306,6 +306,7 @@ fun MedicationEditScreen(
         Column {
             OutlinedTextField(
                 value = searchTerm,
+                enabled = false,
                 onValueChange = { term ->
                     searchTerm = term
                     if (term.text.isNotBlank()) {
@@ -411,14 +412,14 @@ fun MedicationEditScreen(
                         textAlign = TextAlign.Center
                     )
                 }
-                CustomDatePicker(startDateState, medicationViewModel?.startDate?.value.toString()) {
+                CustomDatePicker(false, startDateState, medicationViewModel?.startDate?.value.toString()) {
                     medicationController?.invoke(
                         MedicationViewEvent.StartDateEvent,
                         Date(startDateState.selectedDateMillis?.let { it + TimeUnit.DAYS.toMillis(1) }
                             ?: System.currentTimeMillis()))
 
                 }
-                CustomDatePicker(endDateState, medicationViewModel?.endDate?.value.toString()) {
+                CustomDatePicker(true, endDateState, medicationViewModel?.endDate?.value.toString()) {
                     medicationController?.invoke(
                         MedicationViewEvent.EndDateEvent,
                         Date(endDateState.selectedDateMillis?.let { it + TimeUnit.DAYS.toMillis(1) }
