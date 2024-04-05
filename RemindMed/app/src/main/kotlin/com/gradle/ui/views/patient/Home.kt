@@ -97,11 +97,11 @@ fun HomeMedicationItem(
                 modifier = Modifier
                     .weight(1f)
             ) {
-                Text("Medication: ${medication.name}", fontWeight = FontWeight.Bold)
+                Text( medication.name, fontWeight = FontWeight.Bold)
                 Text("Dosage: ${medication.amount}", style = MaterialTheme.typography.bodyMedium)
 
                 Text(
-                    "Time: ${medication.getFormattedTimes()}",
+                    "Times: ${medication.getFormattedTimes().joinToString(", ")}",
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
@@ -325,19 +325,19 @@ fun DailyOverviewCard(
                 Text(
                     text = "${greeting} ${patient.name.substringBefore(" ")},",
                     fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleSmall,
                 )
                 if (medicationsToday.isEmpty()) {
                     Text(
                         text = "No medications scheduled for this date. Keep it up!",
                         fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleSmall,
                     )
                 } else {
                     Text(
                         text = "Check off the medications that you have taken today.",
                         fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleSmall,
                     )
                 }
             }
