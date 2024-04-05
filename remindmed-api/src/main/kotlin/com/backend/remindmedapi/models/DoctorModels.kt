@@ -1,10 +1,41 @@
 package com.backend.remindmedapi.models
 
-data class Doctor(
-    val did: String,
-    val name: String,
-    val email: String
-) {
+import kotlinx.serialization.Serializable
+@Serializable
+class Doctor(var did: String = "", var _name: String = "", var _email: String = "") {
+    var name: String = _name
+        set(value) {
+            field = value
+        }
+
+    var email: String = _email
+        set(value) {
+            field = value
+        }
+
+    var successfulChange = false
+        set(value) {
+            field = value
+        }
+    var errorMessage = ""
+        set(value) {
+            field = value
+        }
+    var isError = false
+        set(value) {
+            field = value
+        }
+
+    var submitEnabled = false
+        set(value) {
+            field = value
+        }
+
+    var changesSubmitted = false
+        set(value) {
+            field = value
+        }
+
     override fun toString(): String {
         return "Doctor(did=$did, name='$name', email='$email')"
     }

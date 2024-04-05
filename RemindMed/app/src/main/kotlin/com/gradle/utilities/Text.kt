@@ -17,7 +17,7 @@ fun TitleLarge(text: String) {
             modifier = Modifier.padding(top = 13.dp, bottom = 5.dp),
             style = MaterialTheme.typography.titleLarge.copy(
                 color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Black
             )
         )
     }

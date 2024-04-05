@@ -1,287 +1,558 @@
-//package com.gradle.ui.views.shared
-//
-//import android.annotation.SuppressLint
-//import android.os.Build
-//import androidx.annotation.RequiresApi
-//import androidx.compose.foundation.clickable
-//import androidx.compose.foundation.layout.*
-//import androidx.compose.foundation.lazy.LazyColumn
-//import androidx.compose.foundation.lazy.items
-//import androidx.compose.material3.*
-//import androidx.compose.material.icons.Icons
-//import androidx.compose.material.icons.filled.Add
-//import androidx.compose.material.icons.filled.ArrowForward
-//import androidx.compose.material.icons.filled.Delete
-//import androidx.compose.material.icons.filled.Edit
-//import androidx.compose.material.icons.outlined.Info
-//import androidx.compose.runtime.Composable
-//import androidx.compose.runtime.getValue
-//import androidx.compose.runtime.mutableStateOf
-//import androidx.compose.ui.Alignment
-//import androidx.compose.ui.Modifier
-//import androidx.compose.ui.text.font.FontWeight
-//import androidx.compose.ui.unit.dp
-//import androidx.navigation.NavController
-//import androidx.navigation.NavDeepLinkBuilder
-//import androidx.compose.runtime.remember
-//import androidx.compose.runtime.setValue
-//
-//import com.gradle.constants.GlobalObjects
-//import com.gradle.apiCalls.Patient as PatientApi
-//import com.gradle.constants.NavArguments
-//import com.gradle.constants.Routes
-//import com.gradle.models.LoginModel
-//import com.gradle.models.Medication
-//import com.gradle.ui.components.ButtonSecondary
-//import com.gradle.ui.components.HeadlineLarge
-//import com.gradle.ui.components.TitleLarge
-//import com.gradle.ui.theme.*
-//import com.gradle.utilities.toFormattedDateString
-//import java.sql.Date
-//import java.sql.Time
-//import java.time.format.DateTimeFormatter
-//
-////@OptIn(ExperimentalMaterial3Api::class)
-//@RequiresApi(Build.VERSION_CODES.O)
-//@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
-//@Composable
-//fun MedicationListScreen(navController: NavController) {
-//    var medications: List<Medication> = List(0) { Medication("-1", "", "", Date(0), Date(0), "", "", mutableListOf()) }
-//    if(GlobalObjects.type == "patient") {
-//        medications = PatientApi().getMedicines(GlobalObjects.patient.pid)
-//    } else {
-//        //selected patient??
-//    }
-//
-//    val selfAssignedMedicationsState = remember { mutableStateOf(medications) } // need to differentiate it as self assigned
-//
-//    AppTheme {
-//        Scaffold(
-//            floatingActionButton = {
-//                FloatingActionButton(
-//                    onClick = { navController.navigate(Routes.MEDICATION_ENTRY)},
-//                    containerColor = MaterialTheme.colorScheme.primary
-//                ) {
-//                    Icon(Icons.Default.Add, contentDescription = "Add Medication")
-//                }
-//            },
-//        ) { padding ->
-//            Column (
-//                Modifier
-//                    .padding(padding)
-//            ) {
-//
-//                TitleLarge("${GlobalObjects.patient?.name?.substringBefore(" ")}'s Medication")
-//
-//                HeadlineLarge("Medications")
-//                LazyColumn {
-//                    items(medications) { medication ->
-//                        MedicationItem(
-//                            medication = medication,
-//                            navController = navController,
-//                            onRemove = {
-//                                selfAssignedMedicationsState.value =
-//                                    selfAssignedMedicationsState.value.toMutableList().apply {
-//                                        remove(medication)
-//                                    }
-//                            },
-//                            onClick = {
-//                                navController.navigate(
-//                                    Routes.MEDICATION_INFO + "?${NavArguments.MEDICATION_INFO.MEDICATION_NAME}=${medication.name}&" +
-//                                            "${NavArguments.MEDICATION_INFO.START_DATE}=${medication.startDate}&" +
-//                                            "${NavArguments.MEDICATION_INFO.END_DATE}=${medication.endDate}&" +
-//                                            "${NavArguments.MEDICATION_INFO.DOSAGE}=${medication.amount}"
-//                                )
-//                            }
-//                        )
-//                    }
-//                }
-//
-//                Spacer(modifier = (Modifier.height(16.dp)))
-//                Row (modifier = Modifier.align(Alignment.CenterHorizontally)) {
-//                    ButtonSecondary(text = "See More", onClick = {}, enabled = true)
-//                }
-//            }
-//        }
-//    }
-//}
-//
-//
-//@RequiresApi(Build.VERSION_CODES.O)
-//@Composable
-//fun MedicationItem(
-//    medication: Medication,
-//    navController: NavController,
-//    onRemove: () -> Unit,
-//    onClick: () -> Unit // Click listener for the entire item
-//) {
-//    var showDialog by remember { mutableStateOf(false) }
-//
-//    Card(
-//        modifier = Modifier
-//            .padding(6.dp)
-//            .clickable(onClick = onClick), // Apply click listener to the entire item
-//        elevation = CardDefaults.cardElevation(
-//            defaultElevation = 4.dp
-//        ),
-//        colors = CardColors(
-//            containerColor = MaterialTheme.colorScheme.tertiary,
-//            contentColor = MaterialTheme.colorScheme.primary,
-//            disabledContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
-//            disabledContentColor = MaterialTheme.colorScheme.onTertiaryContainer
-//        )
-//    ) {
-//        Row(
-//            modifier = Modifier
-//                .padding(16.dp)
-//                .fillMaxWidth(),
-//            verticalAlignment = Alignment.CenterVertically
-//        ) {
-//            val formatter = DateTimeFormatter.ofPattern("MMMM dd")
-//            val formattedStartDate = medication.startDate.toFormattedDateString().format(formatter)
-//            val formattedEndDate = medication.endDate.toFormattedDateString().format(formatter)
-//
-//            println(formattedStartDate)
-//            println(formattedEndDate)
-//            Icon(Icons.Outlined.Info, contentDescription = null, Modifier.size(50.dp))
-//            Spacer(modifier = Modifier.width(8.dp))
-//            Column {
-//                Text(medication.name, fontWeight = FontWeight.Bold)
-//                Text(medication.amount, style = MaterialTheme.typography.bodyMedium)
-//                Text("$formattedStartDate - $formattedEndDate", style = MaterialTheme.typography.bodyMedium)
-//                Text("${medication.times}", style = MaterialTheme.typography.bodyMedium)
-//            }
-//            Spacer(modifier = Modifier.weight(1f))
-//
-//            Column {
-//                IconButton(onClick = { navController.navigate(Routes.MEDICATION_EDIT) }) {
-//                    Icon(Icons.Filled.Edit, contentDescription = "Edit")
-//                }
-//                // Remove icon
-//                IconButton(onClick = { showDialog = true }) { // Set showDialog to true when remove icon clicked
-//                    Icon(Icons.Filled.Delete, contentDescription = "Delete")
-//                }
-//            }
-//        }
-//    }
-//
-//    if (showDialog) {
-//        AlertDialog(
-//            onDismissRequest = { showDialog = false },
-//            title = { Text("Confirm Delete") },
-//            text = { Text("Are you sure you want to delete this medication?") },
-//            confirmButton = {
-//                Button(
-//                    onClick = {
-//                        onRemove()
-//                        showDialog = false
-//                    }
-//                ) {
-//                    Text("Confirm")
-//                }
-//            },
-//            dismissButton = {
-//                Button(
-//                    onClick = { showDialog = false }
-//                ) {
-//                    Text("Cancel")
-//                }
-//            }
-//        )
-//    }
-//}
+package com.gradle.ui.views.shared
 
 
-//@Preview(showBackground = true)
-//@Composable
-//fun MedicationListScreenPreview() {
-//    MedicationListScreen()
-//}
-//
+import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
+import com.gradle.apiCalls.MedicationApi
+import com.gradle.apiCalls.PatientApi
+import com.gradle.constants.GlobalObjects
+import com.gradle.controller.MedicationController
+import com.gradle.models.Medication
+import com.gradle.ui.components.ButtonSecondary
+import com.gradle.ui.components.CustomDatePicker
+import com.gradle.ui.components.CustomTimePicker
+import com.gradle.ui.components.MedicationSummaryCard
+import com.gradle.ui.components.TitleLarge
+import com.gradle.ui.theme.AppTheme
+import com.gradle.ui.viewModels.MedicationViewModel
+import com.gradle.utilities.notifications.NotificationUtils.Companion.scheduleNotifications
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.sql.Date
+import java.sql.Time
+import java.time.LocalDate
+import java.util.Calendar
+import java.util.concurrent.TimeUnit
 
-//package com.gradle.ui.views
-//
-//import android.annotation.SuppressLint
-//import androidx.compose.foundation.Image
-//import androidx.compose.foundation.layout.*
-//
-//import androidx.compose.material3.*
-//import androidx.compose.runtime.Composable
-//import androidx.compose.runtime.mutableStateOf
-//import androidx.compose.runtime.remember
-//import androidx.compose.ui.Alignment
-//import androidx.compose.ui.Modifier
-//import androidx.compose.ui.res.painterResource
-//import androidx.compose.ui.text.input.TextFieldValue
-//import androidx.compose.ui.unit.dp
-//import androidx.navigation.NavController
-//import com.gradle.constants.Routes
-//import com.gradle.ui.theme.AppTheme
-//import com.gradle.ui.components.ButtonSecondary
-//import com.gradle.ui.components.TitleLarge
-//
-//@OptIn(ExperimentalMaterial3Api::class)
-//@SuppressLint("RememberReturnType", "UnusedMaterialScaffoldPaddingParameter")
-//@Composable
-//fun UserMedicationEditScreen(navController: NavController) {
-//    val medicationName = remember { mutableStateOf(TextFieldValue("Reserphine")) }
-//    val dosage = remember { mutableStateOf(TextFieldValue("3 ml per usage")) }
-//    val time = remember { mutableStateOf(TextFieldValue("9:00 AM")) }
-//    val specifications = remember { mutableStateOf(TextFieldValue("After Breakfast")) }
-//
-//    AppTheme {
-//        Column() {
-//            TitleLarge("Edit Medication")
-//            Spacer(modifier = Modifier.height(16.dp))
-//
-//            OutlinedTextField(
-//                value = medicationName.value.text,
-//                onValueChange = { medicationName.value = TextFieldValue(it) },
-//                label = { Text("Medication Name") }
-//            )
-//            Spacer(modifier = Modifier.height(30.dp))
-//
-//            OutlinedTextField(
-//                value = dosage.value.text,
-//                onValueChange = { dosage.value = TextFieldValue(it) },
-//                label = { Text("Dosage") }
-//            )
-//            Spacer(modifier = Modifier.height(30.dp))
-//
-//            OutlinedTextField(
-//                value = time.value.text,
-//                onValueChange = { time.value = TextFieldValue(it) },
-//                label = { Text("Time") }
-//            )
-//            Spacer(modifier = Modifier.height(30.dp))
-//
-//            OutlinedTextField(
-//                value = specifications.value.text,
-//                onValueChange = { specifications.value = TextFieldValue(it) },
-//                label = { Text("Specifications") }
-//            )
-//            Spacer(modifier = Modifier.height(30.dp))
-//
-//            Spacer(modifier = Modifier.height(30.dp))
-//
-//            MedicationSummaryCard(
-//                name = medicationName.value.text,
-//                dosage = dosage.value.text,
-//                time = time.value.text,
-//                specifications = specifications.value.text
-//            )
-//
-//            Spacer(modifier = Modifier.height(50.dp))
-//
-//            Row(
-//                modifier = Modifier.fillMaxWidth(),
-//                horizontalArrangement = Arrangement.SpaceEvenly
-//            ) {
-//                ButtonSecondary(text = "Cancel", onClick = { navController.navigate(Routes.MEDICATION_LIST) }, enabled = true)
-//
-//                ButtonSecondary(text = "Change", onClick = { /* Handle add action */ }, enabled = true)
-//            }
-//        }
-//
-//    }
-//}
+@RequiresApi(Build.VERSION_CODES.S)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@SuppressLint("RememberReturnType", "UnusedMaterialScaffoldPaddingParameter")
+@Composable
+fun MedicationEditScreen(
+    medicationId: String,
+    patientId: String,
+    onNavigateToPeopleList: () -> Unit,
+    onNavigateToMedicationList: (String) -> Unit
+) {
+    var medication by remember { mutableStateOf<Medication?>(null) }
+    var medications by remember { mutableStateOf(emptyList<Medication>()) }
+    var medicationViewModel by remember { mutableStateOf<MedicationViewModel?>(null) }
+    var medicationController by remember { mutableStateOf<MedicationController?>(null) }
+
+    var dosageValue by remember { mutableStateOf("") }
+    var notesValue by remember { mutableStateOf("") }
+    var timeStatesValue: List<TimePickerState> by remember { mutableStateOf(emptyList()) }
+    var times by remember { mutableStateOf<List<Time>?>(emptyList()) }
+
+    var searchResults by remember { mutableStateOf<List<Pair<String, String>>>(emptyList()) }
+    var searchTerm by remember { mutableStateOf(TextFieldValue("")) }
+
+    val scope = CoroutineScope(Dispatchers.Main)
+    var searchJob: Job? = null
+
+    val context = LocalContext.current
+
+    val calendar = Calendar.getInstance()
+    calendar.time = java.util.Date()
+    calendar.set(Calendar.HOUR_OF_DAY, 0)
+    calendar.set(Calendar.MINUTE, 0)
+    calendar.set(Calendar.SECOND, 0)
+    calendar.set(Calendar.MILLISECOND, 0)
+    val todayStart = calendar.time
+
+    LaunchedEffect(Unit) {
+        val medications = PatientApi().getMedicines(patientId)
+        medication = medications.find { it.medicationId == medicationId }
+
+        medication?.let { med ->
+            medicationViewModel = MedicationViewModel(med)
+            medicationController = MedicationController(med)
+        }
+        searchTerm =
+            medicationViewModel?.name?.value?.let { TextFieldValue(it) } ?: TextFieldValue("")
+        dosageValue = medicationViewModel?.amount?.value ?: ""
+        notesValue = medicationViewModel?.notes?.value ?: ""
+
+        timeStatesValue = medicationViewModel?.times?.value?.map { time ->
+            val (hour, minute) = time.hours to time.minutes
+            TimePickerState(hour, minute, false)
+        } ?: emptyList()
+
+        medicationViewModel?.clearTimePickerState()
+        medicationViewModel?._timeStates?.addAll(timeStatesValue)
+        medicationViewModel?.timeStates = medicationViewModel?._timeStates ?: emptyList()
+
+        times = medicationViewModel?.times?.value ?: emptyList()
+    }
+
+    val showAddMedicationErrorDialog = remember { mutableStateOf(false) }
+    val showValidationErrorDialog = remember { mutableStateOf(false) }
+    val showDuplicateMedicationErrorDialog = remember { mutableStateOf(false) }
+    val showDateInvalidRangeErrorDialog = remember { mutableStateOf(false) }
+
+    val showDateBeforeCurrentDateErrorDialog = remember { mutableStateOf(false) }
+
+    if (showAddMedicationErrorDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showAddMedicationErrorDialog.value = false },
+            title = { Text("Error") },
+            text = { Text("Failed to add medication. Please try again.") },
+            confirmButton = {
+                Button(onClick = { showAddMedicationErrorDialog.value = false }) {
+                    Text("OK")
+                }
+            }
+        )
+    }
+
+    if (showValidationErrorDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showValidationErrorDialog.value = false },
+            title = { Text("Validation Error") },
+            text = { Text("Please check your inputs. Medication Name, Dates, and Time fields are required and must be valid.") },
+            confirmButton = {
+                Button(onClick = { showValidationErrorDialog.value = false }) {
+                    Text("OK")
+                }
+            }
+        )
+    }
+
+    if (showDuplicateMedicationErrorDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showDuplicateMedicationErrorDialog.value = false },
+            title = { Text("Duplicate Medication") },
+            text = { Text("This medication already exists as a prescription in your medication list. Please check your inputs.") },
+            confirmButton = {
+                Button(onClick = { showDuplicateMedicationErrorDialog.value = false }) {
+                    Text("OK")
+                }
+            }
+        )
+    }
+
+    if (showDateInvalidRangeErrorDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showDateInvalidRangeErrorDialog.value = false },
+            title = { Text("Date Error") },
+            text = { Text("The start date must be before or equal to the end date.") },
+            confirmButton = {
+                Button(onClick = { showDateInvalidRangeErrorDialog.value = false }) {
+                    Text("OK")
+                }
+            }
+        )
+    }
+
+    if (showDateBeforeCurrentDateErrorDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showDateBeforeCurrentDateErrorDialog.value = false },
+            title = { Text("Date Error") },
+            text = { Text("The entered dates cannot be before the current date.") },
+            confirmButton = {
+                Button(onClick = { showDateBeforeCurrentDateErrorDialog.value = false }) {
+                    Text("OK")
+                }
+            }
+        )
+    }
+
+    var startDateState = rememberDatePickerState()
+    var endDateState = rememberDatePickerState()
+
+    fun validateInputs(
+    ): Boolean {
+        return medicationViewModel?.name?.value?.isNotBlank() ?: false &&
+                medicationViewModel?.startDate?.value != null &&
+                medicationViewModel?.endDate?.value != null &&
+                !medicationViewModel?.getSelectedTimes().isNullOrEmpty()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun duplicateMedication(): Boolean {
+        for (medication in medications) {
+            if (medication.name == medicationViewModel?.name?.value) {
+                return true
+            }
+        }
+        return false
+    }
+
+
+    @Composable
+    fun TimeInput(medicationViewModel: MedicationViewModel) {
+        Column {
+            Text(
+                text = "Select Times",
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(1.dp, color = Color.Gray, shape = RoundedCornerShape(5.dp))
+                    .padding(8.dp)
+            ) {
+                Column {
+                    medicationViewModel.timeStates.forEachIndexed { index, timeState ->
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            CustomTimePicker(medicationViewModel, timeState, true)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            if (medicationViewModel.timeStates.size > 1) {
+                                IconButton(
+                                    onClick = {
+                                        medicationViewModel.removeTimePickerState(index)
+                                    },
+                                    modifier = Modifier.padding(start = 4.dp)
+                                ) {
+                                    Icon(Icons.Default.Delete, contentDescription = "Remove Time")
+                                }
+                            }
+                        }
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier.size(30.dp),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(50.dp)
+                                    .background(
+                                        MaterialTheme.colorScheme.primary,
+                                        shape = RoundedCornerShape(5.dp)
+                                    )
+                            )
+                            IconButton(
+                                onClick = {
+                                    medicationViewModel.addTimePickerState()
+                                },
+                                modifier = Modifier.size(24.dp)
+                            ) {
+                                Icon(
+                                    Icons.Default.Add,
+                                    contentDescription = "Add Time",
+                                    tint = Color.White
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.S)
+    @SuppressLint("SuspiciousIndentation")
+    @Composable
+    fun MedicationSearchBar(
+        onSearch: () -> Unit,
+        suggestions: List<Pair<String, String>>
+    ) {
+        var expanded by remember { mutableStateOf(false) }
+        var suggestionClicked by remember { mutableStateOf(false) }
+
+        DisposableEffect(Unit) {
+            onDispose {
+                suggestionClicked = false
+            }
+        }
+        fun searchWithDelay(term: TextFieldValue) {
+            searchJob?.cancel()
+            searchJob = scope.launch {
+                delay(300)
+                onSearch()
+            }
+        }
+
+        Column {
+            OutlinedTextField(
+                value = searchTerm,
+                enabled = false,
+                onValueChange = { term ->
+                    searchTerm = term
+                    if (term.text.isNotBlank()) {
+                        searchWithDelay(term)
+                    } else {
+                        searchResults = emptyList()
+                    }
+                    expanded =
+                        (term.text.isNotBlank() && !suggestionClicked) // Expand dropdown only when there's text
+                },
+                label = { Text("Search Medication") },
+                modifier = Modifier.fillMaxWidth(),
+                trailingIcon = {
+                    IconButton(onClick = { expanded = !expanded }) {
+                        Icon(Icons.Filled.ArrowDropDown, contentDescription = "Expand")
+                    }
+                }
+            )
+
+            if (expanded && suggestions.isNotEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 200.dp)
+                        .background(Color.White)
+                        .border(1.dp, Color.Gray)
+                        .zIndex(1f)
+                ) {
+                    LazyColumn {
+                        items(suggestions) { suggestion ->
+                            Text(
+                                text = suggestion.first,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        suggestionClicked = true
+                                        medicationController?.invoke(
+                                            MedicationViewEvent.NameEvent,
+                                            suggestion
+                                        )
+
+                                        medicationController?.invoke(
+                                            MedicationViewEvent.MedicationIdEvent,
+                                            suggestion
+                                        )
+                                        searchTerm =
+                                            TextFieldValue(
+                                                suggestion.first,
+                                                TextRange(suggestion.first.length)
+                                            )
+                                        expanded = false
+                                    }
+                                    .padding(vertical = 16.dp, horizontal = 16.dp),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color.Black,
+                                textAlign = TextAlign.Start
+                            )
+                            HorizontalDivider(color = Color.Gray)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    AppTheme {
+        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+            TitleLarge("Edit Medication")
+            Spacer(modifier = Modifier.height(16.dp))
+
+            MedicationSearchBar(
+                onSearch = {
+                    searchResults = MedicationApi().getAllMedicationsbyName(searchTerm.text)
+                },
+                suggestions = searchResults
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = dosageValue,
+                placeholder = { Text(medicationViewModel?.amount?.value ?: "") },
+                onValueChange = {
+                    dosageValue = it
+                    medicationController?.invoke(MedicationViewEvent.AmountEvent, it)
+
+                },
+                label = { Text("Dosage") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(5.dp)
+            ) {
+                Column(
+                    modifier = Modifier.align(Alignment.CenterVertically)
+                ) {
+                    Text(
+                        text = "Select Dates",
+                        textAlign = TextAlign.Center
+                    )
+                }
+                CustomDatePicker(false, startDateState, medicationViewModel?.startDate?.value.toString()) {
+                    medicationController?.invoke(
+                        MedicationViewEvent.StartDateEvent,
+                        Date(startDateState.selectedDateMillis?.let { it + TimeUnit.DAYS.toMillis(1) }
+                            ?: System.currentTimeMillis()))
+
+                }
+                CustomDatePicker(true, endDateState, medicationViewModel?.endDate?.value.toString()) {
+                    medicationController?.invoke(
+                        MedicationViewEvent.EndDateEvent,
+                        Date(endDateState.selectedDateMillis?.let { it + TimeUnit.DAYS.toMillis(1) }
+                            ?: System.currentTimeMillis()))
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            TimeInput(
+                medicationViewModel ?: MedicationViewModel(
+                    medication ?: Medication(
+                        "",
+                        "",
+                        "",
+                        Date(0L),
+                        Date(0L),
+                        "",
+                        "",
+                        mutableListOf(),
+                        false,
+                        false
+                    )
+                )
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = notesValue,
+                onValueChange = {
+                    notesValue = it
+                    medicationController?.invoke(MedicationViewEvent.NotesEvent, it)
+                },
+                label = { Text("Notes") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(30.dp))
+
+            MedicationSummaryCard(
+                name = searchTerm.text,
+                dosage = dosageValue,
+                time = "${medicationViewModel?.getSelectedFormattedTimes()}",
+                dates = "${medicationViewModel?.startDate?.value} - ${medicationViewModel?.endDate?.value}",
+                specifications = notesValue,
+            )
+            Spacer(modifier = Modifier.height(30.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                ButtonSecondary(
+                    text = "Cancel",
+                    onClick = {
+                        if (GlobalObjects.type == "doctor") {
+                            onNavigateToMedicationList(patientId)
+                        } else {
+                            onNavigateToMedicationList(patientId)
+                        }
+                    },
+                    enabled = true
+                )
+
+                ButtonSecondary(
+                    text = "Change",
+
+                    onClick = {
+                        if (validateInputs()) {
+                            if (duplicateMedication()) {
+                                showDuplicateMedicationErrorDialog.value = true
+                            } else {
+                                val startDate = medicationViewModel?.startDate?.value
+                                val endDate = medicationViewModel?.endDate?.value
+
+                                if (startDate != null && startDate.before(todayStart)) {
+                                    showDateBeforeCurrentDateErrorDialog.value = true
+                                } else {
+
+
+                                    if (startDate != null && endDate != null && startDate > endDate) {
+                                        showDateInvalidRangeErrorDialog.value = true
+                                    } else {
+
+                                        val duplicateTimes = medicationViewModel?.times?.value?.intersect(
+                                            medicationViewModel?.getSelectedTimes() ?: emptyList()
+                                        )?.toList() ?: emptyList()
+
+                                        if (GlobalObjects.type == "patient" && medicationViewModel?.model != null) {
+                                            scheduleNotifications(
+                                                context,
+                                                GlobalObjects.patient,
+                                                medicationViewModel!!.model,
+                                                duplicateTimes
+                                            )
+                                        }
+
+                                        medicationController?.invoke(
+                                            MedicationViewEvent.TimeEvent,
+                                            medicationViewModel?.getSelectedTimes()
+                                        )
+
+
+                                        medicationController?.invoke(
+                                            MedicationViewEvent.UpdateEvent,
+                                            medicationViewModel
+                                        )
+                                        println(medication)
+
+
+
+                                        if (medicationViewModel?.successfulChange?.value == true) {
+                                            if (GlobalObjects.type == "doctor") {
+                                                onNavigateToMedicationList(patientId)
+                                            } else {
+                                                println(medication)
+                                                onNavigateToMedicationList(patientId)
+                                            }
+                                            medicationViewModel?.clearAll()
+                                        } else {
+                                            showAddMedicationErrorDialog.value = true
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            showValidationErrorDialog.value = true
+                        }
+                    },
+                    enabled = true
+                )
+            }
+
+        }
+    }
+}

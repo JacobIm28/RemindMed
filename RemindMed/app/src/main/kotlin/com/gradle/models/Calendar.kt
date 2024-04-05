@@ -5,18 +5,31 @@ import java.util.Date
 import java.util.Locale
 
 data class CalendarModel(
-    val selectedDate: DateModel, // the date selected by the User. by default is Today.
-    val visibleDates: List<DateModel> // the dates shown on the screen
+    val selectedDate: DateModel,
+    val visibleDates: List<DateModel>
 ) {
+    val startDate: DateModel = visibleDates.first()
+    val endDate: DateModel = visibleDates.last()
 
-    val startDate: DateModel = visibleDates.first() // the first of the visible dates
-    val endDate: DateModel = visibleDates.last() // the last of the visible dates
-
-    data class DateModel(
-        val date: Date,
-        val isSelected: Boolean,
-        val isToday: Boolean
-    ) {
-        val day: String = SimpleDateFormat("E", Locale.getDefault()).format(date) ?: ""
-    }
+    val monthNames = mapOf(
+        1 to "Jan",
+        2 to "Feb",
+        3 to "Mar",
+        4 to "Apr",
+        5 to "May",
+        6 to "Jun",
+        7 to "Jul",
+        8 to "Aug",
+        9 to "Sep",
+        10 to "Oct",
+        11 to "Nov",
+        12 to "Dec"
+    )
+}
+data class DateModel(
+    val date: Date,
+    val isSelected: Boolean,
+    val isToday: Boolean
+) {
+    val day: String = SimpleDateFormat("E", Locale.getDefault()).format(date) ?: ""
 }

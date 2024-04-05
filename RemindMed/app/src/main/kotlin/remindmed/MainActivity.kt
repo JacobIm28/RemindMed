@@ -6,33 +6,30 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
-import com.gradle.models.LoginModel
-import com.gradle.ui.views.shared.Login
-import com.example.remindmed.databinding.ActivityMainBinding
 import com.gradle.constants.CHANNEL_ID
-import com.gradle.ui.views.RemindMedApp
-
+import com.gradle.ui.viewModels.LoginViewModel
+import com.gradle.ui.views.shared.Login
 
 class MainActivity : ComponentActivity() {
-    private lateinit var binding: ActivityMainBinding
-
     private val PERMISSION_NOTIFICATION_CODE: Int = 100
-    private val PERMISSION_SCHEDULE_CODE: Int = 100
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val mainViewModel: LoginModel by viewModels()
+        val mainViewModel: LoginViewModel by viewModels()
         mainViewModel.setContext(this)
 
         createNotificationChannel()
+        
+        setAutoOrientationEnabled(applicationContext)
 
         setContent {
-            Login(mainViewModel, applicationContext)
+            Login(mainViewModel)
         }
     }
 
@@ -56,12 +53,19 @@ class MainActivity : ComponentActivity() {
         when (requestCode) {
             PERMISSION_NOTIFICATION_CODE -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
+                    println("Permission granted")
+                } else {
+                    println("Permission denied")
                 }
             }
         }
 
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
-}
 
+    private fun setAutoOrientationEnabled(context: Context) {
+        if (Settings.System.canWrite(context) && Settings.System.getInt(context.contentResolver, Settings.System.ACCELEROMETER_ROTATION, 0) != 1) {
+            Settings.System.putInt(context.contentResolver, Settings.System.ACCELEROMETER_ROTATION, 1)
+        }
+    }
+}

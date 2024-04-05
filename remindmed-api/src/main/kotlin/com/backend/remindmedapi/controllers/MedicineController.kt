@@ -19,7 +19,7 @@ import com.google.gson.JsonObject
 class MedicineController {
     @GetMapping("")
     @ResponseBody
-    fun getMedication(@RequestParam("name") name: String): JsonObject? {
+    fun getMedicationById(@RequestParam("id") name: String): JsonObject? {
         val result: JsonObject = callOpenFdaSingleDrug(name)
         if (result.isJsonNull) {
             return null
@@ -29,8 +29,8 @@ class MedicineController {
 
     @GetMapping("/all")
     @ResponseBody
-    fun getAllMedications(@RequestParam("name") name: String): MutableList<String>{
-        val result: MutableList<String> = callListOfMedication(name)
+    fun getAllMedications(@RequestParam("name") name: String): MutableList<Pair<String, String>>{
+        val result: MutableList<Pair<String, String>> = callListOfMedication(name)
         if (result.isEmpty()) {
             return mutableListOf()
         }

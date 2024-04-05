@@ -1,158 +1,167 @@
 package com.gradle.ui.views.shared
 
 import android.annotation.SuppressLint
+import android.os.Handler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material3.*
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.outlined.Info
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.navArgument
-import com.gradle.constants.GlobalObjects
-import com.gradle.constants.NavArguments
-import com.gradle.constants.Routes
-import com.gradle.constants.doctorView
-import com.gradle.models.Doctor
-import com.gradle.models.Medication
-//import com.gradle.ui.components.notifications.NotificationService
-import com.gradle.ui.theme.*
-import com.gradle.models.Patient
 import com.gradle.ui.components.TitleLarge
-import com.gradle.apiCalls.Patient as PatientApi
-import com.gradle.apiCalls.Doctor as DoctorApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.AlertDialog
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import com.gradle.apiCalls.DoctorApi
+import com.gradle.apiCalls.PatientApi
+import com.gradle.constants.GlobalObjects
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.dp
+import com.gradle.controller.PeopleListController
+import com.gradle.models.PeopleList
+import com.gradle.ui.components.DoctorItem
+import com.gradle.ui.components.LoadingScreen
+import com.gradle.ui.components.PatientItem
+import com.gradle.ui.components.TitleLarge
+import com.gradle.ui.components.PeopleListPatientItem
+import com.gradle.ui.components.TitleLarge
+import com.gradle.ui.theme.AppTheme
+import com.gradle.ui.viewModels.LoginViewModel
+import com.gradle.ui.viewModels.PeopleListViewModel
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+enum class PeopleListEvent {
+    DeleteEvent
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("RememberReturnType", "UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun PeopleListScreen(navController: NavController) {
-    var peopleList = if(GlobalObjects.type == "patient") {
-        PatientApi().getDoctors(GlobalObjects.patient.pid)
-    } else {
-        DoctorApi().getPatients(GlobalObjects.doctor.did)
-    }
-    val doctorView = if(GlobalObjects.type == "patient") {
-        false
-    } else {
-        true
+fun PeopleListScreen(onNavigateToMedicationList: (String) -> Unit, LoginModel: LoginViewModel) {
+    val model : PeopleList = PeopleList()
+    val viewModel : PeopleListViewModel by remember{ mutableStateOf(PeopleListViewModel(model)) }
+    val controller : PeopleListController by remember{ mutableStateOf(PeopleListController(model)) }
+    var isLoading by remember { mutableStateOf(true) }
+
+    var doctorName by remember { mutableStateOf("") }
+    var patientName by remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+        if (GlobalObjects.type == "doctor") {
+            viewModel.patientList.value = DoctorApi().getPatients(GlobalObjects.doctor.did)
+            doctorName = DoctorApi().getDoctor(GlobalObjects.doctor.did).name
+        } else {
+            viewModel.doctorList.value = PatientApi().getDoctors(GlobalObjects.patient.pid)
+            patientName = PatientApi().getPatientbyId(GlobalObjects.patient.pid).name
+        }
+        isLoading = false
     }
 
     AppTheme {
-        Scaffold(
-            floatingActionButton = {
-                if (doctorView) {
-                    FloatingActionButton(
-                        onClick = { navController.navigate(Routes.ADD_PATIENT) },
-                        containerColor = MaterialTheme.colorScheme.primary
-                    ) {
-                        Icon(Icons.Default.Add, contentDescription = "Add Medication")
+        if (isLoading) {
+            LoadingScreen()
+        } else {
+            LazyColumn(modifier = Modifier.padding()) {
+                if (GlobalObjects.type == "doctor") {
+                    item {
+                        TitleLarge("${doctorName.substringBefore(" ")}'s Patients")
+                        HorizontalDivider()
                     }
-                }
-            },
-        ) { padding ->
-            Column (
-                Modifier
-                    .padding(padding)
-            ) {
-                if (doctorView) {
-                    TitleLarge("Patients")
-                } else {
-                    TitleLarge("Doctors")
-                }
-
-                if (doctorView) {
-                    LazyColumn {
-                        items(peopleList) { patient ->
-                            PatientItem(patient as Patient, navController)
+                    if (viewModel.patientList.value.isEmpty()) {
+                        item {
+                            Spacer(modifier = Modifier.height(20.dp))
+                            Text(
+                                "No Patients Found",
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .wrapContentHeight(),
+                                style = typography.h6,
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Center,
+                                color = MaterialTheme.colorScheme.primary
+                            )
                         }
                     }
+                    items(viewModel.patientList.value) { patient ->
+                        println("PATIENT: $patient")
+                        PeopleListPatientItem(
+                            patient,
+                            onNavigateToMedicationList,
+                            true,
+                            false,
+                            { str ->
+                                controller.invoke(
+                                    PeopleListEvent.DeleteEvent,
+                                    str
+                                )
+                            },
+                            LoginModel
+                        )
+                    }
                 } else {
-                    LazyColumn {
-                        items(peopleList) { doctor ->
-                            DoctorItem(doctor as Doctor)
+                    if (GlobalObjects.type == "patient") {
+                        item {
+                            TitleLarge("${patientName.substringBefore(" ")}'s Doctors")
+                            HorizontalDivider()
+                        }
+                    }
+                        if (viewModel.doctorList.value.isEmpty()) {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        "No Doctors Found",
+                                        style = typography.h6,
+                                        fontWeight = FontWeight.Bold,
+                                        textAlign = TextAlign.Center,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            }
+                        }
+                        items(viewModel.doctorList.value) { doctor ->
+                            DoctorItem(doctor)
                         }
                     }
                 }
-            }
-        }
-    }
-}
 
-@Composable
-fun DoctorItem(doctor: Doctor) {
-    AppTheme {
-        Card(
-            modifier = Modifier.padding(6.dp),
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 4.dp
-            ),
-
-            colors = CardColors(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                disabledContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                disabledContentColor = MaterialTheme.colorScheme.onTertiaryContainer
-            )
-        ) {
-            Row(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(Icons.Outlined.Info, contentDescription = null, Modifier.size(50.dp))
-                Spacer(modifier = Modifier.width(8.dp))
-                Column {
-                    Text(doctor.name, fontWeight = FontWeight.Bold)
+                if (viewModel.showDialog.value && viewModel.successfullyRemovedPatient.value) {
+                    AlertDialog(
+                        onDismissRequest = { viewModel.showDialog.value = false },
+                        text = { Text("Success!") },
+                        confirmButton = {
+                            Button(onClick = { viewModel.showDialog.value = false }) {
+                                Text("OK", color = Color.White)
+                            }
+                        }
+                    )
+                    Handler().postDelayed({ viewModel.showDialog.value = false }, 5000)
+                } else if (viewModel.showDialog.value && !viewModel.successfullyRemovedPatient.value) {
+                    AlertDialog(
+                        onDismissRequest = { viewModel.showDialog.value = false },
+                        text = { Text("Success!") },
+                        confirmButton = {
+                            Button(onClick = { viewModel.showDialog.value = false }) {
+                                Text("OK", color = Color.White)
+                            }
+                        }
+                    )
+                    Handler().postDelayed({ viewModel.showDialog.value = false }, 5000)
                 }
             }
         }
     }
-}
-
-@Composable
-fun PatientItem(patient: Patient, navController: NavController) {
-    AppTheme {
-        Card(
-            modifier = Modifier.padding(6.dp),
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 4.dp
-            ),
-
-            colors = CardColors(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                disabledContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                disabledContentColor = MaterialTheme.colorScheme.onTertiaryContainer
-            )
-        ) {
-            Row(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(Icons.Outlined.Info, contentDescription = null, Modifier.size(50.dp))
-                Spacer(modifier = Modifier.width(8.dp))
-                Column {
-                    Text(patient.name, fontWeight = FontWeight.Bold)
-                }
-                Spacer(modifier = Modifier.weight(1f))
-                IconButton(onClick = {
-                    navController.navigate(Routes.MEDICATION_LIST + "?" +
-                            "${NavArguments.MEDICATION_LIST.PID}=${patient.pid}")
-                }) {
-                    Icon(Icons.Default.ArrowForward, contentDescription = "Go to details")
-                }
-            }
-        }
-    }
-}
-

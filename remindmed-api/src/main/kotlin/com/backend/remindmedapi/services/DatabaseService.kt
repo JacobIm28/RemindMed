@@ -37,13 +37,15 @@ class DatabaseService {
       val row = ArrayList<Any>()
       for (i in 1..rsmd.columnCount) {
         if (rsmd.getColumnTypeName(i) == "date") {
-            row.add(data.getDate(i))
+          row.add(data.getDate(i))
         } else if (rsmd.getColumnTypeName(i) == "jsonb") {
-            row.add(data.getObject(i) as PGobject)
+          row.add(data.getObject(i) as PGobject)
         } else if (rsmd.getColumnTypeName(i) == "serial" || rsmd.getColumnTypeName(i) == "int4") {
-            row.add(data.getInt(i))
+          row.add(data.getInt(i))
         } else if (rsmd.getColumnTypeName(i) == "_time") {
-            row.add(data.getArray(i).array as Array<Time>)
+          row.add(data.getArray(i).array as Array<Time>)
+        } else if (rsmd.getColumnTypeName(i) == "bool") {
+            row.add(data.getBoolean(i))
         } else {
             row.add(data.getString(i))
         }

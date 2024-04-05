@@ -12,5 +12,7 @@
 
     <string name="com_auth0_domain">dev-cog1thu33l6uz3pp.us.auth0.com</string>
     <string name="com_auth0_client_id">tYTVa6uhQY0ZrNK8PMzBUsp6dRR1TcR2</string>
+    <string name="com_auth0_client_api_id">ZWR8P2MkE3FUeUqYahfIkVzSpyoEPXzE</string>
+    <string name="com_auth0_api_secret">pV_iHLgnnoHEyD0PLoSDn7wlBzWKDevjIpVufXy1eIS_ICUlQ9uVvOWnGoi2m3TK</string>
 
 </resources>
