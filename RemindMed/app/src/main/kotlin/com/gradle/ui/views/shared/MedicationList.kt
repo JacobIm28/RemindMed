@@ -66,6 +66,7 @@ fun MedicationListScreen(
     var viewModel by remember { mutableStateOf(MedicationListViewModel(model)) }
     var controller by remember { mutableStateOf(MedicationListController(model)) }
 
+    println("PID: $pid")
     LaunchedEffect(Unit) {
         medications = PatientApi().getMedicines(pid)
         if (GlobalObjects.type == "patient") {
@@ -75,6 +76,7 @@ fun MedicationListScreen(
             if (patientResult.pid != "-1") {
                 patient = patientResult
             }
+            println(patient)
         }
 
         model = MedicationList(medications, patient)
@@ -103,7 +105,7 @@ fun MedicationListScreen(
                 TitleLarge("${patient.name.substringBefore(" ")}'s Medication")
                 if(viewModel.medicationList.value.isEmpty()) {
                     Text(
-                        "No Medications found",
+                        "No Medications Found",
                         modifier = Modifier.fillMaxSize().wrapContentHeight(),
                         style = androidx.compose.material.MaterialTheme.typography.h6,
                         fontWeight = FontWeight.Bold,
@@ -123,7 +125,7 @@ fun MedicationListScreen(
                                 coroutineScope.launch {
                                     controller.invoke(
                                         MedicationListViewEvent.MedicationRemove,
-                                        medication.medicationId
+                                        medication
                                     )
                                 }
                             },
@@ -179,8 +181,10 @@ fun MedicationItem(
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                Text("${medication.name}", fontWeight = FontWeight.Bold)
+                Text(medication.name, fontWeight = FontWeight.Bold)
+
                 Text("Dosage: ${medication.amount}", style = MaterialTheme.typography.bodyMedium)
+
                 Text(
                     "Dates: ${medication.startDate} - ${medication.endDate}",
                     style = MaterialTheme.typography.bodyMedium
@@ -193,7 +197,7 @@ fun MedicationItem(
             }
 
             Column {
-                if (accepted) {
+                if (accepted || GlobalObjects.type == "doctor") {
                     IconButton(onClick = {
                         showDialog = true
                     }) {

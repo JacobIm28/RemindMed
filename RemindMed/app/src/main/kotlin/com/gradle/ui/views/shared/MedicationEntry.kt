@@ -55,6 +55,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.sql.Date
 import java.sql.Time
+import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
 enum class MedicationViewEvent {
@@ -88,10 +89,20 @@ fun MedicationEntryScreen(
     var medications by remember { mutableStateOf(emptyList<Medication>()) }
     var user by remember { mutableStateOf<Patient?>(null) }
 
+    val calendar = Calendar.getInstance()
+    calendar.time = java.util.Date()
+    calendar.set(Calendar.HOUR_OF_DAY, 0)
+    calendar.set(Calendar.MINUTE, 0)
+    calendar.set(Calendar.SECOND, 0)
+    calendar.set(Calendar.MILLISECOND, 0)
+
+    val todayStart = calendar.time
+
     LaunchedEffect(Unit) {
         user = PatientApi().getPatientbyId(pid)
         medications = PatientApi().getMedicines(pid)
         medicationController.model.pid = pid
+        medicationViewModel.clearAll()
         medicationViewModel.clearTimePickerState()
     }
 
@@ -104,6 +115,8 @@ fun MedicationEntryScreen(
     val showDuplicateMedicationErrorDialog = remember { mutableStateOf(false) }
 
     val showDateInvalidRangeErrorDialog = remember { mutableStateOf(false) }
+
+    val showDateBeforeCurrentDateErrorDialog = remember { mutableStateOf(false) }
 
     if (showAddMedicationErrorDialog.value) {
         AlertDialog(
@@ -151,6 +164,19 @@ fun MedicationEntryScreen(
             text = { Text("The start date must be before or equal to the end date.") },
             confirmButton = {
                 Button(onClick = { showDateInvalidRangeErrorDialog.value = false }) {
+                    Text("OK")
+                }
+            }
+        )
+    }
+
+    if (showDateBeforeCurrentDateErrorDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showDateBeforeCurrentDateErrorDialog.value = false },
+            title = { Text("Date Error") },
+            text = { Text("The entered dates cannot be before the current date.") },
+            confirmButton = {
+                Button(onClick = { showDateBeforeCurrentDateErrorDialog.value = false }) {
                     Text("OK")
                 }
             }
@@ -438,7 +464,7 @@ fun MedicationEntryScreen(
                     text = "Cancel",
                     onClick = {
                         if (GlobalObjects.type == "doctor") {
-                            onNavigateToPeopleList()
+                            onNavigateToMedicationList(pid)
                         } else {
                             onNavigateToMedicationList(pid)
                         }
@@ -457,36 +483,42 @@ fun MedicationEntryScreen(
                                 val startDate = medicationViewModel.startDate.value
                                 val endDate = medicationViewModel.endDate.value
 
-                                if (startDate > endDate) {
-                                    showDateInvalidRangeErrorDialog.value = true
+                                if (startDate != null && startDate.before(todayStart)) {
+                                    showDateBeforeCurrentDateErrorDialog.value = true
                                 } else {
-                                    controller.invoke(
-                                        MedicationViewEvent.TimeEvent,
-                                        medicationViewModel.getSelectedTimes()
-                                    )
-                                    medicationViewModel.model.accepted =
-                                        GlobalObjects.type == "patient"
-                                    controller.invoke(
-                                        MedicationViewEvent.AddEvent,
-                                        medicationViewModel
-                                    )
 
-                                    if (medicationViewModel.successfulAdd.value) {
-                                        if (GlobalObjects.type == "patient") {
-                                            scheduleNotifications(
-                                                context,
-                                                user!!,
-                                                medicationViewModel.model,
-                                                mutableListOf<Time>()
-                                            )
-                                            onNavigateToMedicationList(GlobalObjects.patient.pid)
-                                        } else {
-                                            onNavigateToMedicationList(medicationViewModel.pid.value)
-                                        }
-                                        onNavigateToMedicationList(pid)
-                                        medicationViewModel.clearAll()
+                                    if (startDate != null && endDate != null && startDate > endDate) {
+                                        showDateInvalidRangeErrorDialog.value = true
                                     } else {
-                                        showAddMedicationErrorDialog.value = true
+                                        controller.invoke(
+                                            MedicationViewEvent.TimeEvent,
+                                            medicationViewModel.getSelectedTimes()
+                                        )
+                                        medicationViewModel.model.accepted =
+                                            GlobalObjects.type == "patient"
+
+                                        controller.invoke(
+                                            MedicationViewEvent.AddEvent,
+                                            medicationViewModel
+                                        )
+
+                                        if (medicationViewModel.successfulAdd.value) {
+                                            if (GlobalObjects.type == "patient") {
+                                                scheduleNotifications(
+                                                    context,
+                                                    user!!,
+                                                    medicationViewModel.model,
+                                                    mutableListOf<Time>()
+                                                )
+//                                            onNavigateToMedicationList(GlobalObjects.patient.pid)
+                                            }
+//                                        else {
+//                                            onNavigateToMedicationList(medicationViewModel.pid.value)
+//                                        }
+                                            onNavigateToMedicationList(pid)
+                                        } else {
+                                            showAddMedicationErrorDialog.value = true
+                                        }
                                     }
                                 }
                             }

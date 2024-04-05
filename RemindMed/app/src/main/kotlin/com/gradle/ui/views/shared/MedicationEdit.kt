@@ -47,6 +47,7 @@ import com.gradle.ui.components.MedicationSummaryCard
 import com.gradle.ui.components.TitleLarge
 import com.gradle.ui.theme.AppTheme
 import com.gradle.ui.viewModels.MedicationViewModel
+import com.gradle.utilities.notifications.NotificationUtils.Companion.scheduleNotifications
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -54,6 +55,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.sql.Date
 import java.sql.Time
+import java.time.LocalDate
+import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
 @RequiresApi(Build.VERSION_CODES.S)
@@ -84,6 +87,14 @@ fun MedicationEditScreen(
 
     val context = LocalContext.current
 
+    val calendar = Calendar.getInstance()
+    calendar.time = java.util.Date()
+    calendar.set(Calendar.HOUR_OF_DAY, 0)
+    calendar.set(Calendar.MINUTE, 0)
+    calendar.set(Calendar.SECOND, 0)
+    calendar.set(Calendar.MILLISECOND, 0)
+    val todayStart = calendar.time
+
     LaunchedEffect(Unit) {
         val medications = PatientApi().getMedicines(patientId)
         medication = medications.find { it.medicationId == medicationId }
@@ -113,6 +124,8 @@ fun MedicationEditScreen(
     val showValidationErrorDialog = remember { mutableStateOf(false) }
     val showDuplicateMedicationErrorDialog = remember { mutableStateOf(false) }
     val showDateInvalidRangeErrorDialog = remember { mutableStateOf(false) }
+
+    val showDateBeforeCurrentDateErrorDialog = remember { mutableStateOf(false) }
 
     if (showAddMedicationErrorDialog.value) {
         AlertDialog(
@@ -160,6 +173,19 @@ fun MedicationEditScreen(
             text = { Text("The start date must be before or equal to the end date.") },
             confirmButton = {
                 Button(onClick = { showDateInvalidRangeErrorDialog.value = false }) {
+                    Text("OK")
+                }
+            }
+        )
+    }
+
+    if (showDateBeforeCurrentDateErrorDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showDateBeforeCurrentDateErrorDialog.value = false },
+            title = { Text("Date Error") },
+            text = { Text("The entered dates cannot be before the current date.") },
+            confirmButton = {
+                Button(onClick = { showDateBeforeCurrentDateErrorDialog.value = false }) {
                     Text("OK")
                 }
             }
@@ -449,9 +475,9 @@ fun MedicationEditScreen(
                     text = "Cancel",
                     onClick = {
                         if (GlobalObjects.type == "doctor") {
-                            onNavigateToPeopleList()
+                            onNavigateToMedicationList(patientId)
                         } else {
-                            onNavigateToMedicationList(GlobalObjects.patient.pid)
+                            onNavigateToMedicationList(patientId)
                         }
                     },
                     enabled = true
@@ -468,39 +494,55 @@ fun MedicationEditScreen(
                                 val startDate = medicationViewModel?.startDate?.value
                                 val endDate = medicationViewModel?.endDate?.value
 
-                                if (startDate != null && endDate != null && startDate > endDate) {
-                                    showDateInvalidRangeErrorDialog.value = true
+                                if (startDate != null && startDate.before(todayStart)) {
+                                    showDateBeforeCurrentDateErrorDialog.value = true
                                 } else {
-                                    medicationController?.invoke(
-                                        MedicationViewEvent.TimeEvent,
-                                        medicationViewModel?.getSelectedTimes()
-                                    )
 
-//                                    var duplicateTimes = MutableList<Time>()
-//
-//                                    if (GlobalObjects.type == "patient" && medicationViewModel?.model != null) {
-//                                        scheduleNotifications(
-//                                            context,
-//                                            GlobalObjects.patient,
-//                                            medicationViewModel!!.model,
-//                                            duplicateTimes
-//                                        )
-//                                    }
 
-                                    medicationController?.invoke(
-                                        MedicationViewEvent.UpdateEvent,
-                                        medicationViewModel
-                                    )
-
-                                    if (medicationViewModel?.successfulChange?.value == true) {
-                                        if (GlobalObjects.type == "doctor") {
-                                            onNavigateToPeopleList()
-                                        } else {
-                                            onNavigateToMedicationList(GlobalObjects.patient.pid)
-                                        }
-                                        medicationViewModel?.clearAll()
+                                    if (startDate != null && endDate != null && startDate > endDate) {
+                                        showDateInvalidRangeErrorDialog.value = true
                                     } else {
-                                        showAddMedicationErrorDialog.value = true
+
+                                        val duplicateTimes = medicationViewModel?.times?.value?.intersect(
+                                            medicationViewModel?.getSelectedTimes() ?: emptyList()
+                                        )?.toList() ?: emptyList()
+
+                                        println("DUPLICATE TIMES: $duplicateTimes")
+
+                                        if (GlobalObjects.type == "patient" && medicationViewModel?.model != null) {
+                                            scheduleNotifications(
+                                                context,
+                                                GlobalObjects.patient,
+                                                medicationViewModel!!.model,
+                                                duplicateTimes
+                                            )
+                                        }
+
+                                        medicationController?.invoke(
+                                            MedicationViewEvent.TimeEvent,
+                                            medicationViewModel?.getSelectedTimes()
+                                        )
+
+
+                                        medicationController?.invoke(
+                                            MedicationViewEvent.UpdateEvent,
+                                            medicationViewModel
+                                        )
+                                        println(medication)
+
+
+
+                                        if (medicationViewModel?.successfulChange?.value == true) {
+                                            if (GlobalObjects.type == "doctor") {
+                                                onNavigateToMedicationList(patientId)
+                                            } else {
+                                                println(medication)
+                                                onNavigateToMedicationList(patientId)
+                                            }
+                                            medicationViewModel?.clearAll()
+                                        } else {
+                                            showAddMedicationErrorDialog.value = true
+                                        }
                                     }
                                 }
                             }
