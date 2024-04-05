@@ -65,6 +65,7 @@ fun MedicationListScreen(
     var model by remember { mutableStateOf(MedicationList(medications, patient)) }
     var viewModel by remember { mutableStateOf(MedicationListViewModel(model)) }
     var controller by remember { mutableStateOf(MedicationListController(model)) }
+    var name by remember { mutableStateOf("") }
 
     println("PID: $pid")
     LaunchedEffect(Unit) {
@@ -82,6 +83,11 @@ fun MedicationListScreen(
         model = MedicationList(medications, patient)
         viewModel = MedicationListViewModel(model)
         controller = MedicationListController(model)
+    }
+
+    LaunchedEffect(patient) {
+        name = patient.name
+        println("Name: $name")
     }
 
     AppTheme {
@@ -102,7 +108,7 @@ fun MedicationListScreen(
                     .padding(padding)
                     .fillMaxWidth()
             ) {
-                TitleLarge("${patient.name.substringBefore(" ")}'s Medication")
+                TitleLarge("${name.substringBefore(" ")}'s Medication")
                 if(viewModel.medicationList.value.isEmpty()) {
                     Text(
                         "No Medications Found",
