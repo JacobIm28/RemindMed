@@ -27,6 +27,7 @@ import com.gradle.apiCalls.DoctorApi
 import com.gradle.apiCalls.PatientApi
 import com.gradle.constants.GlobalObjects
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import com.gradle.controller.PeopleListController
 import com.gradle.models.PeopleList
@@ -81,7 +82,7 @@ fun PeopleListScreen(onNavigateToMedicationList: (String) -> Unit, LoginModel: L
                         item {
                             Spacer(modifier = Modifier.height(20.dp))
                             Text(
-                                "No patients found",
+                                "No Patients Found",
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .wrapContentHeight(),
@@ -93,6 +94,7 @@ fun PeopleListScreen(onNavigateToMedicationList: (String) -> Unit, LoginModel: L
                         }
                     }
                     items(viewModel.patientList.value) { patient ->
+                        println("PATIENT: $patient")
                         PeopleListPatientItem(
                             patient,
                             onNavigateToMedicationList,
@@ -116,17 +118,19 @@ fun PeopleListScreen(onNavigateToMedicationList: (String) -> Unit, LoginModel: L
                     }
                         if (viewModel.doctorList.value.isEmpty()) {
                             item {
-                                Spacer(modifier = Modifier.height(20.dp))
-                                Text(
-                                    "No doctors found",
+                                Box(
                                     modifier = Modifier
-                                        .fillMaxSize()
-                                        .wrapContentHeight(),
-                                    style = typography.h6,
-                                    fontWeight = FontWeight.Bold,
-                                    textAlign = TextAlign.Center,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
+                                        .fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        "No Doctors Found",
+                                        style = typography.h6,
+                                        fontWeight = FontWeight.Bold,
+                                        textAlign = TextAlign.Center,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                }
                             }
                         }
                         items(viewModel.doctorList.value) { doctor ->

@@ -97,7 +97,7 @@ fun HomeMedicationItem(
                 modifier = Modifier
                     .weight(1f)
             ) {
-                Text(medication.name, fontWeight = FontWeight.Bold)
+                Text("Medication: ${medication.name}", fontWeight = FontWeight.Bold)
                 Text("Dosage: ${medication.amount}", style = MaterialTheme.typography.bodyMedium)
 
                 Text(

@@ -96,7 +96,9 @@ fun PeopleListPatientItem(patient: Patient, onNavigateMedicationList: (String) -
                 disabledContentColor = MaterialTheme.colorScheme.onTertiaryContainer
             ),
             onClick = {
+                println("PATIENT PID" + patient.pid)
                 if (!isAddPatient) {
+                    println("PATIENT PID" + patient.pid)
                     onNavigateMedicationList(patient.pid)
                 }
             }

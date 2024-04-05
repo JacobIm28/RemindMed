@@ -27,6 +27,7 @@ import com.gradle.controller.AddPatientController
 import com.gradle.models.AddPatient
 import com.gradle.models.Patient
 import com.gradle.ui.components.ButtonPrimary
+import com.gradle.ui.components.ButtonSecondary
 import com.gradle.ui.components.HeadlineLarge
 import com.gradle.ui.components.PatientItem
 import com.gradle.ui.components.TitleLarge
@@ -69,7 +70,7 @@ fun AddPatientScreen(onNavigateToMedicationList: (String) -> Unit) {
     AppTheme {
         Box(modifier = Modifier.verticalScroll(rememberScrollState())) {
             Column(modifier = Modifier.padding()) {
-                TitleLarge("Add A New Patient")
+                TitleLarge("Enter New Patient")
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -80,12 +81,12 @@ fun AddPatientScreen(onNavigateToMedicationList: (String) -> Unit) {
                     viewModel.email.value,
                     { controller.invoke(AddPatientViewEvent.EmailEvent, it) },
                     !viewModel.emailIsValid.value,
-                    "Not a valid email"
+                    "Not a Valid Email"
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Row(modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                    ButtonPrimary(
+                    ButtonSecondary(
                         "Search",
                         { controller.invoke(AddPatientViewEvent.SearchPatientEvent, "") },
                         viewModel.emailIsValid.value
@@ -111,7 +112,7 @@ fun AddPatientScreen(onNavigateToMedicationList: (String) -> Unit) {
                 }
 
                 Row(modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                    ButtonPrimary(
+                    ButtonSecondary(
                         "Add Patient",
                         { controller.invoke(AddPatientViewEvent.AddPatientEvent, "") },
                         viewModel.currPatient.value != null && !viewModel.patientAlreadyUnderDoctor.value && viewModel.submitEnabled.value

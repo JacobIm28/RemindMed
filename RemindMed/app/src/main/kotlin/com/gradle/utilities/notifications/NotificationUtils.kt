@@ -12,6 +12,8 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationManagerCompat
 import com.gradle.models.Medication
 import com.gradle.models.Patient
+import com.gradle.models.TimeSerializer
+import kotlinx.serialization.Serializable
 import java.sql.Date
 import java.sql.Time
 
@@ -25,7 +27,7 @@ class NotificationUtils {
             context: Context,
             patient: Patient,
             medication: Medication,
-            duplicateTimes: MutableList<Time>
+            duplicateTimes: List<@Serializable(with = TimeSerializer::class) Time>
         ) {
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
