@@ -273,17 +273,17 @@ fun MedicationEntryScreen(
 
         Column {
             OutlinedTextField(
-                value = searchTerm,
+                value = medicationViewModel.name.value,
                 onValueChange = { term ->
-                    searchTerm = term
-                    if (term.text.isNotBlank()) {
-                        searchWithDelay(term)
+                    medicationViewModel.name.value = term
+                    if (term.isNotBlank()) {
+                        searchWithDelay(TextFieldValue(term))
                     } else {
                         searchResults = emptyList()
                     }
                     suggestionClicked = false
                     expanded =
-                        (term.text.isNotBlank() && !suggestionClicked) // Expand dropdown only when there's text
+                        (term.isNotBlank() && !suggestionClicked) // Expand dropdown only when there's text
                 },
                 label = { Text("Search Medication") },
                 placeholder = { Text("Enter Medication Name") },
@@ -321,11 +321,6 @@ fun MedicationEntryScreen(
                                             MedicationViewEvent.MedicationIdEvent,
                                             suggestion
                                         )
-                                        searchTerm =
-                                            TextFieldValue(
-                                                suggestion.first,
-                                                TextRange(suggestion.first.length)
-                                            )
                                         expanded = false
                                     }
                                     .padding(vertical = 16.dp, horizontal = 16.dp),
@@ -354,7 +349,7 @@ fun MedicationEntryScreen(
 
             MedicationSearchBar(
                 onSearch = {
-                    searchResults = MedicationApi().getAllMedicationsbyName(searchTerm.text)
+                    searchResults = MedicationApi().getAllMedicationsbyName(medicationViewModel.name.value)
                 },
                 suggestions = searchResults
             )
