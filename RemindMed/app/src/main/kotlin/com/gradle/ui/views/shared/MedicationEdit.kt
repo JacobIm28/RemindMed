@@ -508,8 +508,6 @@ fun MedicationEditScreen(
                                             medicationViewModel?.getSelectedTimes() ?: emptyList()
                                         )?.toList() ?: emptyList()
 
-                                        println("DUPLICATE TIMES: $duplicateTimes")
-
                                         if (GlobalObjects.type == "patient" && medicationViewModel?.model != null) {
                                             scheduleNotifications(
                                                 context,
