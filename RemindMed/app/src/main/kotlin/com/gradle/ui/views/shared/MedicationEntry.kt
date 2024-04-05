@@ -406,14 +406,14 @@ fun MedicationEntryScreen(
                     )
                 }
 
-                CustomDatePicker(startDateState, "Start Date") {
+                CustomDatePicker(true, startDateState, "Start Date") {
                     controller.invoke(
                         MedicationViewEvent.StartDateEvent,
                         Date(startDateState.selectedDateMillis?.let { it + TimeUnit.DAYS.toMillis(1) }
                             ?: System.currentTimeMillis()))
 
                 }
-                CustomDatePicker(endDateState, "End Date") {
+                CustomDatePicker(true, endDateState, "End Date") {
                     controller.invoke(
                         MedicationViewEvent.EndDateEvent,
                         Date(endDateState.selectedDateMillis?.let { it + TimeUnit.DAYS.toMillis(1) }

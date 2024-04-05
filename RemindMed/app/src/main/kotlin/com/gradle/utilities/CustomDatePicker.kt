@@ -23,7 +23,7 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CustomDatePicker(state: DatePickerState, date: String, onDateSelected: (String) -> Unit) {
+fun CustomDatePicker(enabled: Boolean = true, state: DatePickerState, date: String, onDateSelected: (String) -> Unit) {
     var displayedDate by remember { mutableStateOf(date) }
 
     LaunchedEffect(date) {
@@ -44,7 +44,7 @@ fun CustomDatePicker(state: DatePickerState, date: String, onDateSelected: (Stri
                     disabledContainerColor = MaterialTheme.colorScheme.tertiary,
                     disabledContentColor = MaterialTheme.colorScheme.onTertiary
                 ),
-                enabled = true
+                enabled = enabled,
             ) {
                 Text(text = displayedDate)
             }
