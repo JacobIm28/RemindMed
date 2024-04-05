@@ -56,6 +56,7 @@ class DoctorController {
     @PostMapping("")
     @ResponseBody
     fun addDoctor(@RequestBody doctor: Doctor): String {
+        println(doctor)
         val result = databaseService.query("INSERT INTO Doctors (did, name, email) VALUES ('${doctor.did}','${doctor.name}', '${doctor.email}') RETURNING did;")
         return "Inserted Doctor with name: ${doctor.name} and email: ${doctor.email} with new id: ${result!![0][0]}"
     }

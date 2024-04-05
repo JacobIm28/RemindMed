@@ -1,148 +1,170 @@
 package com.gradle.ui.views.shared
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.NavDeepLinkBuilder
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import com.example.remindmed.R
+import com.gradle.apiCalls.PatientApi
 import com.gradle.constants.GlobalObjects
-import com.gradle.apiCalls.Patient as PatientApi
-import com.gradle.constants.NavArguments
-import com.gradle.constants.Routes
-import com.gradle.models.LoginModel
+import com.gradle.controller.MedicationController
+import com.gradle.controller.MedicationListController
 import com.gradle.models.Medication
-import com.gradle.ui.components.ButtonSecondary
-import com.gradle.ui.components.HeadlineLarge
+import com.gradle.models.MedicationList
+import com.gradle.models.Patient
 import com.gradle.ui.components.TitleLarge
 import com.gradle.ui.theme.*
-import com.gradle.utilities.toFormattedDateString
-import kotlinx.coroutines.coroutineScope
+import com.gradle.ui.viewModels.MedicationListViewModel
+import com.gradle.ui.viewModels.MedicationViewModel
+import com.gradle.utilities.notifications.NotificationUtils.Companion.scheduleNotifications
 import kotlinx.coroutines.launch
-import java.sql.Date
 import java.sql.Time
-import java.time.format.DateTimeFormatter
 
-import com.gradle.apiCalls.Medication as MedicationApi
+enum class MedicationListViewEvent {
+    MedicationRemove
+}
 
-//@OptIn(ExperimentalMaterial3Api::class)
-@RequiresApi(Build.VERSION_CODES.O)
+@RequiresApi(Build.VERSION_CODES.S)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun MedicationListScreen(navController: NavController, pid: String) {
-    // TODO: Implement some sort async code rot run this on load, and display a loading screen in the meantime
+fun MedicationListScreen(
+    pid: String,
+    onNavigateToMedicationEntry: (String) -> Unit,
+    onNavigateToMedicationEdit: (Medication) -> Unit,
+    onNavigateToMedicationInfo: (Medication) -> Unit,
+) {
     val coroutineScope = rememberCoroutineScope()
-    var patient = PatientApi().getPatientbyId(pid)
-    var medications: List<Medication> = PatientApi().getMedicines(pid)
+    var medications by remember { mutableStateOf(mutableListOf<Medication>()) }
+    var patient by remember { mutableStateOf(Patient()) }
+    var model by remember { mutableStateOf(MedicationList(medications, patient)) }
+    var viewModel by remember { mutableStateOf(MedicationListViewModel(model)) }
+    var controller by remember { mutableStateOf(MedicationListController(model)) }
+    var name by remember { mutableStateOf("") }
+
+    println("PID: $pid")
+    LaunchedEffect(Unit) {
+        medications = PatientApi().getMedicines(pid)
+        if (GlobalObjects.type == "patient") {
+            patient = GlobalObjects.patient
+        } else {
+            val patientResult = PatientApi().getPatientbyId(pid)
+            if (patientResult.pid != "-1") {
+                patient = patientResult
+            }
+            println(patient)
+        }
+
+        model = MedicationList(medications, patient)
+        viewModel = MedicationListViewModel(model)
+        controller = MedicationListController(model)
+    }
+
+    LaunchedEffect(patient) {
+        name = patient.name
+        println("Name: $name")
+    }
 
     AppTheme {
         Scaffold(
             floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { navController.navigate(Routes.MEDICATION_ENTRY)},
-                    containerColor = MaterialTheme.colorScheme.primary
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = "Add Medication")
+                if (GlobalObjects.type == "doctor") {
+                    FloatingActionButton(
+                        onClick = { onNavigateToMedicationEntry(pid) },
+                        containerColor = MaterialTheme.colorScheme.primary
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = "Add Medication")
+                    }
                 }
             },
         ) { padding ->
-            Column (
+            Column(
                 Modifier
                     .padding(padding)
+                    .fillMaxWidth()
             ) {
-
-                TitleLarge("${patient.name.substringBefore(" ")}'s Medication")
-
-                HeadlineLarge("Medications")
+                TitleLarge("${name.substringBefore(" ")}'s Medication")
+                if(viewModel.medicationList.value.isEmpty()) {
+                    Text(
+                        "No Medications Found",
+                        modifier = Modifier.fillMaxSize().wrapContentHeight(),
+                        style = androidx.compose.material.MaterialTheme.typography.h6,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+                HorizontalDivider()
                 LazyColumn {
-                    items(medications) { medication ->
+                    items(viewModel.medicationList.value) { medication ->
+                        Spacer(modifier = Modifier.height(8.dp))
                         MedicationItem(
+                            context = LocalContext.current,
+                            patient = patient,
                             medication = medication,
-                            navController = navController,
-//                            onRemove = {
-//                                coroutineScope.launch {
-//                                    val success = PatientApi().removeMedication(GlobalObjects.patient.pid, medication.medicationId)
-//                                    if (success) {
-//                                        // Fetch the updated medications list
-//                                        medications = PatientApi().getMedicines(GlobalObjects.patient.pid).toList()
-//                                    } else {
-//                                        // Handle the case where medication removal was unsuccessful
-//                                        // This might involve showing an error message to the user
-//                                    }
-//                                }
-//                            },
                             onRemove = {
-                                val success = PatientApi().removeMedication(GlobalObjects.patient.pid, medication.medicationId)
-                                if (success) { println("Medication Removed")
-                                   medications = PatientApi().getMedicines(GlobalObjects.patient.pid).toList()
-                                } else {
-                                    medications = PatientApi().getMedicines(GlobalObjects.patient.pid).toList()
-                                    println("Medication Not Removed")
+                                coroutineScope.launch {
+                                    controller.invoke(
+                                        MedicationListViewEvent.MedicationRemove,
+                                        medication
+                                    )
                                 }
-                                println(medications)
                             },
-                            onClick = {
-                                navController.navigate(
-                                    Routes.MEDICATION_INFO + "?${NavArguments.MEDICATION_INFO.MEDICATION_NAME}=${medication.name}&" +
-                                            "${NavArguments.MEDICATION_INFO.START_DATE}=${medication.startDate}&" +
-                                            "${NavArguments.MEDICATION_INFO.END_DATE}=${medication.endDate}&" +
-                                            "${NavArguments.MEDICATION_INFO.DOSAGE}=${medication.amount}"
-                                )
-                            }
+                            onClick = { onNavigateToMedicationInfo(medication) },
+                            onNavigateToMedicationEdit
                         )
                     }
-                }
-
-                Spacer(modifier = (Modifier.height(16.dp)))
-                Row (modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                    ButtonSecondary(text = "See More", onClick = {}, enabled = true)
                 }
             }
         }
     }
 }
 
-
-@RequiresApi(Build.VERSION_CODES.O)
+@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun MedicationItem(
+    context: Context,
+    patient: Patient,
     medication: Medication,
-    navController: NavController,
     onRemove: () -> Unit,
-    onClick: () -> Unit // Click listener for the entire item
+    onClick: () -> Unit,
+    onNavigateToMedicationEdit: (Medication) -> Unit
 ) {
     var showDialog by remember { mutableStateOf(false) }
-
+    var accepted by remember { mutableStateOf(medication.accepted) }
     Card(
         modifier = Modifier
-            .padding(6.dp)
+            .padding(horizontal = 6.dp, vertical = 3.dp) // Adjust padding here
             .clickable(onClick = onClick), // Apply click listener to the entire item
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
         ),
+        shape = RoundedCornerShape(16.dp), // Adjust shape here
         colors = CardColors(
             containerColor = MaterialTheme.colorScheme.tertiary,
             contentColor = MaterialTheme.colorScheme.primary,
@@ -156,27 +178,66 @@ fun MedicationItem(
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val formatter = DateTimeFormatter.ofPattern("MMMM dd")
-            val formattedStartDate = medication.startDate.toFormattedDateString().format(formatter)
-            val formattedEndDate = medication.endDate.toFormattedDateString().format(formatter)
-
-            Icon(Icons.Outlined.Info, contentDescription = null, Modifier.size(50.dp))
-            Spacer(modifier = Modifier.width(8.dp))
-            Column {
+            Image(
+                painter = painterResource(R.drawable.medicine),
+                contentDescription = null,
+                Modifier.size(50.dp)
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
                 Text(medication.name, fontWeight = FontWeight.Bold)
-                Text(medication.amount, style = MaterialTheme.typography.bodyMedium)
-                Text("${medication.startDate} - ${medication.endDate}", style = MaterialTheme.typography.bodyMedium)
-                Text("${medication.times}", style = MaterialTheme.typography.bodyMedium)
+
+                Text("Dosage: ${medication.amount}", style = MaterialTheme.typography.bodyMedium)
+
+                Text(
+                    "Dates: ${medication.startDate} - ${medication.endDate}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    "Times: ${medication.getFormattedTimes().joinToString(", ")}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text("Notes: ${medication.notes}", style = MaterialTheme.typography.bodyMedium)
             }
-            Spacer(modifier = Modifier.weight(1f))
 
             Column {
-                IconButton(onClick = { navController.navigate(Routes.MEDICATION_EDIT) }) {
-                    Icon(Icons.Filled.Edit, contentDescription = "Edit")
-                }
-                // Remove icon
-                IconButton(onClick = { showDialog = true }) { // Set showDialog to true when remove icon clicked
-                    Icon(Icons.Filled.Delete, contentDescription = "Delete")
+                if (accepted || GlobalObjects.type == "doctor") {
+                    IconButton(onClick = {
+                        showDialog = true
+                    }) {
+                        Icon(Icons.Filled.Clear, contentDescription = "Delete")
+                    }
+                    IconButton(onClick = { onNavigateToMedicationEdit(medication) }) {
+                        Icon(Icons.Filled.Edit, contentDescription = "Edit")
+                    }
+                } else if (GlobalObjects.type == "patient") {
+                    IconButton(
+                        onClick = { showDialog = true }
+                    ) {
+                        Icon(Icons.Filled.Clear, contentDescription = "Decline")
+                    }
+                    IconButton(
+                        onClick = {
+                            scheduleNotifications(
+                                context,
+                                patient,
+                                medication,
+                                mutableListOf<Time>()
+                            )
+                            accepted = true
+                            medication.accepted = true
+                            var medicationViewModel = MedicationViewModel(medication)
+                            var medicationController = MedicationController(medication)
+
+                            medicationController.invoke(
+                                MedicationViewEvent.UpdateEvent,
+                                medicationViewModel
+                            )
+                        }) {
+                        Icon(Icons.Filled.Check, contentDescription = "Accept")
+                    }
                 }
             }
         }
@@ -207,11 +268,3 @@ fun MedicationItem(
         )
     }
 }
-
-
-//@Preview(showBackground = true)
-//@Composable
-//fun MedicationListScreenPreview() {
-//    MedicationListScreen()
-//}
-//
