@@ -28,6 +28,7 @@ class PatientController(val model: Patient, private val loginViewModel: LoginVie
                         model._name = model.name
                         model._email = model.email
                         model.submitEnabled = false
+                        GlobalObjects.patient = newPat
                     }
                 } catch (e: Exception) {
                     model.errorMessage = e.message.toString()

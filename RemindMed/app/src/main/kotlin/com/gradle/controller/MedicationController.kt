@@ -5,8 +5,10 @@ import androidx.annotation.RequiresApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import com.gradle.models.Medication
 import com.gradle.ui.views.shared.MedicationViewEvent
+import io.ktor.util.reflect.typeInfo
 import java.sql.Date
 import java.sql.Time
+import kotlin.reflect.typeOf
 
 import com.gradle.apiCalls.PatientApi as PatientApi
 import com.gradle.apiCalls.MedicationApi as MedicationApi
@@ -20,7 +22,15 @@ class MedicationController(val model: Medication) {
                 val res = value as Pair<String, String>
                 model.medicationId = res.second
             }
-            MedicationViewEvent.NameEvent -> model.name = value as String
+            MedicationViewEvent.NameEvent -> {
+                if(value is String) {
+                    model.name = value
+                    return
+                } else {
+                    val res = value as Pair<String, String>
+                    model.name = res.first
+                }
+            }
             MedicationViewEvent.AmountEvent -> model.amount = value as String
             MedicationViewEvent.StartDateEvent -> model.startDate = value as Date
             MedicationViewEvent.EndDateEvent -> model.endDate = value as Date

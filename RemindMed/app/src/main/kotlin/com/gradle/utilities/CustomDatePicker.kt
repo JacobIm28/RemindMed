@@ -16,6 +16,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
 import com.gradle.ui.theme.AppTheme
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -42,7 +43,7 @@ fun CustomDatePicker(enabled: Boolean = true, state: DatePickerState, date: Stri
                     containerColor = MaterialTheme.colorScheme.tertiary,
                     contentColor = MaterialTheme.colorScheme.primary,
                     disabledContainerColor = MaterialTheme.colorScheme.tertiary,
-                    disabledContentColor = MaterialTheme.colorScheme.onTertiary
+                    disabledContentColor = Color.Gray
                 ),
                 enabled = enabled,
             ) {
