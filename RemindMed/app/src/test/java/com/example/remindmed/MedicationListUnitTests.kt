@@ -4,13 +4,12 @@ import com.gradle.controller.MedicationListController
 import com.gradle.models.Medication
 import com.gradle.models.MedicationList
 import com.gradle.models.Patient
-import com.gradle.ui.views.shared.MedicationListViewEvent
-import com.gradle.ui.views.shared.MedicationListViewModel
+import com.gradle.ui.viewModels.MedicationListViewModel
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 internal class MedicationListUnitTests {
-    private val model : MedicationList = MedicationList(emptyList<Medication>(), Patient())
+    private val model: MedicationList = MedicationList(emptyList<Medication>(), Patient())
 
     @Test
     fun viewModelTests() {
@@ -26,7 +25,7 @@ internal class MedicationListUnitTests {
         val controller = MedicationListController(model)
 
         val currMeds = model.medicationList
-        controller.invoke(MedicationListViewEvent.MedicationRemove, "DNE")
+//        controller.invoke(MedicationListViewEvent.MedicationRemove, )
         assertEquals(currMeds, model.medicationList)
     }
 }

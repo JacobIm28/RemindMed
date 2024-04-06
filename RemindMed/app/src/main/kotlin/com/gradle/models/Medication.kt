@@ -142,12 +142,15 @@ class Medication(
         }
 
     override fun toString(): String {
-        return "Medication(pid=$pid, medicationId=$medicationId, amount='$amount', startDate=${startDate}, endDate=${endDate}, name=$name, notes=$notes) times=${times} accepted=$accepted taken=$taken"
+        return "Medication(pid=$pid, medicationId=$medicationId, amount='$amount', startDate=${startDate}, endDate=${endDate}, name=$name, notes=$notes, times=${times}, accepted=$accepted, taken=$taken)"
     }
 
     fun getFormattedTimes(): List<String> {
         return times.map { time ->
-            val formattedHour = if (time.hours == 0 || time.hours == 12) "12" else String.format("%02d", time.hours % 12)
+            val formattedHour = if (time.hours == 0 || time.hours == 12) "12" else String.format(
+                "%02d",
+                time.hours % 12
+            )
             val paddedMinute = String.format("%02d", time.minutes)
             val period = if (time.hours < 12) "AM" else "PM"
             "$formattedHour:$paddedMinute $period"

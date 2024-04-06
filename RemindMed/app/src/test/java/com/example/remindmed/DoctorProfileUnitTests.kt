@@ -2,19 +2,20 @@ package com.example.remindmed
 
 import com.gradle.controller.DoctorController
 import com.gradle.models.Doctor
-import com.gradle.ui.views.DoctorViewModel
+import com.gradle.ui.viewModels.DoctorViewModel
+import com.gradle.ui.viewModels.LoginViewModel
 import com.gradle.ui.views.shared.ProfileViewEvent
+import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.junit.Assert.*
 
 
 internal class DoctorProfileUnitTests {
-    private val testDoc : Doctor = Doctor("1", "Gen", "gen@gmail.com")
+    private val testDoc: Doctor = Doctor("1", "Gen", "gen@gmail.com")
 
     @Test
     fun viewModelTests() {
         // changing the various fields
-        var viewModDoc : DoctorViewModel = DoctorViewModel(testDoc)
+        var viewModDoc: DoctorViewModel = DoctorViewModel(testDoc)
 
         assertEquals(viewModDoc.name.value, testDoc.name)
         assertEquals(viewModDoc.email.value, testDoc.email)
@@ -29,7 +30,8 @@ internal class DoctorProfileUnitTests {
 
     @Test
     fun controllerTests() {
-        val controller = DoctorController(testDoc)
+        val loginViewModel = LoginViewModel()
+        val controller = DoctorController(testDoc, loginViewModel)
 
         controller.invoke(ProfileViewEvent.NameEvent, "Jacob")
         assertEquals("Jacob", testDoc.name)

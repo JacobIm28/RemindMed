@@ -29,7 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -375,7 +374,8 @@ fun MedicationEntryScreen(
 
             MedicationSearchBar(
                 onSearch = {
-                    searchResults = MedicationApi().getAllMedicationsbyName(medicationViewModel.name.value)
+                    searchResults =
+                        MedicationApi().getAllMedicationsbyName(medicationViewModel.name.value)
                 },
                 suggestions = searchResults
             )
@@ -510,11 +510,7 @@ fun MedicationEntryScreen(
                                                     medicationViewModel.model,
                                                     mutableListOf<Time>()
                                                 )
-//                                            onNavigateToMedicationList(GlobalObjects.patient.pid)
                                             }
-//                                        else {
-//                                            onNavigateToMedicationList(medicationViewModel.pid.value)
-//                                        }
                                             onNavigateToMedicationList(pid)
                                         } else {
                                             showAddMedicationErrorDialog.value = true

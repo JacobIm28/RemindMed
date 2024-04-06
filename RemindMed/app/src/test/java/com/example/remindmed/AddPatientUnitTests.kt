@@ -3,13 +3,13 @@ package com.example.remindmed
 import com.gradle.controller.AddPatientController
 import com.gradle.models.AddPatient
 import com.gradle.models.Patient
+import com.gradle.ui.viewModels.AddPatientViewModel
 import com.gradle.ui.views.doctor.AddPatientViewEvent
-import com.gradle.ui.views.doctor.AddPatientViewModel
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 internal class AddPatientUnitTests {
-    private val mod : AddPatient = AddPatient("1", mutableListOf<Patient>())
+    private val mod: AddPatient = AddPatient("1", mutableListOf<Patient>())
 
     @Test
     fun viewModelTests() {
