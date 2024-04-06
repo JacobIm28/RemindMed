@@ -1,6 +1,5 @@
 package com.gradle.models
 
-import android.util.Log
 import com.auth0.android.jwt.JWT
 
 
@@ -24,10 +23,10 @@ data class User(val idToken: String? = null, var type: String = "", var name: St
                 name = jwt.getClaim("name").asString() ?: ""
                 email = jwt.getClaim("email").asString() ?: ""
             } catch (error: com.auth0.android.jwt.DecodeException) {
-                Log.e(TAG, "Error occurred trying to decode JWT: $error ")
+                println(TAG + "Error occurred trying to decode JWT: $error ")
             }
         } else {
-            Log.d(TAG, "User is logged out - instantiating empty User object.")
+            println(TAG + "User is logged out - instantiating empty User object.")
         }
     }
 
