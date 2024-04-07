@@ -7,7 +7,8 @@ their prescriptions with usage notes, and then have reminders automatically sche
 As a result, medications can be properly used, leading to improved care for patients,
 and more time for doctors to help others.
 
-[//]: # (Screenshots, introduction video)
+# Introduction Video
+[![RemindMed Introduction Video](https://img.youtube.com/vi/6Sh5vcLsh7g/0.jpg)](https://youtu.be/6Sh5vcLsh7g)
 
 ## Developers
 Gen Nishiwaki, gen.nishiwaki@gmail.com  
@@ -16,7 +17,7 @@ Jason Zhang, jaszhang6@gmail.com
 Samir Ali, samirhas49@gmail.com
 
 ## Documentation
-- Information on how to use our app can be found in our [user documentation](https://git.uwaterloo.ca/s295ali1/team-102-3/-/wikis/Documentation)  
+- Information on how to use our app can be found in our [user documentation](https://git.uwaterloo.ca/s295ali1/team-102-3/-/wikis/User-Documentation)  
 - Information on the deisgn and architecture of our app can be found in our [design documentation](https://git.uwaterloo.ca/s295ali1/team-102-3/-/wikis/Design-Document)
 
 ## Release Notes
@@ -57,7 +58,7 @@ Samir Ali, samirhas49@gmail.com
 [//]: # (* Gradle)
 
 [//]: # ()
-[//]: # (1. Open RemindMed folder in root of project via Android Studio)
+[//]: # (1. Open RemindMed folder in root of project via Android Studio, this is not the root of the repository.)
 
 [//]: # (2. Wait a few minutes to allow for the gradle build to happen, you'll know it is done when the green play button is available.)
 
