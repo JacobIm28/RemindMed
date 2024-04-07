@@ -6,7 +6,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.example.remindmed.R
+import com.cs346.remindmed.R
 
 val FONT = FontFamily(Font(R.font.poppins))
 

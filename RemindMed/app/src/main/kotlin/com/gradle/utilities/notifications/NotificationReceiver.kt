@@ -9,7 +9,7 @@ import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import com.example.remindmed.R
+import com.cs346.remindmed.R
 import com.gradle.apiCalls.PatientApi
 import com.gradle.constants.CHANNEL_ID
 import com.gradle.utilities.notifications.NotificationUtils.Companion.createPendingIntent
