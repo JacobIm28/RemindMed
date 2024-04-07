@@ -483,7 +483,7 @@ fun MedicationEntryScreen(
                                 val startDate = medicationViewModel.startDate.value
                                 val endDate = medicationViewModel.endDate.value
 
-                                if (startDate != null && startDate.before(todayStart)) {
+                                if ((startDate != null && startDate.before(todayStart)) || (endDate != null && endDate.before(todayStart))) {
                                     showDateBeforeCurrentDateErrorDialog.value = true
                                 } else {
 
