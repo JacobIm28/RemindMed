@@ -495,7 +495,7 @@ fun MedicationEditScreen(
                                 val startDate = medicationViewModel?.startDate?.value
                                 val endDate = medicationViewModel?.endDate?.value
 
-                                if (startDate != null && startDate.before(todayStart)) {
+                                if (endDate != null && endDate.before(todayStart)) {
                                     showDateBeforeCurrentDateErrorDialog.value = true
                                 } else {
 
