@@ -1,4 +1,4 @@
-package com.example.remindmed
+package com.cs346.remindmed
 
 import com.gradle.controller.MedicationListController
 import com.gradle.models.Medication

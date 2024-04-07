@@ -1,4 +1,4 @@
-package com.example.remindmed.models
+package com.cs346.remindmed.models
 
 import com.gradle.models.Medication
 import org.junit.Assert.assertEquals

@@ -39,7 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.remindmed.R
+import com.cs346.remindmed.R
 import com.gradle.apiCalls.DoctorApi
 import com.gradle.apiCalls.PatientApi
 import com.gradle.constants.GlobalObjects
