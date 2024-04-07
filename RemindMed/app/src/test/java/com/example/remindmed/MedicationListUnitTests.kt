@@ -9,23 +9,12 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 internal class MedicationListUnitTests {
-    private val model: MedicationList = MedicationList(emptyList<Medication>(), Patient())
-
     @Test
     fun viewModelTests() {
+        val model: MedicationList = MedicationList(emptyList<Medication>(), Patient())
         val viewModel = MedicationListViewModel(model)
-
         val testP = Patient("1", "Gen", "g@gmail.com")
         model.patient = testP
         assertEquals(testP, viewModel.patient.value)
-    }
-
-    @Test
-    fun controllerTests() {
-        val controller = MedicationListController(model)
-
-        val currMeds = model.medicationList
-//        controller.invoke(MedicationListViewEvent.MedicationRemove, )
-        assertEquals(currMeds, model.medicationList)
     }
 }
