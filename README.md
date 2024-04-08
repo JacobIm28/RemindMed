@@ -3,7 +3,7 @@ With RemindMed, never forget to take your medications.  With scheduled reminders
 your list of medications, your list of doctors, and information on each medication, 
 RemindMed helps patients stay organized and on top of their medications.  With support
 patients and doctors, doctors have the ability to add their patients, send them 
-their prescriptions with usage notes, and then have reminders automatically scheduled. 
+their prescriptions with usage details, and then have reminders automatically scheduled. 
 As a result, medications can be properly used, leading to improved care for patients,
 and more time for doctors to help others.
 
