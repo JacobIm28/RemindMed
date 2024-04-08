@@ -198,7 +198,6 @@ fun MedicationItem(
                     "Times: ${medication.getFormattedTimes().joinToString(", ")}",
                     style = MaterialTheme.typography.bodyMedium
                 )
-                Text("Notes: ${medication.notes}", style = MaterialTheme.typography.bodyMedium)
             }
 
             Column {

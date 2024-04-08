@@ -506,6 +506,7 @@ fun MedicationEditScreen(
                         } else {
                             onNavigateToMedicationList(patientId)
                         }
+                        medicationViewModel?.clearAll()
                     },
                     enabled = true
                 )
