@@ -78,6 +78,8 @@ fun MedicationEditScreen(
     var timeStatesValue: List<TimePickerState> by remember { mutableStateOf(emptyList()) }
     var times by remember { mutableStateOf<List<Time>?>(emptyList()) }
 
+    var timesBeforeChange by remember { mutableStateOf<List<Time>?>(emptyList()) }
+
     var searchResults by remember { mutableStateOf<List<Pair<String, String>>>(emptyList()) }
     var searchTerm by remember { mutableStateOf(TextFieldValue("")) }
 
@@ -117,6 +119,7 @@ fun MedicationEditScreen(
         medicationViewModel?.timeStates = medicationViewModel?._timeStates ?: emptyList()
 
         times = medicationViewModel?.times?.value ?: emptyList()
+        timesBeforeChange = medicationViewModel?.times?.value ?: emptyList()
     }
 
     val showAddMedicationErrorDialog = remember { mutableStateOf(false) }
@@ -552,7 +555,7 @@ fun MedicationEditScreen(
                                         if (medicationViewModel?.successfulChange?.value == true) {
                                             if (GlobalObjects.type == "patient") {
                                                 val duplicateTimes =
-                                                    medicationViewModel?.times?.value?.intersect(
+                                                    timesBeforeChange?.intersect(
                                                         (medicationViewModel?.getSelectedTimes()
                                                             ?: emptyList()).toSet()
                                                     )?.toList() ?: emptyList()
