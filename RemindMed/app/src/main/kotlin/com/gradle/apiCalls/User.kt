@@ -14,7 +14,6 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.append
 import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
@@ -45,12 +44,14 @@ class User {
                             append(HttpHeaders.ContentType, ContentType.Application.Json)
                         }
                         setBody(
-                            Json.encodeToString(mapOf(
-                                "client_id" to "ZWR8P2MkE3FUeUqYahfIkVzSpyoEPXzE",
-                                "client_secret" to "pV_iHLgnnoHEyD0PLoSDn7wlBzWKDevjIpVufXy1eIS_ICUlQ9uVvOWnGoi2m3TK",
-                                "audience" to "https://dev-cog1thu33l6uz3pp.us.auth0.com/api/v2/",
-                                "grant_type" to "client_credentials"
-                            ))
+                            Json.encodeToString(
+                                mapOf(
+                                    "client_id" to "ZWR8P2MkE3FUeUqYahfIkVzSpyoEPXzE",
+                                    "client_secret" to "pV_iHLgnnoHEyD0PLoSDn7wlBzWKDevjIpVufXy1eIS_ICUlQ9uVvOWnGoi2m3TK",
+                                    "audience" to "https://dev-cog1thu33l6uz3pp.us.auth0.com/api/v2/",
+                                    "grant_type" to "client_credentials"
+                                )
+                            )
                         )
                     }.bodyAsText()
                     accessToken = JsonParser.parseString(res).asJsonObject["access_token"].asString
@@ -61,6 +62,7 @@ class User {
             throw e
         }
     }
+
     fun changeEmail(id: String, newEmail: String): Boolean {
         val apiToken = getAccessToken()
         return try {
@@ -68,18 +70,19 @@ class User {
             val auth0Id = "auth0|$id"
             runBlocking {
                 launch {
-                    println("Changing email for user with id: $id")
                     val res = client.patch("$host/api/v2/users/$auth0Id") {
                         headers {
-                            append(HttpHeaders.Authorization
-                                , "Bearer $apiToken"
+                            append(
+                                HttpHeaders.Authorization, "Bearer $apiToken"
                             )
                             append(HttpHeaders.ContentType, ContentType.Application.Json)
                         }
                         setBody(
-                            Json.encodeToString(mapOf(
-                                "email" to newEmail
-                            ))
+                            Json.encodeToString(
+                                mapOf(
+                                    "email" to newEmail
+                                )
+                            )
                         )
                     }
                     success = res.status.isSuccess()

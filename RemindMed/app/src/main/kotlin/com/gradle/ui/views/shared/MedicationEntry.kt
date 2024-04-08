@@ -113,9 +113,12 @@ fun MedicationEntryScreen(
 
     val showDuplicateMedicationErrorDialog = remember { mutableStateOf(false) }
 
+    val showDuplicateTimeErrorDialog = remember { mutableStateOf(false) }
+
     val showDateInvalidRangeErrorDialog = remember { mutableStateOf(false) }
 
     val showDateBeforeCurrentDateErrorDialog = remember { mutableStateOf(false) }
+
 
     if (showAddMedicationErrorDialog.value) {
         AlertDialog(
@@ -147,9 +150,22 @@ fun MedicationEntryScreen(
         AlertDialog(
             onDismissRequest = { showDuplicateMedicationErrorDialog.value = false },
             title = { Text("Duplicate Medication") },
-            text = { Text("This medication already exists as a prescription in your medication list. Please check your inputs.") },
+            text = { Text("Please check your inputs. This medication already exists as a prescription in your medication list.") },
             confirmButton = {
                 Button(onClick = { showDuplicateMedicationErrorDialog.value = false }) {
+                    Text("OK")
+                }
+            }
+        )
+    }
+
+    if (showDuplicateTimeErrorDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showDuplicateTimeErrorDialog.value = false },
+            title = { Text("Duplicate Time") },
+            text = { Text("Please check your inputs. Duplicate times cannot be added.") },
+            confirmButton = {
+                Button(onClick = { showDuplicateTimeErrorDialog.value = false }) {
                     Text("OK")
                 }
             }
@@ -160,7 +176,7 @@ fun MedicationEntryScreen(
         AlertDialog(
             onDismissRequest = { showDateInvalidRangeErrorDialog.value = false },
             title = { Text("Date Error") },
-            text = { Text("The start date must be before or equal to the end date.") },
+            text = { Text("Please check your inputs. The start date must be before or equal to the end date.") },
             confirmButton = {
                 Button(onClick = { showDateInvalidRangeErrorDialog.value = false }) {
                     Text("OK")
@@ -173,7 +189,7 @@ fun MedicationEntryScreen(
         AlertDialog(
             onDismissRequest = { showDateBeforeCurrentDateErrorDialog.value = false },
             title = { Text("Date Error") },
-            text = { Text("The entered dates cannot be before the current date.") },
+            text = { Text("Please check your inputs. The entered dates cannot be before the current date.") },
             confirmButton = {
                 Button(onClick = { showDateBeforeCurrentDateErrorDialog.value = false }) {
                     Text("OK")
@@ -228,7 +244,6 @@ fun MedicationEntryScreen(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             CustomTimePicker(medicationViewModel, timeState, false)
 
-                            Spacer(modifier = Modifier.width(8.dp))
                             if (medicationViewModel.timeStates.size > 1) {
                                 IconButton(
                                     onClick = {
@@ -241,6 +256,7 @@ fun MedicationEntryScreen(
                             }
                         }
                     }
+                    Spacer(modifier = Modifier.height(8.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center,
@@ -272,6 +288,7 @@ fun MedicationEntryScreen(
                             }
                         }
                     }
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
             }
         }
@@ -442,7 +459,7 @@ fun MedicationEntryScreen(
                 time = if (medicationViewModel.getSelectedFormattedTimes().isEmpty()) {
                     ""
                 } else {
-                    "${medicationViewModel.getSelectedFormattedTimes()}"
+                    "${medicationViewModel?.getSelectedFormattedTimes()?.joinToString(", ")}"
                 },
                 dates = if (medicationViewModel.startDate.value == Date(0) && medicationViewModel.endDate.value == Date(
                         0
@@ -483,13 +500,23 @@ fun MedicationEntryScreen(
                                 val startDate = medicationViewModel.startDate.value
                                 val endDate = medicationViewModel.endDate.value
 
-                                if ((startDate != null && startDate.before(todayStart)) || (endDate != null && endDate.before(todayStart))) {
+                                if ((startDate != null && startDate.before(todayStart)) || (endDate != null && endDate.before(
+                                        todayStart
+                                    ))
+                                ) {
                                     showDateBeforeCurrentDateErrorDialog.value = true
                                 } else {
 
                                     if (startDate != null && endDate != null && startDate > endDate) {
                                         showDateInvalidRangeErrorDialog.value = true
                                     } else {
+                                        if (medicationViewModel.getSelectedTimes().size > 1 && medicationViewModel.getSelectedTimes()
+                                                .distinct().size < medicationViewModel.getSelectedTimes().size
+                                        ) {
+                                            showDuplicateTimeErrorDialog.value = true
+                                            return@ButtonSecondary
+                                        }
+
                                         controller.invoke(
                                             MedicationViewEvent.TimeEvent,
                                             medicationViewModel.getSelectedTimes()

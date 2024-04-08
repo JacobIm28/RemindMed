@@ -2,7 +2,6 @@ package com.gradle.ui.views.shared
 
 import TextInput
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
@@ -23,7 +22,6 @@ import androidx.compose.material.RadioButton
 import androidx.compose.material.RadioButtonDefaults
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -58,10 +56,9 @@ import com.gradle.ui.views.RemindMedApp
 @Composable
 fun Login(mainViewModel: LoginViewModel = viewModel()) {
     AppTheme {
-        if(mainViewModel.userIsComplete){
+        if (mainViewModel.userIsComplete) {
             RemindMedApp(mainViewModel)
         } else {
-            println("Reached here")
             Surface(
                 modifier = Modifier.fillMaxSize(),
                 color = androidx.compose.material.MaterialTheme.colors.background
@@ -80,12 +77,6 @@ fun MainView(
     LaunchedEffect(Unit) {
         PatientApi().getAllPatients()
     }
-
-    // Uncomment to skip login process
-//    GlobalObjects.type = "patient"
-//    GlobalObjects.patient = PatientApi().getPatientbyId("65f9aa62cd606f2e1413f38e")
-//    viewModel.userIsAuthenticated = true
-//    viewModel.userIsComplete = true
 
     Column(
         modifier = Modifier.padding(20.dp, 50.dp, 20.dp, 20.dp),
@@ -106,12 +97,17 @@ fun MainView(
             var name by rememberSaveable { mutableStateOf(viewModel.user.name) }
             var type by rememberSaveable { mutableStateOf(viewModel.user.type) }
 
-            if(!validateName(name)) {
-                Text(text = "Please enter a valid name", style = TextStyle(color = androidx.compose.material.MaterialTheme.colors.error))
+            if (!validateName(name)) {
+                Text(
+                    text = "Please enter a valid name",
+                    style = TextStyle(color = androidx.compose.material.MaterialTheme.colors.error)
+                )
             }
 
-            Column (
-                modifier = Modifier.fillMaxWidth().padding(20.dp),
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
             ) {
                 HeadlineLarge(
                     text = "Please enter your name and select your type"
@@ -156,22 +152,31 @@ fun MainView(
         }
 
         var buttonText: String = "Begin"
-        var onClickAction: () -> Unit = { viewModel.login()}
+        var onClickAction: () -> Unit = { viewModel.login() }
         if (viewModel.userIsAuthenticated && !viewModel.userIsComplete) {
             buttonText = "Proceed"
-            onClickAction = { if(validateName(viewModel.user.name) && (viewModel.user.type == "patient" || viewModel.user.type == "doctor")) {
-                viewModel.userIsComplete = processNewUser(viewModel.user.name, viewModel.user.type, viewModel.user.email, viewModel.user.id)
-                if (viewModel.user.type == "patient") {
-                    GlobalObjects.patient = Patient(viewModel.user.id, viewModel.user.name, viewModel.user.email)
-                    GlobalObjects.type = "patient"
-                } else {
-                    GlobalObjects.doctor = Doctor(viewModel.user.id, viewModel.user.name, viewModel.user.email)
-                    GlobalObjects.type = "doctor"
+            onClickAction = {
+                if (validateName(viewModel.user.name) && (viewModel.user.type == "patient" || viewModel.user.type == "doctor")) {
+                    viewModel.userIsComplete = processNewUser(
+                        viewModel.user.name,
+                        viewModel.user.type,
+                        viewModel.user.email,
+                        viewModel.user.id
+                    )
+                    if (viewModel.user.type == "patient") {
+                        GlobalObjects.patient =
+                            Patient(viewModel.user.id, viewModel.user.name, viewModel.user.email)
+                        GlobalObjects.type = "patient"
+                    } else {
+                        GlobalObjects.doctor =
+                            Doctor(viewModel.user.id, viewModel.user.name, viewModel.user.email)
+                        GlobalObjects.type = "doctor"
+                    }
                 }
+                viewModel.isLoading = true
             }
-                viewModel.isLoading = true}
         } else {
-            Image (
+            Image(
                 painter = painterResource(id = R.drawable.logotransparent),
                 contentDescription = "RemindMed Logo",
                 modifier = Modifier
@@ -219,14 +224,12 @@ fun LogButton(
 }
 
 fun processNewUser(name: String, type: String, email: String, id: String): Boolean {
-    if(type == "patient" && name.isNotEmpty() && email.isNotEmpty() && id.isNotEmpty()) {
+    if (type == "patient" && name.isNotEmpty() && email.isNotEmpty() && id.isNotEmpty()) {
         PatientApi().addPatient(Patient(id, name, email))
         return true
     } else if (type == "doctor" && name.isNotEmpty() && email.isNotEmpty() && id.isNotEmpty()) {
         DoctorApi().addDoctor(Doctor(id, name, email))
         return true
-    } else {
-        println("Invalid user type")
     }
 
     return false

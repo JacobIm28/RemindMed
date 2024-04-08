@@ -36,7 +36,12 @@ import com.gradle.ui.theme.AppTheme
 import com.gradle.ui.viewModels.LoginViewModel
 
 @Composable
-fun PatientItem(patient: Patient, onNavigateMedicationList: (String) -> Unit, isValid: Boolean, isAddPatient: Boolean) {
+fun PatientItem(
+    patient: Patient,
+    onNavigateMedicationList: (String) -> Unit,
+    isValid: Boolean,
+    isAddPatient: Boolean
+) {
     AppTheme {
         Card(
             modifier = Modifier.padding(6.dp),
@@ -64,10 +69,12 @@ fun PatientItem(patient: Patient, onNavigateMedicationList: (String) -> Unit, is
                 Icon(Icons.Outlined.Person, contentDescription = null, Modifier.size(50.dp))
                 Spacer(modifier = Modifier.width(8.dp))
                 Column {
-                    Text(patient.name, style = MaterialTheme.typography.headlineMedium.copy(
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold
-                    ))
+                    Text(
+                        patient.name, style = MaterialTheme.typography.headlineMedium.copy(
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(patient.email)
                 }
@@ -78,8 +85,22 @@ fun PatientItem(patient: Patient, onNavigateMedicationList: (String) -> Unit, is
 }
 
 @Composable
-fun PeopleListPatientItem(patient: Patient, onNavigateMedicationList: (String) -> Unit, isValid: Boolean, isAddPatient: Boolean, controllerFunc : (String) -> Unit, loginModel: LoginViewModel) {
-    val controller : PatientController by remember{ mutableStateOf(PatientController(patient, loginModel) ) }
+fun PeopleListPatientItem(
+    patient: Patient,
+    onNavigateMedicationList: (String) -> Unit,
+    isValid: Boolean,
+    isAddPatient: Boolean,
+    controllerFunc: (String) -> Unit,
+    loginModel: LoginViewModel
+) {
+    val controller: PatientController by remember {
+        mutableStateOf(
+            PatientController(
+                patient,
+                loginModel
+            )
+        )
+    }
     var showDialog by remember { mutableStateOf(false) }
 
     AppTheme {
@@ -96,9 +117,7 @@ fun PeopleListPatientItem(patient: Patient, onNavigateMedicationList: (String) -
                 disabledContentColor = MaterialTheme.colorScheme.onTertiaryContainer
             ),
             onClick = {
-                println("PATIENT PID" + patient.pid)
                 if (!isAddPatient) {
-                    println("PATIENT PID" + patient.pid)
                     onNavigateMedicationList(patient.pid)
                 }
             }
@@ -112,16 +131,18 @@ fun PeopleListPatientItem(patient: Patient, onNavigateMedicationList: (String) -
                 Icon(Icons.Outlined.Person, contentDescription = null, Modifier.size(50.dp))
                 Spacer(modifier = Modifier.width(8.dp))
                 Column {
-                    Text(patient.name, style = MaterialTheme.typography.headlineMedium.copy(
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold
-                    ))
+                    Text(
+                        patient.name, style = MaterialTheme.typography.headlineMedium.copy(
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(patient.email)
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 if (!isAddPatient) {
-                    IconButton(onClick = {showDialog = true})
+                    IconButton(onClick = { showDialog = true })
                     {
                         Icon(
                             imageVector = Icons.Outlined.Clear,
