@@ -34,21 +34,21 @@ class MedicationViewModel(val model: Medication) : ISubscriber {
     }
 
     fun clearAll() {
-        medicationId.value = ""
-        name.value = ""
-        amount.value = ""
-        startDate.value = Date(0L)
-        endDate.value = Date(0L)
-        notes.value = ""
+        model.medicationId = ""
+        model.name = ""
+        model.amount = ""
+        model.startDate = Date(0L)
+        model.endDate = Date(0L)
+        model.notes = ""
         _timeStates.clear()
         _timeStates.add(TimePickerState(0, 0, false))
         times.value.clear()
-        successfulAdd.value = false
-        successfulChange.value = false
-        errorMessage.value = ""
-        isError.value = false
-        accepted.value = false
-        taken.value = false
+        model.successfulAdd = false
+        model.successfulChange = false
+        model.errorMessage = ""
+        model.isError = false
+        model.accepted = false
+        model.taken = false
     }
 
     fun clearTimePickerState() {

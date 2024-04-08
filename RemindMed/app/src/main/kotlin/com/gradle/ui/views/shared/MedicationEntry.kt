@@ -480,6 +480,7 @@ fun MedicationEntryScreen(
                 ButtonSecondary(
                     text = "Cancel",
                     onClick = {
+                        medicationViewModel.clearAll()
                         if (GlobalObjects.type == "doctor") {
                             onNavigateToMedicationList(pid)
                         } else {
@@ -539,6 +540,7 @@ fun MedicationEntryScreen(
                                                 )
                                             }
                                             onNavigateToMedicationList(pid)
+                                            medicationViewModel.clearAll()
                                         } else {
                                             showAddMedicationErrorDialog.value = true
                                         }
