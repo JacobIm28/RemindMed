@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -134,6 +135,7 @@ fun MyTimePickerDialog(
                                 val period = if (state.hour < 12) "AM" else "PM"
 
                                 onConfirm("$formattedHour:$paddedMinute $period")
+
                                 onDismiss()
                             },
                             enabled = true

@@ -62,7 +62,6 @@ class User {
             throw e
         }
     }
-
     fun changeEmail(id: String, newEmail: String): Boolean {
         val apiToken = getAccessToken()
         return try {
