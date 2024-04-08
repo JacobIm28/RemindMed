@@ -62,6 +62,11 @@ class Medication(
             field = value
             notifySubscribers()
         }
+    var name: String = initialName
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
 
     var amount: String = initialAmount
         set(value) {
@@ -81,12 +86,6 @@ class Medication(
             notifySubscribers()
         }
 
-    var name: String = initialName
-        set(value) {
-            field = value
-            notifySubscribers()
-        }
-
     var notes: String = initialNotes
         set(value) {
             field = value
@@ -94,6 +93,18 @@ class Medication(
         }
 
     var times: MutableList<@Serializable(with = TimeSerializer::class) Time> = initialTimes
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+
+    var accepted = initialAccepted
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+
+    var taken = initialTaken
         set(value) {
             field = value
             notifySubscribers()
@@ -124,18 +135,6 @@ class Medication(
         }
 
     var isError = false
-        set(value) {
-            field = value
-            notifySubscribers()
-        }
-
-    var accepted = initialAccepted
-        set(value) {
-            field = value
-            notifySubscribers()
-        }
-
-    var taken = initialTaken
         set(value) {
             field = value
             notifySubscribers()

@@ -1,4 +1,4 @@
-package com.example.remindmed
+package com.cs346.remindmed
 
 import com.gradle.controller.PeopleListController
 import com.gradle.models.PeopleList
