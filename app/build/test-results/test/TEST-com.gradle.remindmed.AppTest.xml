@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.gradle.remindmed.AppTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2024-02-01T02:34:05" hostname="Samirs-MacBook-Pro.local" time="0.011">
-  <properties/>
-  <testcase name="appHasAGreeting()" classname="com.gradle.remindmed.AppTest" time="0.011"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>
