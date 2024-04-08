@@ -16,12 +16,12 @@ class CalendarDataSource {
         calendar.time = startDate
 
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
-        val firstDayOfWeek = calendar.time
+        val firstDayInWeek = calendar.time
 
         calendar.add(Calendar.DAY_OF_YEAR, 7)
-        val endDayOfWeek = calendar.time
+        val endDayInWeek = calendar.time
 
-        val visibleDates = getDatesBetween(firstDayOfWeek, endDayOfWeek)
+        val visibleDates = getDatesBetween(firstDayInWeek, endDayInWeek)
         return toCalendarModel(visibleDates, lastSelectedDate)
     }
 
@@ -57,7 +57,7 @@ class CalendarDataSource {
         )
     }
 
-    private fun isToday(date: Date): Boolean {
+    fun isToday(date: Date): Boolean {
         val todayDate = today
         return date.toFormattedDateString() == todayDate.toFormattedDateString()
     }

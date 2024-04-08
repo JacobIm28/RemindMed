@@ -2,22 +2,28 @@ package com.gradle.ui.views.shared
 
 import android.annotation.SuppressLint
 import android.os.Handler
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.material.Text
-import com.gradle.ui.components.TitleLarge
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.AlertDialog
-import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -26,15 +32,10 @@ import androidx.compose.ui.unit.dp
 import com.gradle.apiCalls.DoctorApi
 import com.gradle.apiCalls.PatientApi
 import com.gradle.constants.GlobalObjects
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.unit.dp
 import com.gradle.controller.PeopleListController
 import com.gradle.models.PeopleList
 import com.gradle.ui.components.DoctorItem
 import com.gradle.ui.components.LoadingScreen
-import com.gradle.ui.components.PatientItem
-import com.gradle.ui.components.TitleLarge
 import com.gradle.ui.components.PeopleListPatientItem
 import com.gradle.ui.components.TitleLarge
 import com.gradle.ui.theme.AppTheme
@@ -49,9 +50,9 @@ enum class PeopleListEvent {
 @SuppressLint("RememberReturnType", "UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun PeopleListScreen(onNavigateToMedicationList: (String) -> Unit, LoginModel: LoginViewModel) {
-    val model : PeopleList = PeopleList()
-    val viewModel : PeopleListViewModel by remember{ mutableStateOf(PeopleListViewModel(model)) }
-    val controller : PeopleListController by remember{ mutableStateOf(PeopleListController(model)) }
+    val model: PeopleList = PeopleList()
+    val viewModel: PeopleListViewModel by remember { mutableStateOf(PeopleListViewModel(model)) }
+    val controller: PeopleListController by remember { mutableStateOf(PeopleListController(model)) }
     var isLoading by remember { mutableStateOf(true) }
 
     var doctorName by remember { mutableStateOf("") }
@@ -94,7 +95,6 @@ fun PeopleListScreen(onNavigateToMedicationList: (String) -> Unit, LoginModel: L
                         }
                     }
                     items(viewModel.patientList.value) { patient ->
-                        println("PATIENT: $patient")
                         PeopleListPatientItem(
                             patient,
                             onNavigateToMedicationList,
@@ -116,52 +116,52 @@ fun PeopleListScreen(onNavigateToMedicationList: (String) -> Unit, LoginModel: L
                             HorizontalDivider()
                         }
                     }
-                        if (viewModel.doctorList.value.isEmpty()) {
-                            item {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize(),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        "No Doctors Found",
-                                        style = typography.h6,
-                                        fontWeight = FontWeight.Bold,
-                                        textAlign = TextAlign.Center,
-                                        color = MaterialTheme.colorScheme.primary
-                                    )
-                                }
+                    if (viewModel.doctorList.value.isEmpty()) {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    "No Doctors Found",
+                                    style = typography.h6,
+                                    fontWeight = FontWeight.Bold,
+                                    textAlign = TextAlign.Center,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
                             }
-                        }
-                        items(viewModel.doctorList.value) { doctor ->
-                            DoctorItem(doctor)
                         }
                     }
+                    items(viewModel.doctorList.value) { doctor ->
+                        DoctorItem(doctor)
+                    }
                 }
+            }
 
-                if (viewModel.showDialog.value && viewModel.successfullyRemovedPatient.value) {
-                    AlertDialog(
-                        onDismissRequest = { viewModel.showDialog.value = false },
-                        text = { Text("Success!") },
-                        confirmButton = {
-                            Button(onClick = { viewModel.showDialog.value = false }) {
-                                Text("OK", color = Color.White)
-                            }
+            if (viewModel.showDialog.value && viewModel.successfullyRemovedPatient.value) {
+                AlertDialog(
+                    onDismissRequest = { viewModel.showDialog.value = false },
+                    text = { Text("Success!") },
+                    confirmButton = {
+                        Button(onClick = { viewModel.showDialog.value = false }) {
+                            Text("OK", color = Color.White)
                         }
-                    )
-                    Handler().postDelayed({ viewModel.showDialog.value = false }, 5000)
-                } else if (viewModel.showDialog.value && !viewModel.successfullyRemovedPatient.value) {
-                    AlertDialog(
-                        onDismissRequest = { viewModel.showDialog.value = false },
-                        text = { Text("Success!") },
-                        confirmButton = {
-                            Button(onClick = { viewModel.showDialog.value = false }) {
-                                Text("OK", color = Color.White)
-                            }
+                    }
+                )
+                Handler().postDelayed({ viewModel.showDialog.value = false }, 5000)
+            } else if (viewModel.showDialog.value && !viewModel.successfullyRemovedPatient.value) {
+                AlertDialog(
+                    onDismissRequest = { viewModel.showDialog.value = false },
+                    text = { Text("Success!") },
+                    confirmButton = {
+                        Button(onClick = { viewModel.showDialog.value = false }) {
+                            Text("OK", color = Color.White)
                         }
-                    )
-                    Handler().postDelayed({ viewModel.showDialog.value = false }, 5000)
-                }
+                    }
+                )
+                Handler().postDelayed({ viewModel.showDialog.value = false }, 5000)
             }
         }
     }
+}

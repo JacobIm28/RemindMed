@@ -62,6 +62,11 @@ class Medication(
             field = value
             notifySubscribers()
         }
+    var name: String = initialName
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
 
     var amount: String = initialAmount
         set(value) {
@@ -81,12 +86,6 @@ class Medication(
             notifySubscribers()
         }
 
-    var name: String = initialName
-        set(value) {
-            field = value
-            notifySubscribers()
-        }
-
     var notes: String = initialNotes
         set(value) {
             field = value
@@ -94,6 +93,18 @@ class Medication(
         }
 
     var times: MutableList<@Serializable(with = TimeSerializer::class) Time> = initialTimes
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+
+    var accepted = initialAccepted
+        set(value) {
+            field = value
+            notifySubscribers()
+        }
+
+    var taken = initialTaken
         set(value) {
             field = value
             notifySubscribers()
@@ -129,25 +140,16 @@ class Medication(
             notifySubscribers()
         }
 
-    var accepted = initialAccepted
-        set(value) {
-            field = value
-            notifySubscribers()
-        }
-
-    var taken = initialTaken
-        set(value) {
-            field = value
-            notifySubscribers()
-        }
-
     override fun toString(): String {
-        return "Medication(pid=$pid, medicationId=$medicationId, amount='$amount', startDate=${startDate}, endDate=${endDate}, name=$name, notes=$notes) times=${times} accepted=$accepted taken=$taken"
+        return "Medication(pid=$pid, medicationId=$medicationId, amount='$amount', startDate=${startDate}, endDate=${endDate}, name=$name, notes=$notes, times=${times}, accepted=$accepted, taken=$taken)"
     }
 
     fun getFormattedTimes(): List<String> {
         return times.map { time ->
-            val formattedHour = if (time.hours == 0 || time.hours == 12) "12" else String.format("%02d", time.hours % 12)
+            val formattedHour = if (time.hours == 0 || time.hours == 12) "12" else String.format(
+                "%02d",
+                time.hours % 12
+            )
             val paddedMinute = String.format("%02d", time.minutes)
             val period = if (time.hours < 12) "AM" else "PM"
             "$formattedHour:$paddedMinute $period"

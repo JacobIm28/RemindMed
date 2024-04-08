@@ -31,9 +31,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.gradle.ui.theme.AppTheme
-import java.sql.Time
-import android.app.TimePickerDialog
-import androidx.compose.material3.TimeInput
 import com.gradle.ui.viewModels.MedicationViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,15 +45,13 @@ fun CustomTimePicker(
     }
 
     LaunchedEffect(state.hour, state.minute) {
-        if (isEdit) {
-            val formattedHour = if (state.hour == 0 || state.hour == 12) "12" else String.format(
-                "%02d",
-                state.hour % 12
-            )
-            val paddedMinute = String.format("%02d", state.minute)
-            val period = if (state.hour < 12) "AM" else "PM"
-            time = "$formattedHour:$paddedMinute $period"
-        }
+        val formattedHour = if (state.hour == 0 || state.hour == 12) "12" else String.format(
+            "%02d",
+            state.hour % 12
+        )
+        val paddedMinute = String.format("%02d", state.minute)
+        val period = if (state.hour < 12) "AM" else "PM"
+        time = "$formattedHour:$paddedMinute $period"
     }
 
     var openDialog by remember {
@@ -100,9 +95,6 @@ fun MyTimePickerDialog(
     onDismiss: () -> Unit,
     onConfirm: (String) -> Unit
 ) {
-    var dialogState by remember {
-        mutableStateOf(false)
-    }
 
     AppTheme {
         Dialog(onDismissRequest = onDismiss) {
@@ -134,7 +126,6 @@ fun MyTimePickerDialog(
                         Spacer(modifier = Modifier.width(8.dp))
                         Button(
                             onClick = {
-                                println("state.hour: ${state.hour}")
                                 val formattedHour =
                                     if (state.hour == 0 || state.hour == 12) "12" else String.format(
                                         "%02d",
@@ -153,21 +144,6 @@ fun MyTimePickerDialog(
                         }
                     }
                 }
-            }
-
-            if (dialogState) {
-                AlertDialog(
-                    onDismissRequest = { dialogState = false },
-                    title = { Text(text = "Error") },
-                    text = { Text(text = "The selected time has already been added.") },
-                    confirmButton = {
-                        Button(
-                            onClick = { dialogState = false },
-                        ) {
-                            Text(text = "OK")
-                        }
-                    }
-                )
             }
         }
     }

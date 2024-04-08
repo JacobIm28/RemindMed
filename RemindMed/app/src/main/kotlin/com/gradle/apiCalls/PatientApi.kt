@@ -34,12 +34,12 @@ class PatientApi {
             ContentType.Application.Json
         }
     }
+
     fun getPatientbyId(id: String): Patient {
         return try {
             var patient: Patient? = null
             runBlocking {
                 launch {
-                    println("Getting patient with id: $id")
                     patient = client.get("$host/patient?id=$id").body()
                 }
             }
@@ -58,7 +58,6 @@ class PatientApi {
             var patient: Patient? = null
             runBlocking {
                 launch {
-                    println("Getting patient with email: $email")
                     patient = client.get("$host/patient/email?email=$email").body()
                 }
             }
@@ -77,7 +76,6 @@ class PatientApi {
             var doctors: MutableList<Doctor>? = null
             runBlocking {
                 launch {
-                    println("Getting all doctors")
                     doctors = client.get("$host/patient/doctors?pid=$pid").body()
                 }
             }
@@ -96,7 +94,6 @@ class PatientApi {
             var patients: MutableList<Patient>? = null
             runBlocking {
                 launch {
-                    println("Getting all patients")
                     patients = client.get("$host/patient/all").body()
                 }
             }
@@ -116,7 +113,6 @@ class PatientApi {
             var success = false
             runBlocking {
                 launch {
-                    println("Adding patient: $patient")
                     success = client.post("$host/patient/add") {
                         contentType(ContentType.Application.Json)
                         setBody(patient)
@@ -134,7 +130,6 @@ class PatientApi {
             var success = false
             runBlocking {
                 launch {
-                    println("Deleting patient with id: $id")
                     success = client.delete("$host/patient/delete?id=$id").status.isSuccess()
                 }
             }
@@ -149,8 +144,8 @@ class PatientApi {
             var success = false
             runBlocking {
                 launch {
-                    println("Updating patient: $patient")
-                    success = client.put("$host/patient/update?id=${patient.pid}&name=${patient.name}&email=${patient.email}").status.isSuccess()
+                    success =
+                        client.put("$host/patient/update?id=${patient.pid}&name=${patient.name}&email=${patient.email}").status.isSuccess()
                 }
             }
             success
@@ -165,9 +160,7 @@ class PatientApi {
             var success = false
             runBlocking {
                 launch {
-                    println("Adding medication: ${medication}")
-                    println("${medication}")
-                    success = client.post("$host/patient/medicine"){
+                    success = client.post("$host/patient/medicine") {
                         contentType(ContentType.Application.Json)
                         setBody(medication)
                     }.status.isSuccess()
@@ -179,28 +172,27 @@ class PatientApi {
         }
     }
 
-     fun removeMedication(pid: String, mid: String): Boolean {
-         return try {
-             var success = false
-             runBlocking {
-                 launch {
-                     println("Removing medication with id: $mid from patient with id: $pid")
-                     success = client.delete("$host/patient/medicine?pid=$pid&mid=$mid").status.isSuccess()
-                 }
-             }
-             success
-         } catch (e: Exception) {
-             throw e
-         }
-     }
+    fun removeMedication(pid: String, mid: String): Boolean {
+        return try {
+            var success = false
+            runBlocking {
+                launch {
+                    success =
+                        client.delete("$host/patient/medicine?pid=$pid&mid=$mid").status.isSuccess()
+                }
+            }
+            success
+        } catch (e: Exception) {
+            throw e
+        }
+    }
 
     fun updateMedication(medication: Medication): Boolean {
         return try {
             var success = false
             runBlocking {
                 launch {
-                    println("Updating medication: $medication")
-                    success = client.put("$host/patient/medicine"){
+                    success = client.put("$host/patient/medicine") {
                         contentType(ContentType.Application.Json)
                         setBody(medication)
                     }.status.isSuccess()
@@ -219,8 +211,8 @@ class PatientApi {
             var meds = mutableListOf<Medication>()
             runBlocking {
                 launch {
-                    meds = client.get("$host/patient/medicines?pid=$pid").body<MutableList<Medication>>()
-
+                    meds = client.get("$host/patient/medicines?pid=$pid")
+                        .body<MutableList<Medication>>()
                 }
             }
             meds.ifEmpty {

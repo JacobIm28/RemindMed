@@ -200,7 +200,7 @@ fun ProfileScreen(
                                     ""
                                 )
                             }) {
-                                Text("CANCEL")
+                                Text("Cancel")
                             }
                             Button(onClick = {
                                 controller.invoke(
@@ -370,7 +370,7 @@ fun ProfileScreen(
                                     ""
                                 )
                             }) {
-                                Text("CANCEL")
+                                Text("Cancel")
                             }
                             Button(onClick = {
                                 controller.invoke(

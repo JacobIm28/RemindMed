@@ -2,16 +2,22 @@ package com.gradle.apiCalls
 
 import com.gradle.models.Doctor
 import com.gradle.models.Patient
-import io.ktor.client.*
+import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.engine.android.*
-import io.ktor.client.request.*
+import io.ktor.client.engine.android.Android
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.delete
+import io.ktor.client.request.get
+import io.ktor.client.request.post
+import io.ktor.client.request.put
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import io.ktor.http.isSuccess
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.serialization.json.Json
 
 @OptIn(DelicateCoroutinesApi::class)
@@ -33,7 +39,6 @@ class DoctorApi {
             var doctor: Doctor? = null
             runBlocking {
                 launch {
-                    println("Getting doctor with id: $id")
                     doctor = client.get("$host/doctor?id=$id").body()
                 }
             }
@@ -52,7 +57,6 @@ class DoctorApi {
             var doctor: Doctor? = null
             runBlocking {
                 launch {
-                    println("Getting doctor with email: $email")
                     doctor = client.get("$host/doctor/email?email=$email").body()
                 }
             }
@@ -71,7 +75,6 @@ class DoctorApi {
             var doctors: ArrayList<Doctor>? = null
             runBlocking {
                 launch {
-                    println("Getting all doctors")
                     doctors = client.get("$host/doctor/all").body()
                 }
             }
@@ -90,7 +93,6 @@ class DoctorApi {
             var success = false
             runBlocking {
                 launch {
-                    println("Adding doctor")
                     success = client.post("$host/doctor") {
                         contentType(ContentType.Application.Json)
                         setBody(doctor)
@@ -108,7 +110,6 @@ class DoctorApi {
             var success = false
             runBlocking {
                 launch {
-                    println("Deleting doctor with id: $id")
                     success = client.delete("$host/doctor?id=$id").status.isSuccess()
                 }
             }
@@ -123,8 +124,8 @@ class DoctorApi {
             var success = false
             runBlocking {
                 launch {
-                    println("Updating doctor: $doctor")
-                    success = client.put("$host/doctor?id=${doctor.did}&name=${doctor.name}&email=${doctor.email}").status.isSuccess()
+                    success =
+                        client.put("$host/doctor?id=${doctor.did}&name=${doctor.name}&email=${doctor.email}").status.isSuccess()
                 }
             }
             success
@@ -138,8 +139,8 @@ class DoctorApi {
             var success = false
             runBlocking {
                 launch {
-                    println("Adding patient with id: $pid to doctor with id: $did")
-                    success = client.post("$host/doctor/patient?did=$did&pid=$pid").status.isSuccess()
+                    success =
+                        client.post("$host/doctor/patient?did=$did&pid=$pid").status.isSuccess()
                 }
             }
             success
@@ -153,8 +154,8 @@ class DoctorApi {
             var success = false
             runBlocking {
                 launch {
-                    println("Removing patient with id: $pid from doctor with id: $did")
-                    success = client.delete("$host/doctor/patient?did=$did&pid=$pid").status.isSuccess()
+                    success =
+                        client.delete("$host/doctor/patient?did=$did&pid=$pid").status.isSuccess()
                 }
             }
             success
@@ -168,7 +169,6 @@ class DoctorApi {
             var patients: MutableList<Patient>? = null
             runBlocking {
                 launch {
-                    println("Getting all patients for doctor with id: $did")
                     patients = client.get("$host/doctor/patients?did=$did").body()
                 }
             }

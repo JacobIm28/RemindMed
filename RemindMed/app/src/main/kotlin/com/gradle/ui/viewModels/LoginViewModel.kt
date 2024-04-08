@@ -12,7 +12,7 @@ import com.auth0.android.callback.Callback
 import com.auth0.android.jwt.JWT
 import com.auth0.android.provider.WebAuthProvider
 import com.auth0.android.result.Credentials
-import com.example.remindmed.R
+import com.cs346.remindmed.R
 import com.gradle.apiCalls.DoctorApi
 import com.gradle.apiCalls.PatientApi
 import com.gradle.constants.GlobalObjects
@@ -58,7 +58,6 @@ class LoginViewModel : ViewModel() {
 
                     if (patient.pid != "-1") {
                         user = User(accessToken, patient.name, "patient")
-                        println(user)
                         userIsComplete = true
                         GlobalObjects.patient = patient
                         GlobalObjects.type = "patient"

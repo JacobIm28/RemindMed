@@ -46,7 +46,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.remindmed.R
+import com.cs346.remindmed.R
 import com.gradle.apiCalls.PatientApi
 import com.gradle.constants.GlobalObjects
 import com.gradle.controller.MedicationController

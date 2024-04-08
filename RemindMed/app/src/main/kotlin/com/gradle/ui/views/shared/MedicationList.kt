@@ -30,7 +30,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.example.remindmed.R
+import com.cs346.remindmed.R
 import com.gradle.apiCalls.PatientApi
 import com.gradle.constants.GlobalObjects
 import com.gradle.controller.MedicationController
@@ -67,7 +67,6 @@ fun MedicationListScreen(
     var controller by remember { mutableStateOf(MedicationListController(model)) }
     var name by remember { mutableStateOf("") }
 
-    println("PID: $pid")
     LaunchedEffect(Unit) {
         medications = PatientApi().getMedicines(pid)
         if (GlobalObjects.type == "patient") {
@@ -77,7 +76,6 @@ fun MedicationListScreen(
             if (patientResult.pid != "-1") {
                 patient = patientResult
             }
-            println(patient)
         }
 
         model = MedicationList(medications, patient)
@@ -87,7 +85,6 @@ fun MedicationListScreen(
 
     LaunchedEffect(patient) {
         name = patient.name
-        println("Name: $name")
     }
 
     AppTheme {
@@ -109,10 +106,12 @@ fun MedicationListScreen(
                     .fillMaxWidth()
             ) {
                 TitleLarge("${name.substringBefore(" ")}'s Medication")
-                if(viewModel.medicationList.value.isEmpty()) {
+                if (viewModel.medicationList.value.isEmpty()) {
                     Text(
                         "No Medications Found",
-                        modifier = Modifier.fillMaxSize().wrapContentHeight(),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .wrapContentHeight(),
                         style = androidx.compose.material.MaterialTheme.typography.h6,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
@@ -199,7 +198,6 @@ fun MedicationItem(
                     "Times: ${medication.getFormattedTimes().joinToString(", ")}",
                     style = MaterialTheme.typography.bodyMedium
                 )
-                Text("Notes: ${medication.notes}", style = MaterialTheme.typography.bodyMedium)
             }
 
             Column {

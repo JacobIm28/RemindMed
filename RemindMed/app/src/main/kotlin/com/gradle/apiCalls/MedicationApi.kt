@@ -1,17 +1,18 @@
 package com.gradle.apiCalls
+
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.gradle.models.Medication
-import io.ktor.client.*
+import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.engine.android.*
-import io.ktor.client.request.*
+import io.ktor.client.engine.android.Android
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.get
+import io.ktor.client.statement.bodyAsText
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.statement.bodyAsText
-import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 import java.sql.Date
 import java.sql.Time
@@ -19,7 +20,8 @@ import java.sql.Time
 @OptIn(DelicateCoroutinesApi::class)
 class MedicationApi {
     private val host: String = "https://remindmed-api-nsjyfltjaa-uk.a.run.app"
-    private val nullMedication = Medication("-1", "", "", Date(0), Date(0), "", "", mutableListOf<Time>(), false, false)
+    private val nullMedication =
+        Medication("-1", "", "", Date(0), Date(0), "", "", mutableListOf<Time>(), false, false)
     private val client = HttpClient(Android) {
         install(ContentNegotiation) {
             json(Json {
@@ -35,7 +37,6 @@ class MedicationApi {
             var medication: JsonObject? = null
             runBlocking {
                 launch {
-                    println("Getting medication with id: $id")
                     val response = client.get("$host/medicine?id=$id").bodyAsText()
                     medication = JsonParser.parseString(response).asJsonObject
                 }
@@ -57,7 +58,6 @@ class MedicationApi {
             var medications: MutableList<Pair<String, String>>? = null
             runBlocking {
                 launch {
-                    println("Getting all medications with name: $name")
                     medications = client.get("$host/medicine/all?name=$name").body()
                 }
             }
