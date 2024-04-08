@@ -11,14 +11,20 @@ and more time for doctors to help others.
 [![RemindMed Introduction Video](https://img.youtube.com/vi/6Sh5vcLsh7g/0.jpg)](https://youtu.be/6Sh5vcLsh7g)
 
 ## Developers
-Gen Nishiwaki, gen.nishiwaki@gmail.com  
-Jacob Im, j8im@uwaterloo.ca  
-Jason Zhang, jaszhang6@gmail.com  
-Samir Ali, samirhas49@gmail.com
+Gen Nishiwaki - gen.nishiwaki@gmail.com  
 
-## Documentation
-- Information on how to use our app can be found in our [user documentation](https://git.uwaterloo.ca/s295ali1/team-102-3/-/wikis/User-Documentation)  
-- Information on the deisgn and architecture of our app can be found in our [design documentation](https://git.uwaterloo.ca/s295ali1/team-102-3/-/wikis/Design-Document)
+Jacob Im - j8im@uwaterloo.ca  
+
+Jason Zhang - jaszhang6@gmail.com  
+
+Samir Ali - samirhas49@gmail.com
+
+## Project Documentation
+- User Documentation: Information on how to use our app can be found in our [user documentation](https://git.uwaterloo.ca/s295ali1/team-102-3/-/wikis/User-Documentation)  
+
+- Design Documentation: Information on the deisgn and architecture of our app can be found in our [design documentation](https://git.uwaterloo.ca/s295ali1/team-102-3/-/wikis/Design-Document)
+
+- Reflection: https://git.uwaterloo.ca/s295ali1/team-102-3/-/wikis/Team-Reflection
 
 ## Release Notes
 - [1.0.0](https://git.uwaterloo.ca/s295ali1/team-102-3/-/releases/1.0.0)
