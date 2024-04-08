@@ -119,7 +119,6 @@ fun MedicationEntryScreen(
 
     val showDateBeforeCurrentDateErrorDialog = remember { mutableStateOf(false) }
 
-
     if (showAddMedicationErrorDialog.value) {
         AlertDialog(
             onDismissRequest = { showAddMedicationErrorDialog.value = false },

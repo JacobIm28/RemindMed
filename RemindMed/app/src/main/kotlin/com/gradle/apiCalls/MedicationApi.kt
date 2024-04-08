@@ -32,7 +32,6 @@ class MedicationApi {
 
         }
     }
-
     fun getMedicationbyId(id: String): JsonObject {
         return try {
             var medication: JsonObject? = null
