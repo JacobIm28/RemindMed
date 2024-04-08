@@ -57,7 +57,7 @@ class CalendarDataSource {
         )
     }
 
-    private fun isToday(date: Date): Boolean {
+    fun isToday(date: Date): Boolean {
         val todayDate = today
         return date.toFormattedDateString() == todayDate.toFormattedDateString()
     }
