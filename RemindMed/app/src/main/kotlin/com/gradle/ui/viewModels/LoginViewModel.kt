@@ -58,7 +58,6 @@ class LoginViewModel : ViewModel() {
 
                     if (patient.pid != "-1") {
                         user = User(accessToken, patient.name, "patient")
-                        println(user)
                         userIsComplete = true
                         GlobalObjects.patient = patient
                         GlobalObjects.type = "patient"
