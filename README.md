@@ -7,6 +7,9 @@ their prescriptions with usage details, and then have reminders automatically sc
 As a result, medications can be properly used, leading to improved care for patients,
 and more time for doctors to help others.
 
+# Download
+Download the app on Android [here](https://play.google.com/store/apps/details?id=com.cs346.remindmed&hl=en_GB)!
+
 # Introduction Video
 [![RemindMed Introduction Video](https://img.youtube.com/vi/6Sh5vcLsh7g/0.jpg)](https://youtu.be/6Sh5vcLsh7g)
 
